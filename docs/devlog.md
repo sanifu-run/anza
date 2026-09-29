@@ -26,3 +26,8 @@ GPT-6-Luna implemented T1.1 in an isolated Anza worktree and committed `1072410e
 GPT-6-Luna completed T1.2 and T1.5 in separate Anza worktrees. T1.2 materializes contract v1 revision 2 with strict Go decoders, canonical digests, six JSON schemas and valid/invalid fixtures. Review added explicit null-collection and cross-platform path rejection. Its scoped domain tests/vet pass offline. Current Chat has no Anza setup wrapper fixture; the contract now keeps source-backed parity at T3.6 TestAnzaContractFixture.
 
 T1.5 adds a read-only plan/catalog validator. Its 13 unittest cases and default validation pass; compatibility/content modes report the missing T1.3/T1.4 artifacts as expected. Both tasks are locally accepted and recorded in the execution index. No Chat source, paid calls, deployment or publication changed.
+
+
+## 2026-09-29 - Wave 3 local acceptance
+
+GPT-6-Luna completed T1.3, T1.4 and T2.6 in isolated worktrees. Coordinator reran the compatibility/content validators, all 13 plan-checker unit tests, and the scoped config-editor test/vet; all passed. T1.3 remains documentary-only across 24 platform cells and was reconciled with current official install guidance. T1.4 excludes founder material pending rights permission and records original replacement tasks. T2.6 provides pure JSON/TOML byte planning and drift-aware inverse metadata, with unsupported TOML syntax refused conservatively. Branch commits: T1.3 `b0e08f50df68b065a944b30d62ee637faa915fc9`; T1.4 `9fd0142c59addb9809c2a75e5a2c011362cc6b85`; T2.6 `005dd3aad0b68d3106ac8eaed9df1eab3f18cfcf`. Merged locally to main; no Chat source, user config, paid call, deployment or publication changed. The next prescribed wave is T5.1, T2.2 and T2.1.
