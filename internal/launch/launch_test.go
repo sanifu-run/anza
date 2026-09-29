@@ -81,9 +81,10 @@ func TestSecretChildEnvironment(t *testing.T) {
 		spec.Timeout = 5 * time.Second
 		return process.Run(ctx, spec)
 	}
+	forwarded := []string{"-test.run=TestLaunchChildFixture", "-test.v", "--", "anza-claude-fixture", "literal;$(touch nope)", "--api-key", "synthetic-user-token"}
 	result, err := Launch(context.Background(), Request{
 		Workspace: "workspace-a", Agent: AgentClaude, Choices: choices(AgentClaude, ProviderOpenRouter),
-		Program: os.Args[0], Dir: t.TempDir(), Args: []string{"-test.run=TestLaunchChildFixture", "-test.v", "--", "anza-claude-fixture", "literal;$(touch nope)"},
+		Program: os.Args[0], Dir: t.TempDir(), Args: forwarded,
 		Model: "anthropic/claude-sonnet-4", ClaudeVersion: "2.1.276", ClaudeAuth: claude.AuthNone,
 		Store: store, Runner: fixtureRunner,
 	})
@@ -96,18 +97,18 @@ func TestSecretChildEnvironment(t *testing.T) {
 	if !strings.Contains(result.Execution.Stdout, "OPENROUTER_KEY_ABSENT=1") {
 		t.Fatal("Claude child received an unrelated OpenRouter environment key")
 	}
-	if !strings.Contains(result.Execution.Stdout, "API_EMPTY=1") || !strings.Contains(result.Execution.Stdout, "ARG=literal;$(touch nope)") {
+	if !strings.Contains(result.Execution.Stdout, "API_EMPTY=1") || !strings.Contains(result.Execution.Stdout, "ARG=literal;$(touch nope)") || !strings.Contains(result.Execution.Stdout, "ARG_TOKEN_MATCH=1") {
 		t.Fatalf("child environment or argument forwarding mismatch: %q", result.Execution.Stdout)
 	}
-	if strings.Contains(strings.Join(result.Args, " "), secret) {
-		t.Fatal("secret appeared in argv")
+	if !reflect.DeepEqual(childArgs[2:], forwarded) || result.ArgumentCount != len(childArgs) {
+		t.Fatal("child argument vector was not forwarded intact")
 	}
-	if !reflect.DeepEqual(childArgs, result.Args) {
-		t.Fatal("launch receipt did not preserve the actual argument vector")
+	if strings.Contains(strings.Join(childArgs, " "), secret) {
+		t.Fatal("provider key appeared in argv")
 	}
 	encoded, err := json.Marshal(result)
-	if err != nil || strings.Contains(string(encoded), secret) {
-		t.Fatal("secret appeared in launch receipt")
+	if err != nil || strings.Contains(string(encoded), secret) || strings.Contains(string(encoded), "synthetic-user-token") {
+		t.Fatal("provider key or caller argument appeared in launch receipt")
 	}
 }
 
@@ -116,11 +117,13 @@ func TestCodexOpenRouterChildEnvironment(t *testing.T) {
 	defer assertParentEnvironmentUnchanged(t, parentEnv)
 	store, _ := fixtureStore(t, "workspace-codex", "synthetic-codex-key")
 	home := t.TempDir()
+	var childArgs []string
 	result, err := Launch(context.Background(), Request{
 		Workspace: "workspace-codex", Agent: AgentCodex, Choices: choicesFor("workspace-codex", AgentCodex, ProviderOpenRouter),
 		Program: os.Args[0], Dir: t.TempDir(), Args: []string{"-test.run=TestCodexLaunchChildFixture", "-test.v", "--", "anza-codex-fixture", home},
 		Model: "openai/gpt-5", CodexVersion: "0.157.1", CodexHome: home,
 		Store: store, Runner: func(ctx context.Context, spec process.Spec) (process.Result, error) {
+			childArgs = append([]string(nil), spec.Args...)
 			spec.Timeout = 5 * time.Second
 			return process.Run(ctx, spec)
 		},
@@ -131,7 +134,7 @@ func TestCodexOpenRouterChildEnvironment(t *testing.T) {
 	if !strings.Contains(result.Execution.Stdout, "CODEX_MATCH=1") {
 		t.Fatalf("Codex child did not receive its workspace OpenRouter environment: %+v", result.Execution)
 	}
-	if strings.Contains(strings.Join(result.Args, " "), "synthetic-codex-key") {
+	if strings.Contains(strings.Join(childArgs, " "), "synthetic-codex-key") {
 		t.Fatal("OpenRouter key appeared in Codex arguments")
 	}
 	encoded, err := json.Marshal(result)
@@ -184,9 +187,12 @@ func TestLaunchChildFixture(t *testing.T) {
 	if _, exists := os.LookupEnv("OPENROUTER_API_KEY"); !exists {
 		_, _ = os.Stdout.WriteString("OPENROUTER_KEY_ABSENT=1\n")
 	}
-	for _, arg := range os.Args {
+	for i, arg := range os.Args {
 		if arg == "literal;$(touch nope)" {
 			_, _ = os.Stdout.WriteString("ARG=" + arg + "\n")
+		}
+		if arg == "--api-key" && i+1 < len(os.Args) && os.Args[i+1] == "synthetic-user-token" {
+			_, _ = os.Stdout.WriteString("ARG_TOKEN_MATCH=1\n")
 		}
 	}
 }
@@ -210,7 +216,7 @@ func TestNativeLoginCancellation(t *testing.T) {
 func TestAgentArgumentForwarding(t *testing.T) {
 	want := []string{"-p", "literal;$(echo safe)", "--", "value"}
 	var got process.Spec
-	_, err := Launch(context.Background(), Request{
+	launchResult, err := Launch(context.Background(), Request{
 		Workspace: "workspace-a", Agent: AgentClaude, Choices: choices(AgentClaude, ProviderSubscription),
 		Program: "fixture", ClaudeVersion: "2.1.276", Args: want,
 		Runner: func(_ context.Context, spec process.Spec) (process.Result, error) {
@@ -223,6 +229,9 @@ func TestAgentArgumentForwarding(t *testing.T) {
 	}
 	if !reflect.DeepEqual(got.Args, want) {
 		t.Fatalf("args = %#v; want %#v", got.Args, want)
+	}
+	if launchResult.ArgumentCount != len(want) {
+		t.Fatalf("argument count = %d; want %d", launchResult.ArgumentCount, len(want))
 	}
 }
 
