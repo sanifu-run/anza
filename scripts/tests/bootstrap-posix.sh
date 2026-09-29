@@ -9,6 +9,7 @@ mkdir -p "$tmp/tools" "$tmp/home with spaces"
 python=${PYTHON:-python3}
 cat >"$tmp/server.py" <<'PY'
 import hashlib, http.server, json, os, socketserver
+import ssl, threading
 payload = b'#!/bin/sh\nprintf "called\\n" >> "$ANZA_CALL_LOG"\n'
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -21,6 +22,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 'linux-amd64':{'url':f'http://{host}/artifact','sha256':hashlib.sha256(payload).hexdigest()},
                 'linux-arm64':{'url':f'http://{host}/artifact','sha256':hashlib.sha256(payload).hexdigest()}}}).encode()
             self.send_response(200); self.send_header('Content-Length',str(len(body))); self.end_headers(); self.wfile.write(body)
+        elif self.path == '/downgrade':
+            self.send_response(302); self.send_header('Location',f"http://127.0.0.1:{os.environ['HTTP_PORT']}/artifact"); self.end_headers()
         elif self.path == '/artifact':
             body = b'#!/bin/sh\nexit 9\n' if case=='bad-artifact' else payload
             self.send_response(200); self.send_header('Content-Length',str(len(body)+50 if case=='interrupted' else len(body))); self.end_headers()
@@ -30,14 +33,23 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self,*args): pass
 class Server(socketserver.TCPServer): allow_reuse_address=True
 with Server(('127.0.0.1',0),Handler) as server:
-    open(os.environ['PORT_FILE'],'w').write(str(server.server_address[1]))
-    server.serve_forever()
+    os.environ['HTTP_PORT']=str(server.server_address[1])
+    context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(os.environ['TLS_CERT'],os.environ['TLS_KEY'])
+    with Server(('127.0.0.1',0),Handler) as tls_server:
+        tls_server.socket=context.wrap_socket(tls_server.socket,server_side=True)
+        open(os.environ['PORT_FILE'],'w').write(str(server.server_address[1]))
+        open(os.environ['TLS_PORT_FILE'],'w').write(str(tls_server.server_address[1]))
+        threading.Thread(target=tls_server.serve_forever,daemon=True).start()
+        server.serve_forever()
 PY
 
 portfile=$tmp/port
+tlsportfile=$tmp/tlsport
 casefile=$tmp/case
-PORT_FILE=$portfile CASE_FILE=$casefile "$python" "$tmp/server.py" >/dev/null 2>&1 & server_pid=$!
-i=0; while [ ! -s "$portfile" ]; do i=$((i+1)); [ "$i" -lt 100 ] || { echo 'fixture server did not start' >&2; exit 1; }; sleep 0.05; done
+openssl req -x509 -newkey rsa:2048 -nodes -keyout "$tmp/tls.key" -out "$tmp/tls.crt" -days 1 -subj '/CN=localhost' -addext 'subjectAltName=DNS:localhost' >/dev/null 2>&1
+PORT_FILE=$portfile TLS_PORT_FILE=$tlsportfile CASE_FILE=$casefile TLS_CERT=$tmp/tls.crt TLS_KEY=$tmp/tls.key "$python" "$tmp/server.py" >/dev/null 2>&1 & server_pid=$!
+i=0; while [ ! -s "$portfile" ] || [ ! -s "$tlsportfile" ]; do i=$((i+1)); [ "$i" -lt 100 ] || { echo 'fixture server did not start' >&2; exit 1; }; sleep 0.05; done
 base=http://127.0.0.1:$(cat "$portfile")
 
 # Build a controlled PATH. Missing-tool cases omit exactly one required tool.
@@ -54,6 +66,12 @@ case $1 in
 esac
 EOF
 chmod +x "$tmp/tools/uname"
+cat >"$tmp/tools/wget" <<EOF
+#!/bin/sh
+printf used >"$tmp/wget-used"
+exit 0
+EOF
+chmod +x "$tmp/tools/wget"
 hash=$(curl -fsS "$base/manifest.json" | shasum -a 256 | awk '{print $1}')
 calls=$tmp/calls
 run() {
@@ -106,12 +124,22 @@ rm -f "$dest"
 # Missing fetch and digest tools fail before downloads. Keep core commands.
 mv "$tmp/tools/curl" "$tmp/tools/curl.disabled"
 check_fail missing_fetch_tool run
+[ ! -e "$tmp/wget-used" ] || { echo 'FAIL: installer fell back to wget' >&2; exit 1; }
 mv "$tmp/tools/curl.disabled" "$tmp/tools/curl"
 mv "$tmp/tools/shasum" "$tmp/tools/shasum.disabled"
 mv "$tmp/tools/sha256sum" "$tmp/tools/sha256sum.disabled"
 check_fail missing_hash_tool run
 mv "$tmp/tools/shasum.disabled" "$tmp/tools/shasum"
 mv "$tmp/tools/sha256sum.disabled" "$tmp/tools/sha256sum"
+
+# Exercise curl's production redirect policy against a trusted local HTTPS
+# endpoint that redirects to HTTP. The downgrade must be rejected.
+tlsport=$(cat "$tlsportfile")
+if curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+  --cacert "$tmp/tls.crt" "https://localhost:$tlsport/downgrade" -o "$tmp/downgrade.out" 2>"$tmp/downgrade.err"; then
+  echo 'FAIL: HTTPS-to-HTTP redirect was followed' >&2; exit 1
+fi
+case $(cat "$tmp/downgrade.err") in *redirect*|*protocol*) pass=$((pass+1)) ;; *) echo 'FAIL: curl downgrade rejection unclear' >&2; cat "$tmp/downgrade.err" >&2; exit 1 ;; esac
 
 # Verified artifact installs to the spaced path. A piped run must not invoke
 # the wizard; a controlling-tty run must invoke it exactly once.

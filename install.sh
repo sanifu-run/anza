@@ -23,20 +23,13 @@ arch=$(uname -m 2>/dev/null) || fail 'cannot detect architecture'
 case $os in Darwin) target_os=darwin ;; Linux) target_os=linux ;; *) fail "unsupported operating system: $os" ;; esac
 case $arch in x86_64|amd64) target_arch=amd64 ;; arm64|aarch64) target_arch=arm64 ;; *) fail "unsupported architecture: $arch" ;; esac
 
-if command -v curl >/dev/null 2>&1; then
-  if [ "${ANZA_BOOTSTRAP_TESTING:-}" = 1 ]; then
-    fetch() { curl --fail --silent --show-error --location --proto '=http,https' --proto-redir '=http,https' "$1" -o "$2"; }
-  else
-    fetch() { curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' "$1" -o "$2"; }
-  fi
-elif command -v wget >/dev/null 2>&1; then
-  if [ "${ANZA_BOOTSTRAP_TESTING:-}" = 1 ]; then
-    fetch() { wget -q -O "$2" "$1"; }
-  else
-    fetch() { wget --https-only -q -O "$2" "$1"; }
-  fi
+if ! command -v curl >/dev/null 2>&1; then
+  fail 'curl is required'
+fi
+if [ "${ANZA_BOOTSTRAP_TESTING:-}" = 1 ]; then
+  fetch() { curl --fail --silent --show-error --location --proto '=http,https' --proto-redir '=http,https' "$1" -o "$2"; }
 else
-  fail 'curl or wget is required'
+  fetch() { curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' "$1" -o "$2"; }
 fi
 if command -v sha256sum >/dev/null 2>&1; then
   digest() { sha256sum "$1" | awk '{print $1}'; }
