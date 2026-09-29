@@ -283,6 +283,8 @@ Tests are planned for every implementation, API route and negative boundary. Anz
 
 Wave 1: GPT-6-Luna completed T1.1 on isolated branch task/T1.1 as commit 1072410e29613a73936def25021d3402a648cef4. The coordinator reviewed and fast-forward integrated it, then reran `go test ./cmd/anza -count=1` (3 tests) and `go vet ./cmd/anza` with temporary HOME/cache and module lookup disabled; both passed. Red/green and disabled-behavior evidence is in [T1.1 evidence](evidence/T1.1.md). No Chat files, paid calls, or publication changed.
 
+Before Wave 2, amended T1.5 acceptance to preserve the newly reviewed T1.1 certification while leaving unexecuted rows `not_run`; the validator must never rewrite plan execution status.
+
 ## Hand off Notes
 
 T1.1 is locally implemented and reviewed. Resume with Wave 2 tasks T1.2 and T1.5 after the accepted T1.1 dependency is integrated. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.

@@ -181,7 +181,7 @@
       ],
       "acceptance": [
         "Broken dependency, duplicate task, missing contract and overlapping concurrent output each fail with IDs.",
-        "The unmodified planning artifact passes structural checks while retaining certification=not_run.",
+        "The current planning artifact passes structural checks while preserving coordinator certification: T1.1 remains locally accepted and unexecuted tasks remain not_run; validation never rewrites certification.",
         "Compatibility/content modes reject missing source dates and unclassified entries."
       ],
       "test_cases": [
