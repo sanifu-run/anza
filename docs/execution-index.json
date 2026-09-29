@@ -966,7 +966,7 @@
       ],
       "steps": [
         "Implement catalog loading from an injected fs.FS, checksums, unique IDs, supported platform predicates and dependency cycle validation. Test with real temporary catalog fixtures; production embedding is T5.7.",
-        "Validate each recipe/pack/exercise against v1 fields and provenance; references must resolve. Missing optional domain recipes remain unsupported until added.",
+        "Validate recipe and pack entries against their v1 schemas and provenance; references must resolve. v1 defines no Exercise type/schema, so reject exercise entries explicitly and defer that content until a versioned schema is authored. Missing optional domain recipes remain unsupported until added.",
         "Expose read-only catalog interfaces for server/planner without runtime network fetch. Produce initial manifest metadata; T5.7 seals its inventory after content workers finish."
       ],
       "acceptance": [
