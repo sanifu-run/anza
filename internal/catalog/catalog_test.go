@@ -129,6 +129,10 @@ func mapFiles(values map[string]string) map[string]*fstest.MapFile {
 	}
 	return out
 }
+func exerciseJSON(id string) string {
+	return fmt.Sprintf(`{"schema_version":1,"id":%q,"version":"1.0.0","description":"Manual or unsupported project guidance.","scenarios":[{"id":"ios-linux","project_kind":"ios","supported_platforms":["linux-amd64"],"status":"unsupported","summary":"Native iOS builds require a macOS host.","manual_steps":["Choose a macOS host before planning native iOS work."],"missing_capability_ids":["macos-build-host"],"readiness_constraints":["No SDK or device provisioning is performed."],"verification":"Confirm the selected host is macOS."}]}`, id)
+}
+
 func recipeJSON(id string) string { return recipeJSONWithPrereq(id) }
 func recipeJSONWithPrereq(id string, prereq ...string) string {
 	return fmt.Sprintf(`{"id":%q,"version":"1.0.0","description":"A tool","purpose":"Build projects","supported_platforms":["linux-amd64"],"prerequisites":%s,"detection":"tool --version","install_strategy":"manual","artifact":{"digest":"manual","size":0,"origin":"https://example.invalid/source"},"privileges":[],"license_notes":"MIT","estimated_download_bytes":0,"side_effects":[],"verification":"tool --version","reversal_class":"manual"}`, id, jsonArray(prereq))
@@ -166,11 +170,46 @@ func TestMissingRecipeLicenseOrSource(t *testing.T) {
 	}
 }
 
-func TestUnsupportedExerciseDeferred(t *testing.T) {
-	files := map[string]string{"exercise.json": `{}`}
-	files["manifest.json"] = manifestFor(t, []Entry{{Kind: "exercise", ID: "demo", Path: "exercise.json", SHA256: digest("{}"), ProvenanceIDs: []string{"p"}}}, []Provenance{{ID: "p", Source: "fixture", License: "MIT"}})
+func TestCatalogExerciseLoadsManualAndUnsupportedScenarios(t *testing.T) {
+	data := exerciseJSON("mobile-desktop")
+	files := map[string]string{"exercises/mobile-desktop.json": data}
+	files["manifest.json"] = manifestFor(t, []Entry{{Kind: "exercise", ID: "mobile-desktop", Path: "exercises/mobile-desktop.json", SHA256: digest(data), ProvenanceIDs: []string{"p"}}}, []Provenance{{ID: "p", Source: "fixture", License: "Anza-authored"}})
+	cat, err := Load(fstest.MapFS(mapFiles(files)))
+	if err != nil {
+		t.Fatalf("Load(versioned exercise): %v", err)
+	}
+	got, ok := cat.Exercise("mobile-desktop")
+	if !ok || got.SchemaVersion != 1 || len(got.Scenarios) != 1 || got.Scenarios[0].Status != "unsupported" {
+		t.Fatalf("exercise did not resolve as unsupported scenario: %+v, %v", got, ok)
+	}
+	got.Scenarios[0].ManualSteps[0] = "mutated"
+	got.Scenarios[0].MissingCapabilityIDs[0] = "mutated-capability"
+	second, _ := cat.Exercise("mobile-desktop")
+	if second.Scenarios[0].ManualSteps[0] == "mutated" || second.Scenarios[0].MissingCapabilityIDs[0] == "mutated-capability" {
+		t.Fatal("caller mutation changed catalog exercise")
+	}
+}
+
+func TestCatalogRejectsExerciseWithUnknownPlatform(t *testing.T) {
+	data := strings.Replace(exerciseJSON("mobile-desktop"), `"linux-amd64"`, `"linux-imaginary-amd64"`, 1)
+	files := map[string]string{"exercises/mobile-desktop.json": data}
+	files["manifest.json"] = manifestFor(t, []Entry{{Kind: "exercise", ID: "mobile-desktop", Path: "exercises/mobile-desktop.json", SHA256: digest(data), ProvenanceIDs: []string{"p"}}}, []Provenance{{ID: "p", Source: "fixture", License: "Anza-authored"}})
 	if _, err := Load(fstest.MapFS(mapFiles(files))); err == nil {
-		t.Fatal("exercise accepted without a versioned contract schema")
+		t.Fatal("exercise with unknown platform predicate accepted")
+	}
+}
+
+func TestCatalogLoadsArtifactlessManualRecipe(t *testing.T) {
+	data := `{"id":"git-manual","version":"2.56","description":"Manual Git guidance","purpose":"Retain or select an existing system Git","supported_platforms":["linux-amd64"],"prerequisites":[],"detection":"Check the current Git version without changing it.","install_strategy":"manual","privileges":[],"license_notes":"Follow the system package's license notices.","estimated_download_bytes":0,"side_effects":[],"verification":"Verify the selected Git version.","reversal_class":"manual"}`
+	files := map[string]string{"recipes/git-manual.json": data}
+	files["manifest.json"] = manifestFor(t, []Entry{{Kind: "recipe", ID: "git-manual", Path: "recipes/git-manual.json", SHA256: digest(data), ProvenanceIDs: []string{"p"}}}, []Provenance{{ID: "p", Source: "git documentation", License: "GPL-2.0-or-later"}})
+	cat, err := Load(fstest.MapFS(mapFiles(files)))
+	if err != nil {
+		t.Fatalf("Load(artifactless manual recipe): %v", err)
+	}
+	got, ok := cat.Recipe("git-manual")
+	if !ok || got.Artifact != nil {
+		t.Fatalf("artifactless manual recipe not preserved: %+v, %v", got, ok)
 	}
 }
 

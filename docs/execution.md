@@ -1,10 +1,10 @@
 # GPT-6-Luna execution handbook
 
-Status: instructions for future execution. No worker, build, paid API call or release has been run as part of this planning request.
+Status: active execution handbook. Local workers and builds are recorded in docs/devlog.md; paid API calls, releases and publication remain separately gated.
 
 ## 1. Coordinator preflight
 
-1. Read applicable AGENTS.md, plan.md, design.md, contract v1 revision 2, ADR 006, execution-index.json, roadmap.md, and ajent.social where present. Each task has a repository field: anza or chat. Paths/commands are relative to that assigned worktree, never the coordinator cwd. Existing Sanifu vision/intake work is peer-owned. Reconcile the chat owner's uncommitted contact-intake changes before taking an isolated baseline; never overwrite its live main.go or privacy draft.
+1. Read applicable AGENTS.md, plan.md, design.md, contract v1 (current revision), ADR 006, execution-index.json, roadmap.md, and ajent.social where present. Each task has a repository field: anza or chat. Paths/commands are relative to that assigned worktree, never the coordinator cwd. Existing Sanifu vision/intake work is peer-owned. Reconcile the chat owner's uncommitted contact-intake changes before taking an isolated baseline; never overwrite its live main.go or privacy draft.
 2. Inspect status/remotes, live process working directories, claims and current dependency artifacts. Preserve unrelated files. This public repository ignores ajent.social and local scratch state.
 3. Create the initial local planning commit only after reviewing exact file selection; do not stage concurrent/unrelated work. An empty repository has no base commit for worktrees. A commit does not imply permission to publish. Establish one integration owner and an isolated worktree/branch per implementation task in its declared repository. Chat already has history; Anza needs its initial local planning commit. Never copy the private chat repository into the public Anza tree.
 4. Use the shared claim skill for the task and shared plan resource. Check the literal WON response, retain its SHA and release only that claim by compare-and-swap. The planning attempt failed due native Git identity resolution; do not assume a lock exists. If remote claims remain unavailable, one coordinator may serialize shared writes and use disjoint task outputs as the documented headless-session fallback. Record this limitation; do not pretend it protects against unrelated remote workers.
@@ -19,7 +19,7 @@ Give one worker exactly one task at a time:
 ```text
 You are executing task <ID> in an isolated Anza worktree.
 Read the assigned repository AGENTS.md and the coordinator-supplied Anza
-master task docs/tasks/<ID>.md, contracts/v1.md revision 2, design.md,
+master task docs/tasks/<ID>.md, contracts/v1.md (current revision), design.md,
 execution.md and ADR 006. Chat worktrees do not contain the master plan;
 receive the exact task/context packet rather than guessing sibling paths.
 Target model: GPT-6-Luna. Do not spawn additional agents.

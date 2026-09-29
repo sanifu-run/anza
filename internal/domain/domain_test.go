@@ -138,6 +138,8 @@ func reencodeFixture(kind string, data []byte) ([]byte, error) {
 		value, err = DecodeRecommendation(data)
 	case "recipe":
 		value, err = DecodeRecipe(data)
+	case "exercise":
+		value, err = DecodeExercise(data)
 	case "pack":
 		value, err = DecodePack(data)
 	case "plan":
@@ -155,4 +157,39 @@ func reencodeFixture(kind string, data []byte) ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(value)
+}
+
+func TestManualRecipeMayOmitArtifact(t *testing.T) {
+	data := []byte(`{"id":"git","version":"2.56","description":"Git manual guidance","purpose":"Use the system Git installation","supported_platforms":["linux-amd64"],"prerequisites":[],"detection":"Check the current Git version without changing it.","install_strategy":"manual","privileges":[],"license_notes":"Use the vendor or OS package license notices.","estimated_download_bytes":0,"side_effects":[],"verification":"Verify the selected Git version.","reversal_class":"manual"}`)
+	got, err := DecodeRecipe(data)
+	if err != nil {
+		t.Fatalf("DecodeRecipe(manual without artifact): %v", err)
+	}
+	if got.Artifact != nil || got.EstimatedDownloadBytes != 0 {
+		t.Fatalf("artifact-less manual recipe retained artifact metadata: %+v", got)
+	}
+}
+
+func TestManualRecipeArtifactPolicy(t *testing.T) {
+	base := `{"id":"tool","version":"1","description":"Tool","purpose":"Use tool","supported_platforms":["linux-amd64"],"prerequisites":[],"detection":"Check version","install_strategy":"manual","artifact":{"digest":"not-a-digest","size":1,"origin":"https://example.invalid/tool"},"privileges":[],"license_notes":"License","estimated_download_bytes":0,"side_effects":[],"verification":"Check version","reversal_class":"manual"}`
+	if _, err := DecodeRecipe([]byte(base)); err != nil {
+		t.Fatalf("manual artifact metadata remains allowed for descriptive legacy recipes: %v", err)
+	}
+	noArtifactAutomated := strings.Replace(base, `,"artifact":{"digest":"not-a-digest","size":1,"origin":"https://example.invalid/tool"}`, "", 1)
+	noArtifactAutomated = strings.Replace(noArtifactAutomated, `"install_strategy":"manual"`, `"install_strategy":"verified_archive"`, 1)
+	if _, err := DecodeRecipe([]byte(noArtifactAutomated)); err == nil {
+		t.Fatal("automated recipe without artifact was accepted")
+	}
+	noEstimate := strings.Replace(base, `"estimated_download_bytes":0`, `"estimated_download_bytes":1`, 1)
+	noEstimate = strings.Replace(noEstimate, `,"artifact":{"digest":"not-a-digest","size":1,"origin":"https://example.invalid/tool"}`, "", 1)
+	if _, err := DecodeRecipe([]byte(noEstimate)); err == nil {
+		t.Fatal("artifact-less manual recipe with nonzero download estimate was accepted")
+	}
+}
+
+func TestExerciseRejectsOverlappingScenarios(t *testing.T) {
+	data := []byte(`{"schema_version":1,"id":"mobile-desktop","version":"1","description":"Manual guidance","scenarios":[{"id":"ios-one","project_kind":"ios","supported_platforms":["linux-amd64"],"status":"unsupported","summary":"Requires macOS.","manual_steps":["Use a macOS host."],"missing_capability_ids":["macos-build-host"],"readiness_constraints":[],"verification":"Confirm the host."},{"id":"ios-two","project_kind":"ios","supported_platforms":["linux-amd64"],"status":"manual","summary":"Another result.","manual_steps":["Review requirements."],"missing_capability_ids":[],"readiness_constraints":[],"verification":"Confirm requirements."}]}`)
+	if _, err := DecodeExercise(data); err == nil {
+		t.Fatal("overlapping project-kind/platform scenarios were accepted")
+	}
 }

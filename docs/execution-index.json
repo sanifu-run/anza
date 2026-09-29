@@ -68,7 +68,7 @@
         "UC-009"
       ],
       "steps": [
-        "Materialize docs/contracts/v1.md revision 2 into Go value types and JSON schemas. Include existing chat camelCase envelopes plus the Anza snake_case domain payloads. Record fixtures and explicit field mapping in schema-decisions.md.",
+        "Materialize the then-current docs/contracts/v1.md revision into Go value types and JSON schemas. Include existing chat camelCase envelopes plus the Anza snake_case domain payloads. Record fixtures and explicit field mapping in schema-decisions.md.",
         "Implement strict new-domain decoding, duplicate-key rejection, canonical digests and useful field errors. Legacy chat response extension fields are tolerated only by the documented response decoder policy.",
         "Create valid/invalid fixtures for each type, including Unicode, oversized data, unknown fields, integer overflow and recipe IDs. Test the planned camelCase wrapper and snake_case payload against contract fixtures. Read current chat fixtures read-only; document setup fields not yet present and defer source-backed parity to T3.6 TestAnzaContractFixture. Do not add chat-owned files from this Anza task."
       ],
@@ -966,7 +966,7 @@
       ],
       "steps": [
         "Implement catalog loading from an injected fs.FS, checksums, unique IDs, supported platform predicates and dependency cycle validation. Test with real temporary catalog fixtures; production embedding is T5.7.",
-        "Validate recipe and pack entries against their v1 schemas and provenance; references must resolve. v1 defines no Exercise type/schema, so reject exercise entries explicitly and defer that content until a versioned schema is authored. Missing optional domain recipes remain unsupported until added.",
+        "Validate recipe, pack and versioned Exercise entries against their schemas and provenance; references must resolve. Manual recipes may omit artifact metadata only under the coordinator-approved zero-download rule. Missing optional domain recipes remain unsupported until added.",
         "Expose read-only catalog interfaces for server/planner without runtime network fetch. Produce initial manifest metadata; T5.7 seals its inventory after content workers finish."
       ],
       "acceptance": [
@@ -1046,7 +1046,7 @@
       ],
       "steps": [
         "Encode Codex CLI, Claude Code and Git as separate single-object recipes; a recipe file is one Recipe, never a bundle. Use a base pack that selects those distinct recipe IDs. Ground each method in reviewed compatibility evidence, with exact detection/verification and privilege disclosures.",
-        "Prefer verified per-user artifact installation where qualified; vendor scripts/package-manager methods must disclose bootstrap trust and remain explicitly reviewed. Documented-only or unqualified targets stay manual/unavailable; never invent artifact sentinels, digests or sizes.",
+        "Prefer verified per-user artifact installation where qualified; vendor scripts/package-manager methods must disclose bootstrap trust and remain explicitly reviewed. Artifact metadata may be omitted only for manual strategy with zero estimated bytes; all automated strategies require real artifact metadata, never sentinels or invented values.",
         "Set existing installations to preserve/use if compatible; require a separate reviewed upgrade when incompatible. Mark SDK/license/OS-owned dependencies manual."
       ],
       "acceptance": [
@@ -1167,7 +1167,7 @@
       "steps": [
         "Encode platform prerequisites for iOS, Android and desktop projects, distinguishing automatically installable components from manual SDK/store/license/device steps.",
         "For any unmodeled domain preserve project goal and return a useful manual recommendation with missing capability IDs; never narrow the interview to only shipped packs.",
-        "Record architecture/storage/reboot constraints for SDKs and prohibit automatic license acceptance or device provisioning."
+        "Record architecture/storage/reboot constraints for SDKs and prohibit automatic license acceptance or device provisioning. Exercise scenarios provide plain-language manual/unsupported guidance keyed by project kind and platform, list missing capability IDs, and contain no executable commands, URLs or paths."
       ],
       "acceptance": [
         "iOS on Windows/Linux produces a macOS requirement, not a fake successful install.",
@@ -1214,13 +1214,13 @@
         "Implement root catalog package embedding the named data directories; internal/catalog loads that embedded filesystem. Do not attempt a go:embed path containing parent-directory traversal.",
         "Generate a sorted manifest of content files/digests/provenance references and catalog version from reviewed assets. Exclude Go files and local state; generator --check is read-only.",
         "Run complete reference/recipe/license/platform validation against bundled content and freeze a digest for service/CLI interoperability.",
-        "Generate a sanitized setup recommendation catalog artifact containing IDs, purposes, platform constraints and content version/digest only. The chat contract owner copies/pins it at build time; no executable commands/download URLs or private module dependency cross that boundary. Keep Exercise entries absent and fail closed until a versioned Exercise schema and loader validator are added; selected_exercise_id remains empty for this catalog version."
+        "Generate a sanitized setup recommendation catalog artifact containing IDs, purposes, platform constraints and content version/digest only. The chat contract owner copies/pins it at build time; no executable commands/download URLs or private module dependency cross that boundary. Include Exercise entries only after schema v1 and loader validation; preserve manual/unsupported scenarios and expose no executable steps."
       ],
       "acceptance": [
         "Production CLI/service use the same immutable bundled catalog digest.",
         "Missing asset, stale manifest, duplicate ID, unlicensed content or unknown dependency fails qualification.",
         "Regeneration is deterministic and contains no machine-specific paths.",
-        "Exercise descriptors are not embedded or advertised until their versioned schema and loader validation exist."
+        "Exercise descriptors are embedded and advertised only after strict versioned schema/loader validation; manual/unsupported status is preserved."
       ],
       "test_cases": [
         "TestBundledCatalog",
