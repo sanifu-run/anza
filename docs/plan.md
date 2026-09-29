@@ -49,7 +49,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E3](plans/E3.md).
 
-### E4 -- Participant interview and review experience -> docs/plans/E4.md (0/4)
+### E4 -- Participant interview and review experience -> docs/plans/E4.md (1/4)
 
 [Open E4](plans/E4.md).
 
@@ -164,7 +164,7 @@ The table below is a conservative executable schedule: complete review/integrati
 ### Wave 8: Dispatch (3 workers)
 
 - [x] T6.3 Implement Claude Code configuration adapter
-- [ ] T4.4 Implement exact-plan review and digest approval
+- [x] T4.4 Implement exact-plan review and digest approval
 - [ ] T2.5 Implement OS credential storage and session-only fallback
 
 ### Wave 9: Dispatch (3 workers)
