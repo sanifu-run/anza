@@ -1084,7 +1084,7 @@
       ],
       "steps": [
         "Define Node-based web capabilities with one recipe per exact platform artifact. Pin versions and record vendor-published SHA-256, exact byte size, origin and license. If integrity or exact size is unavailable, omit an automated recipe and leave that capability manual/optional.",
-        "Keep editor, GitHub CLI and browser tooling optional; select by project facts, not all-at-once defaults. Playwright is not ready without its version-matched browser payloads and system dependencies. Recipes describe one supported platform each; packs do not list mutually exclusive per-platform recipes as unconditional prerequisites. The client selects a matching recipe from supported_platforms.",
+        "Keep editor, GitHub CLI and browser tooling optional; select by project facts, not all-at-once defaults. Playwright is not ready without its version-matched browser payloads and system dependencies. Recipes describe one supported platform each; packs do not list mutually exclusive per-platform recipes as unconditional prerequisites. The client selects a matching recipe from supported_platforms. Where the coarse predicate cannot represent an OS/kernel floor, mark the recipe manual and state the floor in detection/verification; unknown OS-version facts never mean ready.",
         "Defer exercise descriptors until a versioned Exercise schema exists. Existing project package scripts require preview and separate execution consent."
       ],
       "acceptance": [
@@ -1123,7 +1123,7 @@
         "UC-011"
       ],
       "steps": [
-        "Define per-project Python environments and Go tooling with one recipe per exact platform artifact. Pin versions and record vendor-published SHA-256, exact byte size, source and license; if integrity or exact size is unavailable, omit an automated recipe and leave the capability manual. Preserve existing interpreter/module versions.",
+        "Define per-project Python environments and Go tooling with one recipe per exact platform artifact. Pin versions and record vendor-published SHA-256, exact byte size, source and license; if integrity or exact size is unavailable, omit an automated recipe and leave the capability manual. Preserve existing interpreter/module versions. Where the coarse platform predicate cannot represent an OS/kernel floor, mark the recipe manual and state the floor in detection/verification; unknown OS-version facts never mean ready.",
         "Separate CPU readiness from optional GPU/CUDA/remote-compute requirements. Zerfoo is optional where fit is established, never a universal ML requirement; no cloud/GPU resources are allocated. Packs must not encode mutually exclusive platform recipes as unconditional prerequisites; clients select a recipe using its supported_platforms. If no reviewed GPU capability exists, a GPU-required project remains manual/unmet.",
         "Defer exercise descriptors until a versioned Exercise schema exists. Do not download datasets or execute project scripts; any later existing-project check requires participant approval."
       ],
