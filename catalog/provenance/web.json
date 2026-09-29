@@ -1,0 +1,32 @@
+[
+  {
+    "id": "nodejs-v24.21.0",
+    "source": "https://nodejs.org/en/download/archive/v24.21.0 (release files and signed SHASUMS256.txt.asc; retrieved 2026-09-28)",
+    "license": "MIT; Node.js README notes bundled external components have separate license terms; retain distribution notices."
+  },
+  {
+    "id": "nodejs-platform-support",
+    "source": "https://github.com/nodejs/node/blob/v24.21.0/BUILDING.md (supported platform floors; retrieved 2026-09-28)",
+    "license": "MIT (Node.js project source; this entry records platform documentation only)."
+  },
+  {
+    "id": "playwright-v1.63.0-package",
+    "source": "https://github.com/microsoft/playwright/blob/v1.63.0/packages/playwright/package.json (version 1.63.0, Node >=20, Apache-2.0; retrieved 2026-09-28)",
+    "license": "Apache-2.0; package metadata only, no Playwright package or browser artifact is included."
+  },
+  {
+    "id": "playwright-browser-requirements",
+    "source": "https://playwright.dev/docs/intro and https://playwright.dev/docs/browsers (platform requirements, matched browser payloads and system dependencies; retrieved 2026-09-28); https://github.com/microsoft/playwright/blob/v1.63.0/LICENSE",
+    "license": "Apache-2.0 (version-pinned upstream repository license); documentation is referenced but not copied or redistributed."
+  },
+  {
+    "id": "nodejs-mit",
+    "source": "https://github.com/nodejs/node/blob/v24.21.0/LICENSE (Node.js license; retrieved 2026-09-28)",
+    "license": "MIT; bundled external components retain their separate license terms."
+  },
+  {
+    "id": "playwright-apache-2.0",
+    "source": "https://github.com/microsoft/playwright/blob/v1.63.0/packages/playwright/package.json (license field; retrieved 2026-09-28)",
+    "license": "Apache-2.0; package metadata only, no package content distributed."
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "id": "node-24-linux-debian-13-amd64",
+  "version": "24.21.0",
+  "description": "Node.js 24.21.0 runtime archive for Debian 13 amd64; exact vendor artifact pinned for local web development.",
+  "purpose": "Provide a reproducible Node.js runtime for project-selected web development tasks.",
+  "supported_platforms": [
+    "linux-debian-13-amd64"
+  ],
+  "prerequisites": [],
+  "detection": "Manual eligibility check: confirm Debian 13 amd64, the vendor floor (Linux kernel >= 4.18 and glibc >= 2.28 on a vendor-supported, non-EOL distribution; current platform facts do not expose kernel/libc versions.), and that the OS release is still vendor-supported. Version/kernel/libc qualification is not available in MachineFacts for this platform cell; unknown never qualifies.",
+  "install_strategy": "manual",
+  "artifact": {
+    "digest": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+    "size": 31890184,
+    "origin": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz"
+  },
+  "privileges": [
+    "user"
+  ],
+  "license_notes": "Node.js is MIT-licensed. The upstream distribution contains third-party components with separate license terms; retain and review all included notices. This recipe does not redistribute the archive.",
+  "estimated_download_bytes": 31890184,
+  "side_effects": [
+    "Manual download and extraction into an Anza-managed, user-writable runtime location; no global PATH or project-file mutation is specified."
+  ],
+  "verification": "Before use, verify the signed SHASUMS256.txt.asc with the official Node.js release keyring using gpgv, then compare this artifact SHA-256; confirm node --version reports v24.21.0. The source signature and downloaded artifact were not locally verified in this task.",
+  "reversal_class": "manual"
+}

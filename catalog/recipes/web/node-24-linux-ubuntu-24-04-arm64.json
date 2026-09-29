@@ -1,0 +1,27 @@
+{
+  "id": "node-24-linux-ubuntu-24-04-arm64",
+  "version": "24.21.0",
+  "description": "Node.js 24.21.0 runtime archive for Ubuntu 24.04 arm64; exact vendor artifact pinned for local web development.",
+  "purpose": "Provide a reproducible Node.js runtime for project-selected web development tasks.",
+  "supported_platforms": [
+    "linux-ubuntu-24.04-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Manual eligibility check: confirm Ubuntu 24.04 arm64, the vendor floor (Linux kernel >= 4.18 and glibc >= 2.28 on a vendor-supported, non-EOL distribution; current platform facts do not expose kernel/libc versions.), and that the OS release is still vendor-supported. Version/kernel/libc qualification is not available in MachineFacts for this platform cell; unknown never qualifies.",
+  "install_strategy": "manual",
+  "artifact": {
+    "digest": "6ad1325edbdb5649c379b75a237147a666c95d4f9ae8d340fef2d1575d289ad2",
+    "size": 30843004,
+    "origin": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-arm64.tar.xz"
+  },
+  "privileges": [
+    "user"
+  ],
+  "license_notes": "Node.js is MIT-licensed. The upstream distribution contains third-party components with separate license terms; retain and review all included notices. This recipe does not redistribute the archive.",
+  "estimated_download_bytes": 30843004,
+  "side_effects": [
+    "Manual download and extraction into an Anza-managed, user-writable runtime location; no global PATH or project-file mutation is specified."
+  ],
+  "verification": "Before use, verify the signed SHASUMS256.txt.asc with the official Node.js release keyring using gpgv, then compare this artifact SHA-256; confirm node --version reports v24.21.0. The source signature and downloaded artifact were not locally verified in this task.",
+  "reversal_class": "manual"
+}

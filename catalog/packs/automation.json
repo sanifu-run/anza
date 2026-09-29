@@ -1,0 +1,15 @@
+{
+  "id": "automation",
+  "version": "1.0.0",
+  "skill_ids": [],
+  "prerequisites": [],
+  "license_ids": [
+    "playwright-apache-2.0"
+  ],
+  "provenance_ids": [
+    "playwright-v1.63.0-package",
+    "playwright-browser-requirements"
+  ],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}
