@@ -1,6 +1,6 @@
 # Anza implementation plan
 
-Date: 2026 09 28. Revision: 3, shared chat reuse and authorized native-only credentials dependency. Status: in progress. Execution target: GPT-6-Luna.
+Date: 2026 09 28. Revision: 4, shared chat reuse, native-only credentials dependency, and CLI credential-input ownership. Status: in progress. Execution target: GPT-6-Luna.
 
 ## Context
 

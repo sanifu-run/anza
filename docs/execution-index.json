@@ -381,7 +381,7 @@
       ],
       "steps": [
         "Use github.com/byteness/keyring v1.13.2 with service name anza and credential IDs scoped to provider/workspace. Build with keyring_no1password, keyring_nofile, keyring_nopass, keyring_nopassage and keyring_noprotonpass tags. Runtime allowlist selects exactly the current OS-native backend: keychain, wincred, or secret-service. Never auto-select or fall back to file, password-manager, kernel-keyring or another service; never place secrets in arguments, receipts or project config.",
-        "Provide masked terminal acquisition at the CLI seam and an in-memory session-only path if the store is unavailable; persist no plaintext fallback.",
+        "Expose the Secret/Store boundary for the CLI. The CLI owns masked interactive acquisition; use session-only memory if native storage is unavailable and persist no plaintext fallback.",
         "Delete only credentials recorded as created by Anza. Existing vendor credentials are outside ownership."
       ],
       "acceptance": [
@@ -1679,7 +1679,7 @@
       "steps": [
         "Wire every CLI command in v1 to real package implementations, with injected stdio/context and documented exit codes.",
         "Make default wizard interview -> plan -> review -> apply -> login guidance -> doctor -> exercise, with truthful partial readiness on user skip.",
-        "Verify noninteractive operation refuses missing consent/credentials instead of hanging; ensure help/version stay side-effect-free."
+        "Acquire credentials through a masked terminal prompt only in interactive mode. Noninteractive operation refuses missing consent/credentials instead of reading secrets from argv, environment, or project config; ensure help/version stay side-effect-free."
       ],
       "acceptance": [
         "A subprocess integration fixture traverses the whole command graph with temporary HOME and local fake provider/download servers.",
