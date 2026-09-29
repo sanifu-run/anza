@@ -840,6 +840,7 @@
       "owned_paths": [
         "internal/brief/import.go",
         "internal/brief/import_test.go",
+        "internal/domain/validate.go",
         "docs/brief-import.md"
       ],
       "use_cases": [
