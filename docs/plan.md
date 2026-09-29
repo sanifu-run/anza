@@ -65,7 +65,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E7](plans/E7.md).
 
-### E8 -- Repair update removal and support -> docs/plans/E8.md (0/3)
+### E8 -- Repair update removal and support -> docs/plans/E8.md (3/3)
 
 [Open E8](plans/E8.md).
 
@@ -193,9 +193,9 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 13: Dispatch (3 workers)
 
-- [ ] T8.1 Implement catalog and binary update planning
-- [ ] T8.2 Implement ownership-limited uninstall and repair
-- [ ] T8.3 Create opt-in redacted diagnostics and local deletion
+- [x] T8.1 Implement catalog and binary update planning
+- [x] T8.2 Implement ownership-limited uninstall and repair
+- [x] T8.3 Create opt-in redacted diagnostics and local deletion
 
 ### Wave 14: Dispatch (3 workers)
 
