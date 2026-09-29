@@ -1,0 +1,27 @@
+{
+  "id": "python-3.14.7-darwin-universal2",
+  "version": "3.14.7",
+  "description": "Python 3.14.7 official macOS universal2 installer. Manual only because v1 platform predicates cannot enforce the documented macOS 10.15+ floor.",
+  "purpose": "Offer a pinned Python runtime artifact for explicitly selected macOS projects while preserving any existing interpreter and project constraints.",
+  "supported_platforms": [
+    "darwin-amd64",
+    "darwin-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Before proposing, inspect only the participant-approved project declaration and existing interpreter version. If the existing interpreter satisfies the project declaration, do not select this recipe. Confirm macOS 10.15 or later; if the OS version is unknown, report manual/unmet. Never rewrite project constraints or lockfiles.",
+  "install_strategy": "manual",
+  "artifact": {
+    "digest": "70c5239ad2d62925d2947e46921d0ddd3d35be3d2f0a2d50db33da507dbcb419",
+    "size": 78557763,
+    "origin": "https://www.python.org/ftp/python/3.14.7/python-3.14.7-macos11.pkg"
+  },
+  "privileges": [],
+  "license_notes": "Python software is licensed under the Python Software Foundation License Version 2. Python distributions can include components under other licenses; preserve vendor notices. This recipe does not repackage the artifact.",
+  "estimated_download_bytes": 78557763,
+  "side_effects": [
+    "No automated installation is supported by this record.",
+    "A participant-selected manual install may change machine-level Python aliases; do not proceed unless the destination and effects are reviewed and existing project versions remain intact."
+  ],
+  "verification": "Manual/unmet until OS version is known and compatibility is confirmed. After a separately approved manual installation, verify the installed version at the explicit executable path; do not treat an unknown OS version as ready.",
+  "reversal_class": "manual"
+}

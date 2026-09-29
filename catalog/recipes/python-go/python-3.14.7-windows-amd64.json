@@ -1,0 +1,26 @@
+{
+  "id": "python-3.14.7-windows-amd64",
+  "version": "3.14.7",
+  "description": "Python 3.14.7 official Windows x64 installer. Manual only because the reviewed release source does not establish an enforceable minimum Windows version.",
+  "purpose": "Offer a pinned Python runtime artifact for explicitly selected Windows x64 projects while preserving any existing interpreter and project constraints.",
+  "supported_platforms": [
+    "windows-amd64"
+  ],
+  "prerequisites": [],
+  "detection": "Before proposing, inspect only the participant-approved project declaration and existing interpreter version. If the existing interpreter satisfies the project declaration, do not select this recipe. The reviewed release source does not establish a minimum Windows version here; confirm vendor support manually, and if OS-version support is unknown report manual/unmet. Never rewrite project constraints or lockfiles.",
+  "install_strategy": "manual",
+  "artifact": {
+    "digest": "9d9eb2709ef81bf5cd30db3c2096bdbc4ea10087c22e62f27d356b36f6ae9649",
+    "size": 33258168,
+    "origin": "https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe"
+  },
+  "privileges": [],
+  "license_notes": "Python software is licensed under the Python Software Foundation License Version 2. Python distributions can include components under other licenses; preserve vendor notices. This recipe does not repackage the artifact.",
+  "estimated_download_bytes": 33258168,
+  "side_effects": [
+    "No automated installation is supported by this record.",
+    "A participant-selected manual install may change PATH or interpreter selection; do not proceed unless the destination and effects are reviewed and existing project versions remain intact."
+  ],
+  "verification": "Manual/unmet until vendor-supported Windows version is established and confirmed. After a separately approved manual installation, invoke the explicit installed executable to verify its version; do not rely on whichever python command appears first on PATH.",
+  "reversal_class": "manual"
+}

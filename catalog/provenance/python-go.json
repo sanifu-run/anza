@@ -1,0 +1,12 @@
+[
+  {
+    "id": "python-psf-2",
+    "source": "https://www.python.org/downloads/release/python-3147/; artifacts: https://www.python.org/ftp/python/3.14.7/python-3.14.7-macos11.pkg and https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe; license: https://docs.python.org/3/license.html",
+    "license": "Python Software Foundation License Version 2 (Python distribution; bundled components may have other licenses)"
+  },
+  {
+    "id": "go-bsd-3-clause",
+    "source": "https://go.dev/dl/?mode=json; release history: https://go.dev/doc/devel/release; license: https://go.dev/LICENSE; artifact URLs are the go.dev/dl filenames recorded in each recipe",
+    "license": "BSD-3-Clause-style Go Authors license (review bundled notices for separately licensed components)"
+  }
+]
