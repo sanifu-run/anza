@@ -41,7 +41,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E1](plans/E1.md).
 
-### E2 -- Local platform and preservation primitives -> docs/plans/E2.md (3/6)
+### E2 -- Local platform and preservation primitives -> docs/plans/E2.md (4/6)
 
 [Open E2](plans/E2.md).
 
@@ -53,11 +53,11 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E4](plans/E4.md).
 
-### E5 -- Curated skills and project tool recipes -> docs/plans/E5.md (1/7)
+### E5 -- Curated skills and project tool recipes -> docs/plans/E5.md (7/7)
 
 [Open E5](plans/E5.md).
 
-### E6 -- Deterministic planning and installation -> docs/plans/E6.md (0/4)
+### E6 -- Deterministic planning and installation -> docs/plans/E6.md (2/4)
 
 [Open E6](plans/E6.md).
 
