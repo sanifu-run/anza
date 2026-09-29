@@ -49,7 +49,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E3](plans/E3.md).
 
-### E4 -- Participant interview and review experience -> docs/plans/E4.md (3/4)
+### E4 -- Participant interview and review experience -> docs/plans/E4.md (4/4)
 
 [Open E4](plans/E4.md).
 
@@ -188,7 +188,7 @@ The table below is a conservative executable schedule: complete review/integrati
 ### Wave 12: Dispatch (3 workers)
 
 - [ ] T7.2 Report local and paid readiness separately
-- [ ] T4.3 Implement accessible interview wizard
+- [x] T4.3 Implement accessible interview wizard
 - [x] T7.3 Run a project-specific first verification exercise
 
 ### Wave 13: Dispatch (3 workers)
