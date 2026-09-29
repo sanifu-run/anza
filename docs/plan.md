@@ -41,7 +41,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E1](plans/E1.md).
 
-### E2 -- Local platform and preservation primitives -> docs/plans/E2.md (4/6)
+### E2 -- Local platform and preservation primitives -> docs/plans/E2.md (5/6)
 
 [Open E2](plans/E2.md).
 
@@ -165,13 +165,13 @@ The table below is a conservative executable schedule: complete review/integrati
 
 - [x] T6.3 Implement Claude Code configuration adapter
 - [x] T4.4 Implement exact-plan review and digest approval
-- [ ] T2.5 Implement OS credential storage and session-only fallback
+- [x] T2.5 Implement OS credential storage and session-only fallback
 
-### Wave 9: Dispatch (3 workers; T7.1 deferred pending T2.5)
+### Wave 9: Dispatch (3 workers; T7.1 held for native access authorization)
 
 - [x] T6.1 Build deterministic local installation plans
 - [x] T3.1 Extend existing conversations for setup purpose and state
-- [ ] T7.1 Launch both agents with independent access choices
+- [ ] T7.1 Launch both agents with independent access choices (held pending native/provider test authorization)
 
 ### Wave 10: Dispatch (3 workers)
 
