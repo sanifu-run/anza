@@ -119,11 +119,13 @@ func TestRemoveInversePatchPreservesOtherKeys(t *testing.T) {
 type repairFixture struct {
 	current []byte
 	applied int
+	reads   int
 	output  []byte
 	fail    error
 }
 
 func (r *repairFixture) Read(context.Context, domain.Operation) ([]byte, error) {
+	r.reads++
 	return append([]byte(nil), r.current...), nil
 }
 func (r *repairFixture) Apply(_ context.Context, _ domain.Operation) error {
@@ -138,7 +140,8 @@ func (r *repairFixture) Apply(_ context.Context, _ domain.Operation) error {
 func TestRepairNewApproval(t *testing.T) {
 	before, after := []byte("before"), []byte("after")
 	op := domain.Operation{ID: "repair", RelativePath: "config.json", PreimageHash: digest(before), ExpectedPostimageHash: digest(after)}
-	plan := domain.Plan{Digest: "current-digest", Operations: []domain.Operation{op}}
+	plan := domain.Plan{Operations: []domain.Operation{op}}
+	setPlanDigest(t, &plan)
 	actions := &repairFixture{current: before, output: after}
 	if _, err := Repair(context.Background(), plan, domain.Approval{PlanDigest: "old-digest", ApprovedAt: "now", DisclosureVersion: "v1"}, actions); !errors.Is(err, ErrApprovalRequired) {
 		t.Fatalf("old approval accepted: %v", err)
@@ -157,7 +160,8 @@ func TestRepairNewApproval(t *testing.T) {
 
 func TestRepairPreservesDriftAndFailedAction(t *testing.T) {
 	before, after := []byte("before"), []byte("after")
-	plan := domain.Plan{Digest: "fresh", Operations: []domain.Operation{{ID: "repair", RelativePath: "config", PreimageHash: digest(before), ExpectedPostimageHash: digest(after)}}}
+	plan := domain.Plan{Operations: []domain.Operation{{ID: "repair", RelativePath: "config", PreimageHash: digest(before), ExpectedPostimageHash: digest(after)}}}
+	setPlanDigest(t, &plan)
 	approval := domain.Approval{PlanDigest: plan.Digest, ApprovedAt: "now", DisclosureVersion: "v1"}
 	drift := &repairFixture{current: []byte("changed"), output: after}
 	if _, err := Repair(context.Background(), plan, approval, drift); !errors.Is(err, ErrDrift) {
@@ -175,4 +179,28 @@ func TestRepairPreservesDriftAndFailedAction(t *testing.T) {
 	if len(result.Succeeded) != 0 || result.Failed["repair"] == "" {
 		t.Fatalf("failed action claimed success: %#v", result)
 	}
+}
+
+func TestRepairRejectsPlanMutationAfterApproval(t *testing.T) {
+	before, after := []byte("before"), []byte("after")
+	plan := domain.Plan{Operations: []domain.Operation{{ID: "repair", RelativePath: "config", PreimageHash: digest(before), ExpectedPostimageHash: digest(after)}}}
+	setPlanDigest(t, &plan)
+	approval := domain.Approval{PlanDigest: plan.Digest, ApprovedAt: "now", DisclosureVersion: "v1"}
+	plan.Operations[0].Description = "changed after approval"
+	actions := &repairFixture{current: before, output: after}
+	if _, err := Repair(context.Background(), plan, approval, actions); !errors.Is(err, ErrPlanDigestMismatch) {
+		t.Fatalf("mutated plan was not rejected as a digest mismatch: %v", err)
+	}
+	if actions.reads != 0 || actions.applied != 0 {
+		t.Fatalf("tampered plan caused effects: reads=%d applies=%d", actions.reads, actions.applied)
+	}
+}
+
+func setPlanDigest(t *testing.T, plan *domain.Plan) {
+	t.Helper()
+	digest, err := domain.CanonicalPlanDigest(*plan)
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan.Digest = digest
 }

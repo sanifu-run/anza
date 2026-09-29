@@ -9,6 +9,7 @@ import (
 )
 
 var ErrApprovalRequired = errors.New("fresh approval for this repair plan required")
+var ErrPlanDigestMismatch = errors.New("repair plan digest does not match its contents")
 
 // RepairActions contains the effects needed for a newly reviewed repair plan.
 // Implementations should use the same locked, preimage-checked effect path as
@@ -28,10 +29,16 @@ type RepairResult struct {
 // inspected before the first effect so drift cannot be overwritten.
 func Repair(ctx context.Context, plan domain.Plan, approval domain.Approval, actions RepairActions) (RepairResult, error) {
 	result := RepairResult{Succeeded: []string{}, Failed: map[string]string{}}
-	if plan.Digest == "" || approval.PlanDigest != plan.Digest || approval.ApprovedAt == "" || approval.DisclosureVersion == "" {
+	currentDigest, err := domain.CanonicalPlanDigest(plan)
+	if err != nil {
+		return result, fmt.Errorf("digesting repair plan: %w", err)
+	}
+	if plan.Digest == "" || plan.Digest != currentDigest {
+		return result, ErrPlanDigestMismatch
+	}
+	if approval.PlanDigest != currentDigest || approval.ApprovedAt == "" || approval.DisclosureVersion == "" {
 		return result, ErrApprovalRequired
 	}
-	preimages := make(map[string][]byte, len(plan.Operations))
 	for _, op := range plan.Operations {
 		if !safePath(op.RelativePath) {
 			return result, fmt.Errorf("unsafe operation path %q", op.RelativePath)
@@ -43,7 +50,6 @@ func Repair(ctx context.Context, plan domain.Plan, approval domain.Approval, act
 		if err := matchPreimage(op, current); err != nil {
 			return result, fmt.Errorf("%s: %w", op.ID, err)
 		}
-		preimages[op.ID] = current
 	}
 	for _, op := range plan.Operations {
 		if err := actions.Apply(ctx, op); err != nil {
