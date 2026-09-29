@@ -1025,7 +1025,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 784bb4d153eb4fce5e0f410960e116c21076cdeb; coordinator human review and integrated catalog tests",
       "wave": 5,
       "repository": "anza"
     },
@@ -1101,7 +1101,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 b772f2b08ae0c70415b895ca72c216ecb1bd3290; integrated catalog tests passed",
       "wave": 5,
       "repository": "anza"
     },
@@ -1142,7 +1142,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 9d86b39b10d766119edbce4956a9e9b3d83a0c28; integrated catalog tests passed; GPU test unavailable by v1 design",
       "wave": 5,
       "repository": "anza"
     },
