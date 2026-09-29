@@ -9,6 +9,8 @@ import (
 	"github.com/sanifu-run/anza/internal/domain"
 )
 
+const maxLiveCheckTimeout = 15 * time.Second
+
 // LiveCheckFunc may perform a small provider/agent round trip. It must be
 // supplied by the caller; doctor never discovers credentials or starts an agent.
 type LiveCheckFunc func(context.Context, string) (domain.CheckResult, error)
@@ -37,7 +39,13 @@ func runLiveCheck(ctx context.Context, workspace string, options Options, checke
 	if options.LiveCheck == nil {
 		return domain.CheckResult{}, errors.New("live check consent was granted but no live check callback is configured")
 	}
-	result, err := options.LiveCheck(ctx, workspace)
+	timeout := options.LiveTimeout
+	if timeout <= 0 || timeout > maxLiveCheckTimeout {
+		timeout = maxLiveCheckTimeout
+	}
+	liveCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	result, err := options.LiveCheck(liveCtx, workspace)
 	if err != nil {
 		return domain.CheckResult{}, fmt.Errorf("live provider/agent check: %w", err)
 	}

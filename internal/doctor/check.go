@@ -24,6 +24,7 @@ type CheckSpec struct {
 type Options struct {
 	LocalChecks []CheckSpec
 	Live        bool
+	LiveTimeout time.Duration
 	ConfirmLive func(context.Context) (bool, error)
 	LiveCheck   LiveCheckFunc
 	Now         func() time.Time
