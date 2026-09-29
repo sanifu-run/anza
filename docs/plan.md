@@ -37,7 +37,7 @@ Out of scope: completing customer projects, member/community apps, payments, aut
 
 Each epic links to exact owned outputs, dependencies, estimates, acc predicates and one task contract per row. All checkboxes begin open; generated counts describe plan state only.
 
-### E1 -- Foundation and frozen contracts -> docs/plans/E1.md (0/5)
+### E1 -- Foundation and frozen contracts -> docs/plans/E1.md (3/5)
 
 [Open E1](plans/E1.md).
 
@@ -128,8 +128,8 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 2: Dispatch (2 workers)
 
-- [ ] T1.2 Freeze shared schemas, fixtures and value types
-- [ ] T1.5 Build task and catalog metadata checks
+- [x] T1.2 Freeze shared schemas, fixtures and value types
+- [x] T1.5 Build task and catalog metadata checks
 
 ### Wave 3: Dispatch (3 workers)
 
@@ -285,9 +285,11 @@ Wave 1: GPT-6-Luna completed T1.1 on isolated branch task/T1.1 as commit 1072410
 
 Before Wave 2, amended T1.5 acceptance to preserve the newly reviewed T1.1 certification while leaving unexecuted rows `not_run`; the validator must never rewrite plan execution status.
 
+Wave 2: T1.2 and T1.5 completed on isolated task branches. The current chat source has no Anza setup wrapper fixture; amended T1.2 to keep contract-backed local fixtures in scope and retain source-backed parity at T3.6 TestAnzaContractFixture.
+
 ## Hand off Notes
 
-T1.1 is locally implemented and reviewed. Resume with Wave 2 tasks T1.2 and T1.5 after the accepted T1.1 dependency is integrated. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
+Waves 1 and 2 are locally accepted. Proceed with Wave 3 tasks T1.3, T1.4 and T2.6. Source-backed chat wrapper parity remains scheduled for T3.6. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
 
 The launch gate reviews existing chat deployment/provider grants and asks only for missing incremental setup limits/resource/live-check/publication scopes. Reuse the existing origin and data policy; verify setup mail exclusion and Anza licensing. No new host or invitation system is proposed. Unknown caps must not be guessed by workers.
 

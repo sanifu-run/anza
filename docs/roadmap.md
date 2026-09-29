@@ -6,7 +6,7 @@ No Anza/setup extension implementation shipped; the existing chat foundation is 
 
 ## In progress
 
-T1.1 CLI foundation locally implemented and reviewed. Wave 2 tasks T1.2 and T1.5 are next after T1.1 integration.
+Waves 1 and 2 are locally accepted: T1.1, T1.2 and T1.5. Wave 3 tasks T1.3, T1.4 and T2.6 are next. Chat source-fixture parity remains a T3.6 integration check.
 
 ## Planned
 

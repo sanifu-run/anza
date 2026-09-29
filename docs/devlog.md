@@ -19,3 +19,10 @@ The revised plan has 53 contracts across 11 epics and 21 waves: 44 Anza tasks an
 Completed the ownership/runtime preflight and the first implementation wave. The 85-file planning baseline was reviewed for local identity material and committed locally as `0acc30b`. Task claim acquisition failed because GitHub SSH reports `No user exists for uid 501`; per execution.md, work proceeds under the single-coordinator serialized fallback, without cross-session collision protection. Chat remained clean at `26d79ab`; its contact-intake work was reconciled before dispatch.
 
 GPT-6-Luna implemented T1.1 in an isolated Anza worktree and committed `1072410e29613a73936def25021d3402a648cef4`. The coordinator reviewed and integrated it, then reran the scoped three-test package suite and vet with temporary HOME/cache and offline module lookup. Both passed. Red/green, disabled-behavior and environment evidence is in [T1.1 evidence](evidence/T1.1.md). No Chat source, paid calls, deployment or publication changed. Next is Wave 2: T1.2 and T1.5.
+
+
+## 2026-09-29 - Wave 2 foundations
+
+GPT-6-Luna completed T1.2 and T1.5 in separate Anza worktrees. T1.2 materializes contract v1 revision 2 with strict Go decoders, canonical digests, six JSON schemas and valid/invalid fixtures. Review added explicit null-collection and cross-platform path rejection. Its scoped domain tests/vet pass offline. Current Chat has no Anza setup wrapper fixture; the contract now keeps source-backed parity at T3.6 TestAnzaContractFixture.
+
+T1.5 adds a read-only plan/catalog validator. Its 13 unittest cases and default validation pass; compatibility/content modes report the missing T1.3/T1.4 artifacts as expected. Both tasks are locally accepted and recorded in the execution index. No Chat source, paid calls, deployment or publication changed.

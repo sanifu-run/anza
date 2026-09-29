@@ -70,12 +70,12 @@
       "steps": [
         "Materialize docs/contracts/v1.md revision 2 into Go value types and JSON schemas. Include existing chat camelCase envelopes plus the Anza snake_case domain payloads. Record fixtures and explicit field mapping in schema-decisions.md.",
         "Implement strict new-domain decoding, duplicate-key rejection, canonical digests and useful field errors. Legacy chat response extension fields are tolerated only by the documented response decoder policy.",
-        "Create valid/invalid fixtures for each type, including Unicode, oversized data, unknown fields, integer overflow and recipe IDs; test HTTP wrapper field names against chat-source fixtures."
+        "Create valid/invalid fixtures for each type, including Unicode, oversized data, unknown fields, integer overflow and recipe IDs. Test the planned camelCase wrapper and snake_case payload against contract fixtures. Read current chat fixtures read-only; document setup fields not yet present and defer source-backed parity to T3.6 TestAnzaContractFixture. Do not add chat-owned files from this Anza task."
       ],
       "acceptance": [
         "A changed plan operation changes its digest; map key order does not; duplicate keys are rejected.",
         "Recommendation rejects command/url/path fields, unknown enums and oversized collections.",
-        "Every shared type round-trips canonical JSON; fixtures demonstrate all required fields and limits."
+        "Every shared type round-trips canonical JSON; fixtures demonstrate required fields and limits. Current chat fixture gaps are documented, and T3.6 retains source-backed wrapper parity as an integration check."
       ],
       "test_cases": [
         "TestContractFixtures",
@@ -86,7 +86,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 114bf109ebc429ef7eee6083ec10e717d35dd915",
       "wave": 2,
       "repository": "anza"
     },
@@ -194,7 +194,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 da5e586422cc3c4e921b7d9fc1e6de8dd23f678c",
       "wave": 2,
       "repository": "anza"
     },
