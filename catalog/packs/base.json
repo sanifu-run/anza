@@ -1,0 +1,22 @@
+{
+  "id": "base",
+  "version": "1.0.0",
+  "skill_ids": [],
+  "prerequisites": [
+    "codex-cli",
+    "claude-code",
+    "git"
+  ],
+  "license_ids": [
+    "codex-cli-apache-2.0",
+    "claude-code-vendor-terms",
+    "git-gpl-2.0"
+  ],
+  "provenance_ids": [
+    "codex-cli-source",
+    "claude-code-source",
+    "git-source"
+  ],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}
