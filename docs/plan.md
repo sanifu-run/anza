@@ -41,7 +41,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E1](plans/E1.md).
 
-### E2 -- Local platform and preservation primitives -> docs/plans/E2.md (1/6)
+### E2 -- Local platform and preservation primitives -> docs/plans/E2.md (3/6)
 
 [Open E2](plans/E2.md).
 
@@ -53,7 +53,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E4](plans/E4.md).
 
-### E5 -- Curated skills and project tool recipes -> docs/plans/E5.md (0/7)
+### E5 -- Curated skills and project tool recipes -> docs/plans/E5.md (1/7)
 
 [Open E5](plans/E5.md).
 
@@ -139,9 +139,9 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 4: Dispatch (3 workers)
 
-- [ ] T5.1 Load and validate versioned recipe and pack catalog
-- [ ] T2.2 Implement private state, durable writes and locks
-- [ ] T2.1 Inspect platforms and existing project tools read-only
+- [x] T5.1 Load and validate versioned recipe and pack catalog
+- [x] T2.2 Implement private state, durable writes and locks
+- [x] T2.1 Inspect platforms and existing project tools read-only
 
 ### Wave 5: Dispatch (3 workers)
 
@@ -289,7 +289,7 @@ Wave 2: T1.2 and T1.5 completed on isolated task branches. The current chat sour
 
 ## Hand off Notes
 
-Waves 1-3 are locally accepted. Proceed with Wave 4 tasks T5.1, T2.2 and T2.1. Source-backed chat wrapper parity remains scheduled for T3.6. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
+Waves 1-4 are locally accepted. Proceed with Wave 5 tasks T5.2, T5.4 and T5.5. Source-backed chat wrapper parity remains scheduled for T3.6. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
 
 The launch gate reviews existing chat deployment/provider grants and asks only for missing incremental setup limits/resource/live-check/publication scopes. Reuse the existing origin and data policy; verify setup mail exclusion and Anza licensing. No new host or invitation system is proposed. Unknown caps must not be guessed by workers.
 

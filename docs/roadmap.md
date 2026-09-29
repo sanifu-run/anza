@@ -6,7 +6,7 @@ No Anza/setup extension implementation shipped; the existing chat foundation is 
 
 ## In progress
 
-Waves 1-3 are locally accepted: T1.1, T1.2, T1.3, T1.4, T1.5 and T2.6. Wave 4 is next: T5.1, T2.2 and T2.1. Chat source-fixture parity remains a T3.6 integration check.
+Waves 1-4 are locally accepted: T1.1, T1.2, T1.3, T1.4, T1.5, T2.1, T2.2, T2.6 and T5.1. Wave 5 is next: T5.2, T5.4 and T5.5. Chat source-fixture parity remains a T3.6 integration check.
 
 ## Planned
 
