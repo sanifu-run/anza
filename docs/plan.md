@@ -158,7 +158,7 @@ The table below is a conservative executable schedule: complete review/integrati
 ### Wave 7: Dispatch (3 workers)
 
 - [x] T5.7 Seal and embed the complete reviewed content catalog
-- [ ] T2.4 Verify downloads and extract archives safely
+- [x] T2.4 Verify downloads and extract archives safely
 - [x] T6.2 Implement Codex configuration adapter
 
 ### Wave 8: Dispatch (3 workers)
@@ -303,6 +303,6 @@ The launch gate reviews existing chat deployment/provider grants and asks only f
 - [Execution instructions](execution.md)
 - [Roadmap](roadmap.md)
 
-Wave 6 local acceptance: T5.3 and T5.6 were implemented in isolated GPT-6-Luna worktrees and integrated after coordinator review. T5.3 commit `8feff0f4442dbe3a0b4018c467b5fd090d638c51` adds separate Codex CLI, Claude Code and Git manual recipes; all omit artifacts and report zero estimated download bytes because Anza has no verified installation path. T5.6 commit `14e38c9761d016a3c5846d315705d98951dc1e77` adds mobile/desktop recipes and seven versioned manual/unsupported Exercise scenarios, with dated vendor-source facts; retrieval-date correction is `a628eaef73ecef230405e9d1f9031be637339453`. After integration, `go test ./internal/catalog -count=1`, `go vet ./internal/catalog`, all three plan validators, and `git diff --check` passed. The Exercise entries are not yet in a sealed manifest; end-to-end recommendation projection remains unqualified until its consumer exists. No install, account/license acceptance, project inspection, Chat change, external publication or native qualification occurred. Wave 7 is now dependency-ready.
+Wave 6 local acceptance: T5.3 and T5.6 were implemented in isolated GPT-6-Luna worktrees and integrated after coordinator review. T5.3 commit `8feff0f4442dbe3a0b4018c467b5fd090d638c51` adds separate Codex CLI, Claude Code and Git manual recipes; all omit artifacts and report zero estimated download bytes because Anza has no verified installation path. T5.6 commit `14e38c9761d016a3c5846d315705d98951dc1e77` adds mobile/desktop recipes and seven versioned manual/unsupported Exercise scenarios, with dated vendor-source facts; retrieval-date correction is `a628eaef73ecef230405e9d1f9031be637339453`. After integration, `go test ./internal/catalog -count=1`, `go vet ./internal/catalog`, all three plan validators, and `git diff --check` passed. The Exercise entries are not yet in a sealed manifest; end-to-end recommendation projection remains unqualified until its consumer exists. No install, account/license acceptance, project inspection, Chat change, external publication or native qualification occurred. Wave 7 is locally accepted; Wave 8 tasks are ready under their listed dependencies.
 
-Wave 7 progress: T5.7 and T6.2 are locally accepted and integrated; T2.4 remains active. The local catalog digest is `aa6a9c6b46c2e0401d7af7d2d49c3a9be6e5e9678027ebc411d6d3cd122a948c`. First-party product-license/redistribution authorization remains a release/publication gate; no external distribution has occurred.
+Wave 7 local acceptance: T5.7, T2.4 and T6.2 are integrated and coordinator-reviewed. The local catalog digest is `aa6a9c6b46c2e0401d7af7d2d49c3a9be6e5e9678027ebc411d6d3cd122a948c`. First-party product-license/redistribution authorization remains a release/publication gate; no external distribution has occurred.
