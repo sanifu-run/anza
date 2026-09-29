@@ -1277,7 +1277,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 9d752d0f5b983b55a7d4706ee7755d041aa96569; 11 planner test functions, vet, scoped lint and guard-disabled negative passed; root reran tests/vet after integration; no native install claimed",
       "wave": 9,
       "repository": "anza"
     },

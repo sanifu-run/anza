@@ -57,7 +57,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E5](plans/E5.md).
 
-### E6 -- Deterministic planning and installation -> docs/plans/E6.md (2/4)
+### E6 -- Deterministic planning and installation -> docs/plans/E6.md (3/4)
 
 [Open E6](plans/E6.md).
 
@@ -167,9 +167,9 @@ The table below is a conservative executable schedule: complete review/integrati
 - [x] T4.4 Implement exact-plan review and digest approval
 - [ ] T2.5 Implement OS credential storage and session-only fallback
 
-### Wave 9: Dispatch (3 workers)
+### Wave 9: Dispatch (3 workers; T7.1 deferred pending T2.5)
 
-- [ ] T6.1 Build deterministic local installation plans
+- [x] T6.1 Build deterministic local installation plans
 - [ ] T3.1 Extend existing conversations for setup purpose and state
 - [ ] T7.1 Launch both agents with independent access choices
 
