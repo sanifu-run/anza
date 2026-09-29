@@ -61,7 +61,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E6](plans/E6.md).
 
-### E7 -- Agent access and project readiness -> docs/plans/E7.md (2/3)
+### E7 -- Agent access and project readiness -> docs/plans/E7.md (3/3)
 
 [Open E7](plans/E7.md).
 
@@ -187,7 +187,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 12: Dispatch (3 workers)
 
-- [ ] T7.2 Report local and paid readiness separately
+- [x] T7.2 Report local and paid readiness separately
 - [x] T4.3 Implement accessible interview wizard
 - [x] T7.3 Run a project-specific first verification exercise
 
