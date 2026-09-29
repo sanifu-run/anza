@@ -1072,7 +1072,7 @@
         "T5.1"
       ],
       "owned_paths": [
-        "catalog/recipes/web.json",
+        "catalog/recipes/web",
         "catalog/packs/web.json",
         "catalog/packs/automation.json",
         "catalog/provenance/web.json"
@@ -1083,15 +1083,16 @@
         "UC-011"
       ],
       "steps": [
-        "Define Node-based web and optional browser-automation capabilities with pinned qualified tool methods and explicit download sizes/licenses.",
-        "Keep editor, GitHub CLI and browser tooling optional; select by project facts, not all-at-once defaults.",
-        "Define proposed non-destructive exercise intent in design notes only if needed to explain the pack; do not create catalog/exercises descriptors until a versioned Exercise schema and loader validator exist. Existing project package scripts require preview and separate execution consent."
+        "Define Node-based web capabilities with one recipe per exact platform artifact. Pin versions and record vendor-published SHA-256, exact byte size, origin and license. If integrity or exact size is unavailable, omit an automated recipe and leave that capability manual/optional.",
+        "Keep editor, GitHub CLI and browser tooling optional; select by project facts, not all-at-once defaults. Playwright is not ready without its version-matched browser payloads and system dependencies. Recipes describe one supported platform each; packs do not list mutually exclusive per-platform recipes as unconditional prerequisites. The client selects a matching recipe from supported_platforms.",
+        "Defer exercise descriptors until a versioned Exercise schema exists. Existing project package scripts require preview and separate execution consent."
       ],
       "acceptance": [
         "Web needs select only prerequisites and relevant skills; no unnecessary paid hosting provisioning.",
         "Existing project source is not overwritten by an exercise.",
         "Unavailable browser/system requirements return manual actions rather than ready.",
-        "No exercise descriptor is emitted until a versioned Exercise schema exists; no entry may bypass catalog validation."
+        "No exercise descriptor is emitted until a versioned Exercise schema exists; no entry may bypass catalog validation.",
+        "No artifact digest or exact size is invented; no Exercise descriptor is emitted until a versioned schema exists."
       ],
       "test_cases": [
         "TestCatalogValidation against synthetic recipe/pack fixtures"
@@ -1111,7 +1112,7 @@
         "T5.1"
       ],
       "owned_paths": [
-        "catalog/recipes/python-go.json",
+        "catalog/recipes/python-go",
         "catalog/packs/data-ml.json",
         "catalog/packs/go.json",
         "catalog/provenance/python-go.json"
@@ -1122,15 +1123,16 @@
         "UC-011"
       ],
       "steps": [
-        "Define per-project Python environments and Go tooling with qualified methods; preserve existing interpreter/module versions.",
-        "Separate CPU readiness from optional GPU/CUDA/remote-compute requirements. Zerfoo is optional where fit is established, never a universal ML requirement.",
-        "Defer exercise descriptors until a versioned Exercise schema and loader validator exist. Do not download datasets or execute package scripts; any later existing-project check requires participant approval."
+        "Define per-project Python environments and Go tooling with one recipe per exact platform artifact. Pin versions and record vendor-published SHA-256, exact byte size, source and license; if integrity or exact size is unavailable, omit an automated recipe and leave the capability manual. Preserve existing interpreter/module versions.",
+        "Separate CPU readiness from optional GPU/CUDA/remote-compute requirements. Zerfoo is optional where fit is established, never a universal ML requirement; no cloud/GPU resources are allocated. Packs must not encode mutually exclusive platform recipes as unconditional prerequisites; clients select a recipe using its supported_platforms. If no reviewed GPU capability exists, a GPU-required project remains manual/unmet.",
+        "Defer exercise descriptors until a versioned Exercise schema exists. Do not download datasets or execute project scripts; any later existing-project check requires participant approval."
       ],
       "acceptance": [
         "Existing Python/Go projects retain declared versions and lockfiles.",
         "GPU-required project on CPU machine reports unmet requirement explicitly.",
         "No cloud/GPU allocation or model training charges occur during setup.",
-        "No exercise descriptor is emitted until a versioned Exercise schema exists; no entry may bypass catalog validation."
+        "No exercise descriptor is emitted until a versioned Exercise schema exists; no entry may bypass catalog validation.",
+        "No artifact digest or exact size is invented; GPU readiness remains manual/unmet without an observed matching capability; no Exercise descriptor is emitted until a versioned schema exists."
       ],
       "test_cases": [
         "TestCatalogValidation against synthetic recipe/pack fixtures",
