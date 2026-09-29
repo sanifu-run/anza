@@ -1446,7 +1446,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 worker commits 8fc68c1178d4ac737badb92276f7277a7c585e6f and abd0757d3179b9adeba10eb91c43b91926225a3e; coordinator merges 30d9ea0/39c3c71; final post-merge launch tests/vet passed.",
       "wave": 9,
       "repository": "anza"
     },

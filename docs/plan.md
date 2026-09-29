@@ -61,7 +61,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E6](plans/E6.md).
 
-### E7 -- Agent access and project readiness -> docs/plans/E7.md (1/3)
+### E7 -- Agent access and project readiness -> docs/plans/E7.md (2/3)
 
 [Open E7](plans/E7.md).
 
@@ -171,7 +171,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 - [x] T6.1 Build deterministic local installation plans
 - [x] T3.1 Extend existing conversations for setup purpose and state
-- [ ] T7.1 Launch both agents with independent access choices (in progress in an isolated worktree; local synthetic checks only)
+- [x] T7.1 Launch both agents with independent access choices
 
 ### Wave 10: Dispatch (3 workers)
 
