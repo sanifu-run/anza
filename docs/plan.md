@@ -153,7 +153,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 - [ ] T5.6 Define mobile, desktop and unsupported-domain paths
 - [ ] T5.3 Define base agent and Git installation recipes
-- [ ] T2.3 Implement bounded child process execution
+- [x] T2.3 Implement bounded child process execution
 
 ### Wave 7: Dispatch (3 workers)
 
