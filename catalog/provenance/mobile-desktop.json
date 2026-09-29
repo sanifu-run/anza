@@ -11,22 +11,22 @@
   },
   {
     "id": "apple-xcode-support",
-    "source": "https://developer.apple.com/xcode/system-requirements/ (current Xcode/macOS and SDK support matrix; retrieved 2026-09-29).",
+    "source": "https://developer.apple.com/xcode/system-requirements/ (current Xcode/macOS and SDK support matrix; retrieved 2026-09-28).",
     "license": "Apple Developer documentation referenced for factual requirements only; no documentation text or software is copied."
   },
   {
     "id": "apple-xcode-sdk-terms",
-    "source": "https://developer.apple.com/support/terms/ (Xcode and Apple SDKs Agreement; retrieved 2026-09-29).",
+    "source": "https://developer.apple.com/support/terms/ (Xcode and Apple SDKs Agreement; retrieved 2026-09-28).",
     "license": "Xcode and Apple SDKs Agreement; participant review and acceptance is required before use; no terms accepted here."
   },
   {
     "id": "android-studio-requirements",
-    "source": "https://developer.android.com/studio/install (Android Studio platform, architecture, and storage requirements; retrieved 2026-09-29).",
+    "source": "https://developer.android.com/studio/install (Android Studio platform, architecture, and storage requirements; retrieved 2026-09-28).",
     "license": "Android Developers documentation is under Apache License 2.0; referenced for factual requirements only, no text copied."
   },
   {
     "id": "android-sdk-terms",
-    "source": "https://developer.android.com/studio/terms and https://developer.android.com/tools/sdkmanager (Android SDK license agreement and per-package license acceptance; retrieved 2026-09-29).",
+    "source": "https://developer.android.com/studio/terms and https://developer.android.com/tools/sdkmanager (Android SDK license agreement and per-package license acceptance; retrieved 2026-09-28).",
     "license": "Android Software Development Kit License Agreement; participant review and acceptance is required before use; no terms accepted here."
   }
 ]
