@@ -739,7 +739,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 worker commit 61b9002a8829fc58e31921bfb07acd1ab87a76bf; Chat coordinator merge c5a0712; post-merge go test . -count=1 and go vet . passed.",
       "wave": 11
     },
     {

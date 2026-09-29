@@ -45,7 +45,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E2](plans/E2.md).
 
-### E3 -- Shared chat setup interview -> docs/plans/E3.md (3/8)
+### E3 -- Shared chat setup interview -> docs/plans/E3.md (4/8)
 
 [Open E3](plans/E3.md).
 
@@ -181,7 +181,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 11: Dispatch (3 workers)
 
-- [ ] T3.7 Reuse turn reservation with a setup-specific replay policy
+- [x] T3.7 Reuse turn reservation with a setup-specific replay policy
 - [x] T4.1 Implement Anza client for the existing chat protocol
 - [x] T4.2 Import and review an optional learner brief
 
