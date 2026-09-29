@@ -1230,7 +1230,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-28 d396f3f02e3aa8756e35e240440fb5315d5fff4f; catalog digest aa6a9c6b\u2026a948c; rights remain a release gate",
       "wave": 7,
       "repository": "anza"
     },
@@ -1315,7 +1315,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-28 9e7ee573e0c838267e6f88727409678e61f9ab6d; adapter unit tests/vet passed; no runtime/provider qualification",
       "wave": 7,
       "repository": "anza"
     },
