@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanifu.run/anza/v1/recommendation.schema.json",
+  "title": "Recommendation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog_version",
+    "summary",
+    "selected_recipe_ids",
+    "selected_pack_ids",
+    "selected_exercise_id",
+    "reasons",
+    "unresolved_questions",
+    "manual_steps",
+    "readiness_constraints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "catalog_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "selected_recipe_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "maxItems": 30
+    },
+    "selected_pack_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "maxItems": 10
+    },
+    "selected_exercise_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+    },
+    "reasons": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      }
+    },
+    "unresolved_questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 2000
+      },
+      "maxItems": 100
+    },
+    "manual_steps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 2000
+      },
+      "maxItems": 100
+    },
+    "readiness_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 2000
+      },
+      "maxItems": 100
+    }
+  }
+}

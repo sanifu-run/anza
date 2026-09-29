@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanifu.run/anza/v1/pack.schema.json",
+  "title": "Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "skill_ids",
+    "prerequisites",
+    "license_ids",
+    "provenance_ids",
+    "compatible_agent_versions",
+    "file_digests"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "skill_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^anza-[a-z0-9][a-z0-9._-]{0,94}$"
+      },
+      "maxItems": 100
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "maxItems": 100
+    },
+    "license_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "maxItems": 100
+    },
+    "provenance_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "maxItems": 100
+    },
+    "compatible_agent_versions": {
+      "type": "object",
+      "maxProperties": 20,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      }
+    },
+    "file_digests": {
+      "type": "object",
+      "maxProperties": 500,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    }
+  }
+}

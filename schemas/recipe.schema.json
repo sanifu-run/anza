@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanifu.run/anza/v1/recipe.schema.json",
+  "title": "Recipe",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "description",
+    "purpose",
+    "supported_platforms",
+    "prerequisites",
+    "detection",
+    "install_strategy",
+    "artifact",
+    "privileges",
+    "license_notes",
+    "estimated_download_bytes",
+    "side_effects",
+    "verification",
+    "reversal_class"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "supported_platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "maxItems": 20
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "maxItems": 100
+    },
+    "detection": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "install_strategy": {
+      "enum": [
+        "verified_archive",
+        "vendor_installer",
+        "package_manager",
+        "manual"
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "size",
+        "origin"
+      ],
+      "properties": {
+        "digest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "origin": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "privileges": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "maxItems": 20
+    },
+    "license_notes": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "estimated_download_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "side_effects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 100
+    },
+    "verification": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "reversal_class": {
+      "type": "string",
+      "maxLength": 100
+    }
+  }
+}

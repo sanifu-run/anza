@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanifu.run/anza/v1/brief.schema.json",
+  "title": "ProjectBrief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_summary",
+    "desired_slice",
+    "experience",
+    "constraints",
+    "known_stack",
+    "project_kind",
+    "existing_project"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "project_summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "desired_slice": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "experience": {
+      "enum": [
+        "beginner",
+        "developer"
+      ]
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "maxItems": 20
+    },
+    "known_stack": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+      },
+      "maxItems": 20
+    },
+    "project_kind": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "existing_project": {
+      "type": "boolean"
+    },
+    "client_project": {
+      "type": "boolean"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "reviewed"
+      ],
+      "properties": {
+        "kind": {
+          "const": "learner_export"
+        },
+        "reviewed": {
+          "const": true
+        }
+      }
+    }
+  }
+}
