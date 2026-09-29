@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "pack_id": "core",
+  "assets": [
+    {
+      "id": "anza-scope",
+      "path": "catalog/skills/anza-scope/SKILL.md",
+      "provenance_id": "anza-original-content",
+      "source": "Original Anza-authored workflow based on the project brief and content inventory intent: clarify outcome, constraints, and safe boundaries.",
+      "attribution": "Anza-authored; no upstream wording or code included.",
+      "adaptation": "Original replacement for excluded founder planning material; no founder source files used.",
+      "license_status": "The Anza product license is undecided. This record does not grant redistribution permission."
+    },
+    {
+      "id": "anza-plan",
+      "path": "catalog/skills/anza-plan/SKILL.md",
+      "provenance_id": "anza-original-content",
+      "source": "Original Anza-authored workflow based on the project brief and content inventory intent: dependency-ordered work with owners, acceptance evidence, and gates.",
+      "attribution": "Anza-authored; no upstream wording or code included.",
+      "adaptation": "Original replacement for excluded founder planning and dispatch material; no founder source files used.",
+      "license_status": "The Anza product license is undecided. This record does not grant redistribution permission."
+    },
+    {
+      "id": "anza-build",
+      "path": "catalog/skills/anza-build/SKILL.md",
+      "provenance_id": "anza-original-content",
+      "source": "Original Anza-authored workflow based on the project brief and content inventory intent: make bounded changes while preserving neighboring work.",
+      "attribution": "Anza-authored; no upstream wording or code included.",
+      "adaptation": "Original replacement for excluded founder apply/dispatch material; no founder source files used.",
+      "license_status": "The Anza product license is undecided. This record does not grant redistribution permission."
+    },
+    {
+      "id": "anza-check",
+      "path": "catalog/skills/anza-check/SKILL.md",
+      "provenance_id": "anza-original-content",
+      "source": "Original Anza-authored workflow based on the project brief and content inventory intent: select checks from observed project configuration and state evidence limits.",
+      "attribution": "Anza-authored; no upstream wording or code included.",
+      "adaptation": "Original replacement for excluded founder verification material; no founder source files used.",
+      "license_status": "The Anza product license is undecided. This record does not grant redistribution permission."
+    },
+    {
+      "id": "anza-review",
+      "path": "catalog/skills/anza-review/SKILL.md",
+      "provenance_id": "anza-original-content",
+      "source": "Original Anza-authored workflow based on the project brief and content inventory intent: inspect bounded changes for correctness, safety, and scope.",
+      "attribution": "Anza-authored; no upstream wording or code included.",
+      "adaptation": "Original replacement for excluded founder review material; no founder source files used.",
+      "license_status": "The Anza product license is undecided. This record does not grant redistribution permission."
+    },
+    {
+      "id": "anza-continue",
+      "path": "catalog/skills/anza-continue/SKILL.md",
+      "provenance_id": "anza-original-content",
+      "source": "Original Anza-authored workflow based on the project brief and content inventory intent: resume from verified state and leave a useful handoff.",
+      "attribution": "Anza-authored; no upstream wording or code included.",
+      "adaptation": "Original replacement for excluded founder journaling material; no founder source files used.",
+      "license_status": "The Anza product license is undecided. This record does not grant redistribution permission."
+    }
+  ],
+  "provenance": [
+    {
+      "id": "anza-original-content",
+      "source": "Anza product brief and docs/content-inventory.md; new writing only.",
+      "license": "Anza-authored; product license decision pending; no upstream material copied."
+    },
+    {
+      "id": "anza-rights-pending",
+      "source": "Anza product brief: the Anza product license remains a release decision.",
+      "license": "Unapproved; redistribution permission is not asserted."
+    }
+  ],
+  "review_note": "Founder workflow source files remain excluded pending written rights. ECC MIT content informed only high-level intent; no ECC wording or code is bundled."
+}

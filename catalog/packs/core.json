@@ -1,0 +1,17 @@
+{
+  "id": "core",
+  "version": "1.0.0",
+  "skill_ids": [
+    "anza-scope",
+    "anza-plan",
+    "anza-build",
+    "anza-check",
+    "anza-review",
+    "anza-continue"
+  ],
+  "prerequisites": [],
+  "license_ids": ["anza-rights-pending"],
+  "provenance_ids": ["anza-original-content"],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}
