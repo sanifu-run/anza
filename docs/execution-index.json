@@ -1036,7 +1036,8 @@
         "T5.1"
       ],
       "owned_paths": [
-        "catalog/recipes/base.json",
+        "catalog/recipes/base",
+        "catalog/packs/base.json",
         "catalog/provenance/base.json"
       ],
       "use_cases": [
@@ -1044,12 +1045,12 @@
         "UC-006"
       ],
       "steps": [
-        "Encode qualified Codex, Claude Code and Git methods per supported platform from compatibility evidence, with exact detection/verification and privilege disclosures.",
-        "Prefer verified per-user artifact installation where available; vendor scripts/package-manager methods must disclose bootstrap trust and remain explicitly reviewed.",
+        "Encode Codex CLI, Claude Code and Git as separate single-object recipes; a recipe file is one Recipe, never a bundle. Use a base pack that selects those distinct recipe IDs. Ground each method in reviewed compatibility evidence, with exact detection/verification and privilege disclosures.",
+        "Prefer verified per-user artifact installation where qualified; vendor scripts/package-manager methods must disclose bootstrap trust and remain explicitly reviewed. Documented-only or unqualified targets stay manual/unavailable; never invent artifact sentinels, digests or sizes.",
         "Set existing installations to preserve/use if compatible; require a separate reviewed upgrade when incompatible. Mark SDK/license/OS-owned dependencies manual."
       ],
       "acceptance": [
-        "Both agents are selected by the base profile; install detection prevents duplicate installations.",
+        "The base pack selects Codex CLI, Claude Code and Git as distinct recipes; install detection prevents duplicate installations.",
         "Every automated target has real source/version/integrity data or a documented vendor trust method; placeholders fail validation.",
         "Git installation cannot run a privileged command without a distinct prompt."
       ],
