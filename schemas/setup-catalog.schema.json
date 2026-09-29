@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanifu.run/anza/v1/setup-catalog.schema.json",
+  "title": "Sanitized Setup Catalog",
+  "description": "Recommendation metadata only. This schema intentionally excludes install strategies, artifacts, commands, URLs, paths, secrets, and executable recipe content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog_version",
+    "catalog_digest",
+    "recipes",
+    "packs",
+    "exercises"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "catalog_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "catalog_digest": {
+      "$ref": "#/$defs/sha256"
+    },
+    "recipes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/recipe"
+      },
+      "maxItems": 500
+    },
+    "packs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pack"
+      },
+      "maxItems": 100
+    },
+    "exercises": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/exercise"
+      },
+      "maxItems": 100
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,99}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "id_list": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "maxItems": 100,
+      "uniqueItems": true
+    },
+    "text_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 100
+    },
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "description",
+        "purpose",
+        "supported_platforms",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "supported_platforms": {
+          "$ref": "#/$defs/platforms"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "recipe_ids",
+        "skill_ids",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "recipe_ids": {
+          "$ref": "#/$defs/id_list"
+        },
+        "skill_ids": {
+          "$ref": "#/$defs/id_list"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "exercise_scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "project_kind",
+        "supported_platforms",
+        "status",
+        "missing_capability_ids",
+        "readiness_constraints"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "project_kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "supported_platforms": {
+          "$ref": "#/$defs/platforms"
+        },
+        "status": {
+          "enum": [
+            "manual",
+            "unsupported"
+          ]
+        },
+        "missing_capability_ids": {
+          "$ref": "#/$defs/id_list"
+        },
+        "readiness_constraints": {
+          "$ref": "#/$defs/text_list"
+        }
+      }
+    },
+    "exercise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "description",
+        "scenarios",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/exercise_scenario"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}
