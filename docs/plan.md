@@ -167,11 +167,11 @@ The table below is a conservative executable schedule: complete review/integrati
 - [x] T4.4 Implement exact-plan review and digest approval
 - [x] T2.5 Implement OS credential storage and session-only fallback
 
-### Wave 9: Dispatch (3 workers; T7.1 held for native access authorization)
+### Wave 9: Dispatch (3 workers; T7.1 resumed after T2.5 acceptance)
 
 - [x] T6.1 Build deterministic local installation plans
 - [x] T3.1 Extend existing conversations for setup purpose and state
-- [ ] T7.1 Launch both agents with independent access choices (held pending native/provider test authorization)
+- [ ] T7.1 Launch both agents with independent access choices (in progress in an isolated worktree; local synthetic checks only)
 
 ### Wave 10: Dispatch (3 workers)
 
