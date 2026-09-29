@@ -1,0 +1,700 @@
+[
+  {
+    "id": "UC-001",
+    "domain": "bootstrap",
+    "name": "Install and launch Anza with one OS-appropriate command",
+    "description": "Install and launch Anza with one OS-appropriate command",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza / bootstrap",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "A verified CLI starts without requiring a Go compiler.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "bootstrap"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.1",
+      "T1.3",
+      "T2.4",
+      "T5.3",
+      "T9.1",
+      "T9.2",
+      "T9.3",
+      "T9.4",
+      "T10.1",
+      "T10.2",
+      "T11.1",
+      "T11.3"
+    ]
+  },
+  {
+    "id": "UC-002",
+    "domain": "inspection",
+    "name": "Inspect and review the local project environment",
+    "description": "Inspect and review the local project environment",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza inspect --json",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Read-only platform facts identify existing tools and unmet prerequisites.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "inspection"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T2.1",
+      "T4.3",
+      "T10.1"
+    ]
+  },
+  {
+    "id": "UC-003",
+    "domain": "interview",
+    "name": "Describe any real project through a hosted interview",
+    "description": "Describe any real project through a hosted interview",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza setup / chat setup start + /api/ask",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Participant reaches useful setup questions without prior agent login.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "interview"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.2",
+      "T3.1",
+      "T3.3",
+      "T3.4",
+      "T3.5",
+      "T3.7",
+      "T4.1",
+      "T4.3",
+      "T9.1",
+      "T10.1",
+      "T11.3",
+      "T11.4"
+    ]
+  },
+  {
+    "id": "UC-004",
+    "domain": "recommendation",
+    "name": "Receive a tailored and bounded setup recommendation",
+    "description": "Receive a tailored and bounded setup recommendation",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza interview / chat setup recommendation",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Known tool IDs and manual limitations are accurately explained.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "recommendation"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.2",
+      "T3.1",
+      "T3.3",
+      "T3.4",
+      "T3.5",
+      "T4.1",
+      "T4.3",
+      "T5.1",
+      "T5.6",
+      "T5.7",
+      "T6.1",
+      "T10.1",
+      "T11.4"
+    ]
+  },
+  {
+    "id": "UC-005",
+    "domain": "approval",
+    "name": "Review and approve the exact installation changes",
+    "description": "Review and approve the exact installation changes",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza plan / anza apply",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Only the reviewed current plan can execute.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "approval"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.2",
+      "T4.4",
+      "T6.1",
+      "T6.4",
+      "T9.1",
+      "T10.1",
+      "T10.3"
+    ]
+  },
+  {
+    "id": "UC-006",
+    "domain": "installation",
+    "name": "Install prerequisites and both agents",
+    "description": "Install prerequisites and both agents",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza apply",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Supported tools install and unsupported/elevated steps are explicit.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "installation"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.3",
+      "T2.3",
+      "T2.4",
+      "T5.1",
+      "T5.3",
+      "T5.4",
+      "T5.5",
+      "T5.6",
+      "T5.7",
+      "T6.1",
+      "T6.4",
+      "T10.1",
+      "T10.2",
+      "T11.3"
+    ]
+  },
+  {
+    "id": "UC-007",
+    "domain": "content",
+    "name": "Use curated portable skills in both agents",
+    "description": "Use curated portable skills in both agents",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "project skill discovery",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Both agents discover the selected skills without replacing existing content.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "content"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.2",
+      "T1.4",
+      "T2.6",
+      "T5.1",
+      "T5.2",
+      "T5.4",
+      "T5.5",
+      "T5.7",
+      "T6.1",
+      "T6.2",
+      "T6.3",
+      "T6.4",
+      "T10.1",
+      "T10.2"
+    ]
+  },
+  {
+    "id": "UC-008",
+    "domain": "access",
+    "name": "Choose subscription or OpenRouter independently per agent",
+    "description": "Choose subscription or OpenRouter independently per agent",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza run codex|claude",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Agent launches with participant-owned access and protected credentials.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "access"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.3",
+      "T2.5",
+      "T2.6",
+      "T6.2",
+      "T6.3",
+      "T7.1",
+      "T10.4",
+      "T11.1",
+      "T11.3"
+    ]
+  },
+  {
+    "id": "UC-009",
+    "domain": "recovery",
+    "name": "Resume, repair or reconcile interrupted setup",
+    "description": "Resume, repair or reconcile interrupted setup",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza setup / anza repair",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Completed actions are not duplicated and unknown effects remain visible.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "recovery"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T1.2",
+      "T2.2",
+      "T2.3",
+      "T3.7",
+      "T4.1",
+      "T6.4",
+      "T8.2",
+      "T9.1",
+      "T10.1",
+      "T10.2",
+      "T10.3",
+      "T11.1"
+    ]
+  },
+  {
+    "id": "UC-010",
+    "domain": "readiness",
+    "name": "Check local readiness and optionally verify live access",
+    "description": "Check local readiness and optionally verify live access",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza doctor [--live]",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Installed, configured, authenticated and live-verified are distinguished.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "readiness"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T2.3",
+      "T7.1",
+      "T7.2",
+      "T9.1",
+      "T10.4",
+      "T11.4"
+    ]
+  },
+  {
+    "id": "UC-011",
+    "domain": "learning",
+    "name": "Complete a first check relevant to the participant project",
+    "description": "Complete a first check relevant to the participant project",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "setup exercise stage",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Participant observes a meaningful toolchain check and next action.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "learning"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T5.2",
+      "T5.4",
+      "T5.5",
+      "T5.6",
+      "T5.7",
+      "T7.3",
+      "T9.1",
+      "T11.4"
+    ]
+  },
+  {
+    "id": "UC-012",
+    "domain": "updates",
+    "name": "Review and apply a safe update",
+    "description": "Review and apply a safe update",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza update",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "User edits survive and a failed update preserves the previous installation.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P1",
+    "tags": [
+      "updates"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T2.2",
+      "T8.1",
+      "T9.1",
+      "T10.2"
+    ]
+  },
+  {
+    "id": "UC-013",
+    "domain": "removal",
+    "name": "Remove Anza-owned changes safely",
+    "description": "Remove Anza-owned changes safely",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza uninstall",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Unowned files, modified content and native credentials survive.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P1",
+    "tags": [
+      "removal"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T2.2",
+      "T2.6",
+      "T8.2",
+      "T9.1",
+      "T10.1",
+      "T10.2"
+    ]
+  },
+  {
+    "id": "UC-014",
+    "domain": "distribution",
+    "name": "Verify release provenance and recover from bad releases",
+    "description": "Verify release provenance and recover from bad releases",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "bootstrap / updater",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Artifact integrity and revocation/rollback paths are observable.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "distribution"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T2.4",
+      "T8.1",
+      "T9.2",
+      "T9.3",
+      "T9.4",
+      "T10.3",
+      "T11.2",
+      "T11.3"
+    ]
+  },
+  {
+    "id": "UC-015",
+    "domain": "support",
+    "name": "Export sanitized diagnostics on request",
+    "description": "Export sanitized diagnostics on request",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza diagnostics",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Useful status can be shared without secret or project content leakage.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P1",
+    "tags": [
+      "support"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T2.5",
+      "T3.8",
+      "T7.2",
+      "T8.3",
+      "T9.1",
+      "T10.3",
+      "T11.1"
+    ]
+  },
+  {
+    "id": "UC-016",
+    "domain": "service",
+    "name": "Operate bounded setup mode in the shared chat backend",
+    "description": "Operate bounded setup mode in the shared chat backend",
+    "actor": "operator",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "chat setup mode / DELETE /api/conversation",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Isolation, expiration and persistent admission caps survive failures.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P0",
+    "tags": [
+      "service"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T3.1",
+      "T3.2",
+      "T3.3",
+      "T3.5",
+      "T3.6",
+      "T3.7",
+      "T3.8",
+      "T8.3",
+      "T10.3",
+      "T11.1",
+      "T11.2",
+      "T11.3",
+      "T11.5"
+    ]
+  },
+  {
+    "id": "UC-017",
+    "domain": "brief",
+    "name": "Import an optional approved project brief",
+    "description": "Import an optional approved project brief",
+    "actor": "participant",
+    "preconditions": [
+      "Applicable platform/access constraints are disclosed"
+    ],
+    "interfaces": [
+      {
+        "type": "cli_or_api",
+        "path": "anza setup --brief FILE",
+        "page_state": "PLANNED"
+      }
+    ],
+    "expected_outcome": "Participant reviews reusable facts and avoids repeated questions.",
+    "test_data": {
+      "source": "synthetic fixtures only"
+    },
+    "priority": "P1",
+    "tags": [
+      "brief"
+    ],
+    "wiring_status": "PLANNED",
+    "coverage": {
+      "interfaces_found": [],
+      "has_tests": false
+    },
+    "task_ids": [
+      "T3.4",
+      "T3.5",
+      "T3.8",
+      "T4.2",
+      "T4.3",
+      "T10.1"
+    ]
+  }
+]

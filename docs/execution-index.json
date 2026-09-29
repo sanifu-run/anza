@@ -1,0 +1,2371 @@
+{
+  "schema_version": 1,
+  "status": "planned_not_executed",
+  "tasks": [
+    {
+      "id": "T1.1",
+      "title": "Create the Go CLI and dependency baseline",
+      "deps": [],
+      "owned_paths": [
+        "go.mod",
+        "go.sum",
+        "cmd/anza/main.go",
+        "cmd/anza/main_test.go",
+        ".golangci.yml"
+      ],
+      "use_cases": [
+        "infrastructure",
+        "UC-001"
+      ],
+      "steps": [
+        "Select and pin a supported Go version and the CLI exceptions listed in design.md. No database driver or hosted-service dependencies belong in Anza.",
+        "Create real version/help commands using flag.FlagSet and a run function returning an exit code. No cmd/anza-interview or second backend is created.",
+        "Use build variables for version/commit/build time without personal paths. Add formatting and lint configuration scoped to CLI packages."
+      ],
+      "acceptance": [
+        "The CLI builds with an empty temporary HOME and no network at runtime.",
+        "Version/help report deterministic development defaults and perform no file writes; unknown flags return 2.",
+        "Module contains only CLI dependencies; there is no private chat module import or local replace directive."
+      ],
+      "test_cases": [
+        "TestVersionNoSideEffects",
+        "TestUnknownFlagExitCode"
+      ],
+      "verification": "go test ./cmd/anza -count=1; go vet ./cmd/anza",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 1,
+      "repository": "anza"
+    },
+    {
+      "id": "T1.2",
+      "title": "Freeze shared schemas, fixtures and value types",
+      "deps": [
+        "T1.1"
+      ],
+      "owned_paths": [
+        "internal/domain/types.go",
+        "internal/domain/validate.go",
+        "internal/domain/canonical.go",
+        "internal/domain/domain_test.go",
+        "schemas/brief.schema.json",
+        "schemas/recommendation.schema.json",
+        "schemas/recipe.schema.json",
+        "schemas/pack.schema.json",
+        "schemas/plan.schema.json",
+        "schemas/receipt.schema.json",
+        "testdata/contracts/valid.json",
+        "testdata/contracts/invalid.json",
+        "docs/contracts/schema-decisions.md"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-005",
+        "UC-007",
+        "UC-009"
+      ],
+      "steps": [
+        "Materialize docs/contracts/v1.md revision 2 into Go value types and JSON schemas. Include existing chat camelCase envelopes plus the Anza snake_case domain payloads. Record fixtures and explicit field mapping in schema-decisions.md.",
+        "Implement strict new-domain decoding, duplicate-key rejection, canonical digests and useful field errors. Legacy chat response extension fields are tolerated only by the documented response decoder policy.",
+        "Create valid/invalid fixtures for each type, including Unicode, oversized data, unknown fields, integer overflow and recipe IDs; test HTTP wrapper field names against chat-source fixtures."
+      ],
+      "acceptance": [
+        "A changed plan operation changes its digest; map key order does not; duplicate keys are rejected.",
+        "Recommendation rejects command/url/path fields, unknown enums and oversized collections.",
+        "Every shared type round-trips canonical JSON; fixtures demonstrate all required fields and limits."
+      ],
+      "test_cases": [
+        "TestContractFixtures",
+        "TestCanonicalDigest",
+        "TestRejectDuplicateKeys"
+      ],
+      "verification": "go test ./internal/domain -count=1; go vet ./internal/domain",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 2,
+      "repository": "anza"
+    },
+    {
+      "id": "T1.3",
+      "title": "Qualify vendor configuration and platform methods",
+      "deps": [
+        "T1.5"
+      ],
+      "owned_paths": [
+        "docs/compatibility.md",
+        "docs/research/vendor-methods.json"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-006",
+        "UC-008"
+      ],
+      "steps": [
+        "Read current official vendor install/auth/config docs and record source URL, retrieval date, supported CLI versions, platform prerequisites and exact method in vendor-methods.json.",
+        "Cover macOS arm64/amd64, native Windows amd64 and Linux Ubuntu 22.04/24.04 plus Debian 12 amd64/arm64 as proposed pilot targets. Classify other Windows ARM, WSL and musl combinations explicitly as qualified, manual or unsupported.",
+        "Distinguish subscription login, OpenRouter setup, model/tool-call support and config syntax. Use installed binaries only for read-only validation; defer new installs and paid requests to platform qualification.",
+        "Document privilege requirements, agent auto-update behavior, pinned version options and downloads that lack verifiable digest/signature. No invented artifact URLs or checksums."
+      ],
+      "acceptance": [
+        "Each matrix cell names evidence and is marked documented_only until a real platform test exists.",
+        "Claude and Codex OpenRouter configuration have separate examples without tokens, auto-logout or permission bypass.",
+        "Each automated method states integrity verification and post-install detection; otherwise it remains manual."
+      ],
+      "test_cases": [
+        "Validate every source record has method, platform, source URL, date and evidence level"
+      ],
+      "verification": "python3 scripts/check-plan.py --compatibility",
+      "kind": "agent",
+      "estimate_minutes": 75,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 3,
+      "repository": "anza"
+    },
+    {
+      "id": "T1.4",
+      "title": "Audit candidate skills and redistribution provenance",
+      "deps": [
+        "T1.5"
+      ],
+      "owned_paths": [
+        "docs/content-inventory.md",
+        "docs/research/content-sources.json"
+      ],
+      "use_cases": [
+        "UC-007"
+      ],
+      "steps": [
+        "Compare founder plan/apply/verify/review/journal/go workflows and selected ECC planning, verification and domain skills. Read supporting files and record dependencies instead of copying only SKILL.md.",
+        "For each candidate record source revision/path, purpose, license proof, attribution, personal assumptions, harness-specific tools, required scripts and keep/adapt/exclude decision.",
+        "Recommend small original portable anza-scope, anza-plan, anza-build, anza-check, anza-review, anza-continue skills; list domain additions separately. Flag unresolved rights instead of claiming every local file is redistributable."
+      ],
+      "acceptance": [
+        "Every proposed bundled asset has verified permission or an original replacement task.",
+        "No home paths, private infrastructure references, customer data or credentials enter candidate exports.",
+        "Inventory differentiates shared instruction intent from agent-specific syntax and supporting tools."
+      ],
+      "test_cases": [
+        "Review all selected rows for provenance and portable prerequisites"
+      ],
+      "verification": "python3 scripts/check-plan.py --content",
+      "kind": "agent",
+      "estimate_minutes": 75,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 3,
+      "repository": "anza"
+    },
+    {
+      "id": "T1.5",
+      "title": "Build task and catalog metadata checks",
+      "deps": [
+        "T1.1"
+      ],
+      "owned_paths": [
+        "scripts/check-plan.py",
+        "scripts/tests/test_check_plan.py"
+      ],
+      "use_cases": [
+        "infrastructure"
+      ],
+      "steps": [
+        "Implement a stdlib Python validator for execution-index.json, task docs, use-case coverage, dependency cycles and ownership using repository plus relative path; a chat path must not be interpreted as an Anza path.",
+        "Implement --compatibility and --content modes validating the metadata from T1.3/T1.4 when files exist; missing requested files must fail.",
+        "Return nonzero on malformed or absent evidence. The script validates artifacts, never edits plan status or certifies execution."
+      ],
+      "acceptance": [
+        "Broken dependency, duplicate task, missing contract and overlapping concurrent output each fail with IDs.",
+        "The unmodified planning artifact passes structural checks while retaining certification=not_run.",
+        "Compatibility/content modes reject missing source dates and unclassified entries."
+      ],
+      "test_cases": [
+        "test_dependency_cycle",
+        "test_missing_contract",
+        "test_overlap",
+        "test_missing_evidence"
+      ],
+      "verification": "python3 -m unittest discover -s scripts/tests -p test_check_plan.py; python3 scripts/check-plan.py",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 2,
+      "repository": "anza"
+    },
+    {
+      "id": "T2.1",
+      "title": "Inspect platforms and existing project tools read-only",
+      "deps": [
+        "T1.2",
+        "T1.3"
+      ],
+      "owned_paths": [
+        "internal/platform/inspect.go",
+        "internal/platform/detect.go",
+        "internal/platform/inspect_test.go"
+      ],
+      "use_cases": [
+        "UC-002"
+      ],
+      "steps": [
+        "Implement OS/architecture/distro/shell detection and catalog-constrained executable/version probes with timeout and output bounds.",
+        "Inspect only selected project manifests after participant permission; do not execute project scripts or upload source. Detect symlinked roots and unsupported filesystems.",
+        "Produce reviewed MachineFacts without paths, usernames or a full installed-software inventory. Preserve absent/unknown/unsupported distinctions."
+      ],
+      "acceptance": [
+        "Inspection writes nothing and never executes a project package script.",
+        "Missing executable, malformed version and timeout each produce distinct actionable results.",
+        "Darwin/Windows/Linux fixture facts map to declared compatibility cells; unsupported targets are explicit."
+      ],
+      "test_cases": [
+        "TestInspectReadOnly",
+        "TestManifestNeverExecuted",
+        "TestPlatformMatrix",
+        "TestProbeTimeout"
+      ],
+      "verification": "go test ./internal/platform -count=1; go vet ./internal/platform",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 4,
+      "repository": "anza"
+    },
+    {
+      "id": "T2.2",
+      "title": "Implement private state, durable writes and locks",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/state/store.go",
+        "internal/state/atomic_unix.go",
+        "internal/state/atomic_windows.go",
+        "internal/state/lock_unix.go",
+        "internal/state/lock_windows.go",
+        "internal/state/store_test.go"
+      ],
+      "use_cases": [
+        "UC-009",
+        "UC-012",
+        "UC-013"
+      ],
+      "steps": [
+        "Resolve OS/XDG state roots and stable canonical workspace identity; create owner-private directories and enforce Windows ACLs explicitly.",
+        "Implement lock acquisition in documented order, atomic replace and durable JSON journal persistence; inject filesystem faults in tests.",
+        "Keep lock owner PID/start identity and do not steal a live lock based on time alone. Detect malformed/newer schema state and preserve it."
+      ],
+      "acceptance": [
+        "Second concurrent writer is rejected; process death permits a documented recovery path.",
+        "Interrupted write leaves either old or new valid data, never truncated state.",
+        "State permissions exclude other users; malformed/newer schema is not overwritten."
+      ],
+      "test_cases": [
+        "TestAtomicCrashRecovery",
+        "TestLockExclusion",
+        "TestPrivatePermissions",
+        "TestFutureSchemaPreserved"
+      ],
+      "verification": "go test ./internal/state -count=1; go vet ./internal/state",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 4,
+      "repository": "anza"
+    },
+    {
+      "id": "T2.3",
+      "title": "Implement bounded child process execution",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/process/run.go",
+        "internal/process/cancel_unix.go",
+        "internal/process/cancel_windows.go",
+        "internal/process/run_test.go"
+      ],
+      "use_cases": [
+        "UC-006",
+        "UC-009",
+        "UC-010"
+      ],
+      "steps": [
+        "Run explicit executable/argument arrays without a shell by default; establish cwd and an allowlisted environment.",
+        "Implement cancellation of only the owned process tree on supported platforms, bounded captured output and deadline errors.",
+        "Represent sensitive environment values separately from serializable operation specs. Refuse unsafe relative executable resolution and redact logs."
+      ],
+      "acceptance": [
+        "Arguments containing shell syntax remain literal in the child fixture.",
+        "Timeout/Ctrl-C ends child and owned descendants without killing an unrelated process.",
+        "Secrets and excessive output never enter serialized result or diagnostics."
+      ],
+      "test_cases": [
+        "TestLiteralArguments",
+        "TestCancelOwnedTree",
+        "TestOutputBounds",
+        "TestSecretRedaction"
+      ],
+      "verification": "go test ./internal/process -count=1; go vet ./internal/process",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 6,
+      "repository": "anza"
+    },
+    {
+      "id": "T2.4",
+      "title": "Verify downloads and extract archives safely",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/download/fetch.go",
+        "internal/download/extract.go",
+        "internal/download/download_test.go"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-006",
+        "UC-014"
+      ],
+      "steps": [
+        "Implement HTTPS-only artifact fetches with expected digest, maximum size, deadline and constrained redirect hosts from trusted catalog data.",
+        "Validate archive entries before extraction: traversal, absolute paths, Windows drive/UNC paths, duplicate/case-fold targets, symlink/hardlink escape, device entries and decompression limits.",
+        "Download to private temporary storage, verify digest before executable permission and atomically install only after verification. Cache by digest."
+      ],
+      "acceptance": [
+        "Wrong digest, oversized body, redirect to an unapproved host and archive escape fail before target writes.",
+        "A verified cached artifact can satisfy offline installation; unverified partial downloads cannot.",
+        "Participant/model input cannot override trusted expected checksum."
+      ],
+      "test_cases": [
+        "TestDigestBeforeInstall",
+        "TestArchiveTraversalMatrix",
+        "TestRedirectPolicy",
+        "TestBoundedExtraction"
+      ],
+      "verification": "go test ./internal/download -count=1; go vet ./internal/download",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 7,
+      "repository": "anza"
+    },
+    {
+      "id": "T2.5",
+      "title": "Implement OS credential storage and session-only fallback",
+      "deps": [
+        "T1.1",
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/credentials/store.go",
+        "internal/credentials/platform.go",
+        "internal/credentials/store_test.go"
+      ],
+      "use_cases": [
+        "UC-008",
+        "UC-015"
+      ],
+      "steps": [
+        "Use reviewed OS credential-store adapters with service name anza and credential IDs scoped to provider/workspace. Never place secrets in arguments, receipts or project config.",
+        "Provide masked terminal acquisition at the CLI seam and an in-memory session-only path if the store is unavailable; persist no plaintext fallback.",
+        "Delete only credentials recorded as created by Anza. Existing vendor credentials are outside ownership."
+      ],
+      "acceptance": [
+        "Put/Get/Delete round-trip through a test adapter; unavailable keychain returns an explicit recoverable result.",
+        "No key value appears in JSON/debug/error output.",
+        "Removal of an Anza key never removes native Codex/Claude credentials."
+      ],
+      "test_cases": [
+        "TestCredentialLifecycle",
+        "TestUnavailableStore",
+        "TestNoCredentialSerialization",
+        "TestOwnershipLimitedDelete"
+      ],
+      "verification": "go test ./internal/credentials -count=1; go vet ./internal/credentials",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 8,
+      "repository": "anza"
+    },
+    {
+      "id": "T2.6",
+      "title": "Plan preserving JSON and TOML configuration edits",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/configedit/json.go",
+        "internal/configedit/toml.go",
+        "internal/configedit/edit.go",
+        "internal/configedit/edit_test.go"
+      ],
+      "use_cases": [
+        "UC-007",
+        "UC-008",
+        "UC-013"
+      ],
+      "steps": [
+        "Implement parse-and-patch edits for only supported managed keys/blocks. Preserve comments, unrelated keys and user formatting where possible; otherwise refuse with a manual diff.",
+        "Return planned bytes, preimage/postimage hashes and owned-key metadata without writing. Handle missing files separately from malformed existing files.",
+        "Define drift-aware inverse patches: undo Anza keys only if current values still match recorded postimage; preserve participant edits and unknown syntax."
+      ],
+      "acceptance": [
+        "Existing comments and unrelated settings survive apply/reversal fixtures.",
+        "Duplicate keys, malformed syntax and user-owned conflicting keys produce a conflict without replacement.",
+        "Inverse patch never restores a whole stale backup over user changes."
+      ],
+      "test_cases": [
+        "TestPreserveUnknownConfig",
+        "TestConfigConflict",
+        "TestDriftAwareInverse",
+        "TestMalformedConfig"
+      ],
+      "verification": "go test ./internal/configedit -count=1; go vet ./internal/configedit",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 3,
+      "repository": "anza"
+    },
+    {
+      "id": "T3.1",
+      "title": "Extend existing conversations for setup purpose and state",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "transcripts.go",
+        "dynamodb.go",
+        "setup_state.go",
+        "setup_state_test.go",
+        "setup_store_test.go",
+        "setup_types.go"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-016"
+      ],
+      "steps": [
+        "Add optional immutable Conversation.Purpose and Setup state to the existing Conversation type. Empty purpose remains legacy intake. Reuse conversationID, transcriptStore and existing DynamoDB CAS/TTL/generation behavior; do not create a new session/token store.",
+        "Define setup protocol/catalog context, start request ID/body digest, setup status, recommendation/source version and privacy consent fields in setup_state.go. Native CLI generates the existing 64-hex random recovery token; server persists only its SHA256 ID. Define backend-local wire types in setup_types.go from the public protocol fixtures; do not import the Anza module just to get types.",
+        "Make existing store serialization and conversation deletion preserve/remove setup state with the whole conversation. Extend summary purpose metadata for the later mail/admin boundary task. Keep all existing fields and legacy JSON behavior.",
+        "Add strict setup creation validation using store.Put(previous=0), immutable purpose and body digest replay. A legacy intake token cannot silently become a setup conversation."
+      ],
+      "acceptance": [
+        "Legacy conversation fixtures still round-trip unchanged while setup fields survive DynamoDB CAS and restart fixtures.",
+        "Matching start request replay returns the same setup state; changed body or intake-purpose token returns conflict.",
+        "GET/DELETE through the existing conversation lifecycle restores/removes setup state; missing/expired records follow existing visibility rules."
+      ],
+      "test_cases": [
+        "TestSetupConversationCompatibility",
+        "TestSetupStartReplay",
+        "TestSetupPurposeImmutable",
+        "TestSetupStoreTTLAndDelete"
+      ],
+      "verification": "go test . -run \"TestSetupConversation|TestSetupStart|TestSetupPurpose|TestSetupStore|TestDynamo|TestConversation\" -count=1; go vet .",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 9,
+      "repository": "chat"
+    },
+    {
+      "id": "T3.2",
+      "title": "Add persistent setup-only admission to the shared backend",
+      "deps": [
+        "T3.1"
+      ],
+      "owned_paths": [
+        "setup_quota.go",
+        "setup_quota_dynamo.go",
+        "setup_quota_test.go"
+      ],
+      "use_cases": [
+        "UC-016"
+      ],
+      "steps": [
+        "Use the existing AWS SDK/client configuration to implement a setup coordination table adapter with DynamoDB conditional transactions for request state, per-conversation allowance and setup-wide daily cost reservations. Keep these rows out of the transcript table scanned by admin/mail.",
+        "Reuse the existing server allow/active ceilings as an additional shared per-instance limit. New persistent caps apply to setup calls; do not claim that unchanged intake calls have a new distributed hard cap.",
+        "Reserve conservative configured input/output/reasoning cost in integer micro-USD before calling the shared model client. Persist running/unknown/completed idempotency state; on ambiguous outcomes retain reservation and forbid automatic paid retry.",
+        "Implement explicit deletion/expiry cleanup that removes session-linking payloads while retaining only minimal non-content anti-replay/budget tombstones for their disclosed TTL. Costs/model prices/caps are configuration; missing required values disable setup only."
+      ],
+      "acceptance": [
+        "Concurrent setup requests across simulated instances cannot exceed configured setup caps or duplicate a request ID.",
+        "A restart, timeout or day rollover preserves unresolved reservations and existing per-session allowances.",
+        "Missing quota configuration rejects setup calls without breaking ordinary website intake; transcript scans never encounter quota rows."
+      ],
+      "test_cases": [
+        "TestSetupQuotaConcurrent",
+        "TestSetupQuotaUnknownRestart",
+        "TestSetupQuotaIsolation",
+        "TestSetupQuotaDeletion"
+      ],
+      "verification": "go test . -run TestSetupQuota -count=1; go vet .",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 10,
+      "repository": "chat"
+    },
+    {
+      "id": "T3.3",
+      "title": "Extract and reuse the existing model transport",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "main.go",
+        "model.go",
+        "model_test.go"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-016"
+      ],
+      "steps": [
+        "Extract the raw request/response portion of answerWithPrompt into one reusable server method in model.go. Keep answer/answerWithPrompt as compatibility wrappers that preserve citation filtering, title token limits, selected endpoint/key and provider-specific parameters.",
+        "Return raw text and optional usage metadata for structured setup output before citation filtering. Reuse s.client, s.key, s.model, s.endpoint and loadRuntimeCredentials; no new provider secret or independent provider router.",
+        "Apply bounded output/deadline/error classification to the shared helper. Do not switch the existing configured provider, enable fallback or alter the existing contact-intake prompt changes; integrate only from the reconciled peer baseline.",
+        "Add HTTP transport fixtures asserting both legacy payloads and setup JSON behavior, including malformed/truncated responses and absent usage. Missing usage keeps a full conservative setup reservation."
+      ],
+      "acceptance": [
+        "Existing ask/title/brief/Experiential fixtures retain their request parameters, citation output and failure semantics.",
+        "Setup generation uses the same model endpoint/client/credential as intake and receives unfiltered structured output plus usage when available.",
+        "No additional provider client, credential store or network retry loop is introduced."
+      ],
+      "test_cases": [
+        "TestSharedModelLegacyCompatibility",
+        "TestSharedModelSetupRawJSON",
+        "TestSharedModelFailureMatrix",
+        "TestSharedModelUsageOptional"
+      ],
+      "verification": "go test . -run \"TestSharedModel|TestExperiential|TestBrief|TestTitle|TestAsk\" -count=1; go vet .",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 10,
+      "repository": "chat"
+    },
+    {
+      "id": "T3.4",
+      "title": "Add a setup interview policy and typed recommendations",
+      "deps": [
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.7",
+        "T5.7"
+      ],
+      "owned_paths": [
+        "setup_interview.go",
+        "setup_prompt.go",
+        "setup_catalog.go",
+        "setup_catalog.json",
+        "setup_interview_test.go",
+        "testdata/anza/setup-contracts.json"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-017"
+      ],
+      "steps": [
+        "Create setupService as a consumer of the existing server/store/shared model helper, shared turn policy, and setup quota adapter. Keep the general intake prompt, booking and brief behavior intact; use a setup-specific prompt only for immutable setup-purpose conversations.",
+        "Use reviewed brief/machine facts as context in the existing bounded server-held history. Ask only missing setup questions through /api/ask; answers remain the existing AskResponse shape. Recommendation generation is a separate explicit setup action.",
+        "Embed only reviewed recommendation metadata from the sealed Anza catalog. Copy public wire fixtures with version/digest provenance into chat testdata; do not import the Anza executable or runtime-fetch a participant-provided catalog URL.",
+        "Generate typed Recommendation via the shared raw model helper, validate catalog IDs/platform constraints and persist exact source version/context digest. Manual steps remain plain text. Bound repair to one charged attempt under the same quota.",
+        "Unknown network outcome and stale versions invalidate generation safely; new setup messages/context edits invalidate older recommendations. Setup cannot book, approve a learner brief or invent a workshop agenda."
+      ],
+      "acceptance": [
+        "A reviewed project brief avoids repeated project-goal questions while setup-specific missing facts are still requested.",
+        "Prompt injection, unknown recipe IDs and stale/catalog-mismatched recommendations never become executable local operations.",
+        "The setup flow calls the existing model transport and conversation lifecycle; no duplicate interview server or storage engine is created."
+      ],
+      "test_cases": [
+        "TestSetupInterviewReuse",
+        "TestSetupRecommendationInjection",
+        "TestSetupRecommendationVersion",
+        "TestSetupCatalogContract"
+      ],
+      "verification": "go test . -run \"TestSetupInterview|TestSetupRecommendation|TestSetupCatalog\" -count=1; go vet .",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 14,
+      "repository": "chat"
+    },
+    {
+      "id": "T3.5",
+      "title": "Implement additive setup handlers alongside existing chat routes",
+      "deps": [
+        "T3.4"
+      ],
+      "owned_paths": [
+        "setup_handlers.go",
+        "setup_handlers_test.go"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-016",
+        "UC-017"
+      ],
+      "steps": [
+        "Implement capability/session/context/recommendation handlers per contract v1 revision 2 on setupService, reusing transcriptHeaders, conversationID, writeJSON and transcriptStore. Do not register new routes or edit the main router until T3.6.",
+        "Use the same X-Conversation-Token and stable requestId semantics as chat. Start accepts reviewed setup facts; new tokens are participant-generated. No invitation or independent bearer-session protocol.",
+        "Test real HTTP requests through a local handler mux for every documented method/status/body, origin policy, feature flag, session-purpose isolation and strict new payload size/field limits.",
+        "Require completed current setup turn and exact version for recommendation. Ordinary conversation GET/DELETE remain the sole resume/deletion endpoints."
+      ],
+      "acceptance": [
+        "All new setup handler success and negative statuses are covered at the real HTTP boundary.",
+        "A website intake token cannot request setup-only mutations and setup tokens cannot mutate booking or learner-brief state.",
+        "CLI requests without Origin work as existing chat permits; browser CORS is not broadened."
+      ],
+      "test_cases": [
+        "TestSetupHandlerMatrix",
+        "TestSetupPurposeHTTPIsolation",
+        "TestSetupCORSAndLimits"
+      ],
+      "verification": "go test . -run \"TestSetupHandler|TestSetupPurposeHTTP|TestSetupCORS\" -count=1; go vet .",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 15,
+      "repository": "chat"
+    },
+    {
+      "id": "T3.6",
+      "title": "Wire setup mode into the existing server and preserve legacy routes",
+      "deps": [
+        "T3.5",
+        "T3.8"
+      ],
+      "owned_paths": [
+        "main.go",
+        "setup_runtime.go",
+        "setup_routes_test.go",
+        "setup_fixture_test.go",
+        "docs/anza-setup-api.md"
+      ],
+      "use_cases": [
+        "UC-016",
+        "infrastructure"
+      ],
+      "steps": [
+        "Add optional setup service field/initialization to existing server and register only additive setup routes. In /api/ask, dispatch existing setup-purpose conversations through setupService while retaining the legacy branch and response format.",
+        "Default ANZA_SETUP_ENABLED to false. A missing/invalid setup-only configuration disables setup capability and its routes with a clear status; existing health/intake/title/brief/booking still function.",
+        "Reuse provider secrets, shared HTTP process, storage and graceful shutdown. Apply quota/mode guards before provider calls; use shared allow/active exactly once per call. Do not introduce a new executable or health service.",
+        "Provide an opt-in loopback setup test fixture using the real shared router and fake storage/provider. Its startup writes a temporary ready file; no live credentials/model/calendar calls. This supports the Anza cross-repo CLI acceptance task.",
+        "Document additive API/config and gate rollout on existing website contact/intake/title/brief/booking regression results from the reconciled peer baseline."
+      ],
+      "acceptance": [
+        "Feature disabled preserves all existing route behavior and the current contact-intake prompt tests.",
+        "Feature enabled runs both website intake and Anza setup through the same server/store/model client with purpose isolation.",
+        "Missing setup quota/catalog configuration does not cause shared server startup failure or an unrelated website outage."
+      ],
+      "test_cases": [
+        "TestSetupFeatureDisabled",
+        "TestSetupSharedRoutes",
+        "TestSetupMissingConfigIsolation",
+        "TestAnzaContractFixture"
+      ],
+      "verification": "go test . -count=1; go vet .",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 16,
+      "repository": "chat"
+    },
+    {
+      "id": "T3.7",
+      "title": "Reuse turn reservation with a setup-specific replay policy",
+      "deps": [
+        "T3.1",
+        "T3.2"
+      ],
+      "owned_paths": [
+        "transcripts.go",
+        "setup_turns.go",
+        "setup_turns_test.go"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-009",
+        "UC-016"
+      ],
+      "steps": [
+        "Extract shared reservation/completion mechanics from reserveTurn/finishTurn into policy-aware helpers; retain legacy wrappers and exact legacy behavior.",
+        "For setup turns enforce existing requestId/body identity, expected conversation version, setup limit and durable quota request state. An expired lease after an ambiguous provider call is not permission to generate again.",
+        "Invalidate setup recommendations when source turns or context change; keep learner-brief invalidation behavior unchanged for intake. Resolve server-owned full history exactly once.",
+        "Test completed replay, in-flight request, failed-before-send, unknown-after-send and conflicting concurrent turns without changing website retry semantics."
+      ],
+      "acceptance": [
+        "Both intake and setup use shared turn persistence/CAS code; legacy retry tests remain green.",
+        "A setup request with unknown provider outcome cannot create a second paid call by waiting for lease expiry.",
+        "New setup content makes previously generated recommendations stale without silently altering a learner brief."
+      ],
+      "test_cases": [
+        "TestSetupTurnReplayPolicy",
+        "TestSetupTurnAmbiguousOutcome",
+        "TestSetupTurnInvalidation"
+      ],
+      "verification": "go test . -run \"TestSetupTurn|TestReserve|TestReplay|TestConversation\" -count=1; go vet .",
+      "repository": "chat",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 11
+    },
+    {
+      "id": "T3.8",
+      "title": "Protect shared admin, mail and deletion boundaries",
+      "deps": [
+        "T3.1",
+        "T3.7",
+        "T3.3"
+      ],
+      "owned_paths": [
+        "transcripts.go",
+        "admin.go",
+        "setup_privacy_test.go",
+        "infra/lambda/transcript_mail.py",
+        "infra/lambda/test_transcript_mail.py",
+        "docs/anza-data-policy.md",
+        "main.go"
+      ],
+      "use_cases": [
+        "UC-015",
+        "UC-016",
+        "UC-017"
+      ],
+      "steps": [
+        "Default setup-purpose conversations out of scheduled owner transcript email. Teach the existing mail reader to skip explicit purpose=setup while treating absent purpose as existing intake; preserve existing mail dedup/booking behavior.",
+        "Keep legacy owner lists backward compatible; expose setup summaries only through an explicit owner-authorized purpose filter. Never serve setup context through unauthenticated admin output.",
+        "Ensure shared conversation DELETE/expiry also invokes setup coordination cleanup through an optional hook without importing installer concerns. Minimal budget tombstones remain content-free with documented TTL. Add an optional server cleanup callback field with nil preserving legacy behavior; T3.6 wires it when setup is enabled. This task owns that narrow main.go field addition after the transport refactor.",
+        "Document actual shared retention: configured AWS transcript TTL, separate provider capture policy, setup mail exclusion and deletion limits. Do not promise 24-hour retention or inherit email consent silently."
+      ],
+      "acceptance": [
+        "Existing intake mail fixtures behave unchanged and setup records trigger no SES send.",
+        "Owner and participant isolation tests cover both conversation purposes without leaking setup facts.",
+        "Deletion removes active setup content while retaining only disclosed minimal quota/replay metadata; no claimed deletion of provider copies."
+      ],
+      "test_cases": [
+        "TestSetupPrivacyDeletion",
+        "TestSetupAdminPurposeFilter",
+        "test_skip_setup_transcript",
+        "test_legacy_intake_delivery"
+      ],
+      "verification": "go test . -run \"TestSetupPrivacy|TestSetupAdmin|TestAdmin|TestConversation\" -count=1; go vet .; python3 -m unittest discover -s infra/lambda -p \"test_*.py\"",
+      "repository": "chat",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 14
+    },
+    {
+      "id": "T4.1",
+      "title": "Implement Anza client for the existing chat protocol",
+      "deps": [
+        "T1.2",
+        "T2.2"
+      ],
+      "owned_paths": [
+        "internal/interviewclient/client.go",
+        "internal/interviewclient/session.go",
+        "internal/interviewclient/client_test.go"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-009"
+      ],
+      "steps": [
+        "Use the shared Sanifu base URL and X-Conversation-Token protocol. Generate 32 random bytes as 64 lowercase hex characters, save only in private local state and keep it out of URLs/logs.",
+        "Call additive setup capability/start/context/recommendation endpoints, /api/ask for questions, and /api/conversation for resume/delete per contract revision 2. Do not parse an installation plan from free-text answers.",
+        "Persist stable requestId and expected versions; on network timeout read conversation state before retrying. Distinguish legacy AskResponse from typed setup recommendation and verify catalog digest.",
+        "Handle disabled feature, unsupported catalog, 409/429/503 and expired/missing state with useful guidance; no new session service, invitation token or model fallback."
+      ],
+      "acceptance": [
+        "Client fixtures match the existing chat camelCase request/response and recovery-token rules exactly.",
+        "Resume reuses request identity and resolves shared conversation state; ambiguous generation is not automatically repeated.",
+        "Only reviewed project facts go to chat; participant agent credentials and raw repository files never do."
+      ],
+      "test_cases": [
+        "TestClientChatContract",
+        "TestResumeRequestIdentity",
+        "TestClientSetupCapabilities",
+        "TestNoSecretUpload"
+      ],
+      "verification": "go test ./internal/interviewclient -count=1; go vet ./internal/interviewclient",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 11,
+      "repository": "anza"
+    },
+    {
+      "id": "T4.2",
+      "title": "Import and review an optional learner brief",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/brief/import.go",
+        "internal/brief/import_test.go",
+        "docs/brief-import.md"
+      ],
+      "use_cases": [
+        "UC-017"
+      ],
+      "steps": [
+        "Read a learner-selected bounded ProjectBrief JSON or approved learner-brief text export. Existing chat LearnerBrief.Text is plain text, so do not pretend it already supplies typed project fields.",
+        "Preview the imported content before upload. A typed brief uses the structured schema; a text export is sent as clearly labeled untrusted context and the setup interview confirms missing facts.",
+        "Never read browser localStorage, a browser recovery token or a private transcript automatically. A future direct browser-to-CLI handoff needs separate explicit authorization/design."
+      ],
+      "acceptance": [
+        "A valid typed brief or learner-reviewed text export carries project context without inventing structured facts or an agenda.",
+        "Credential/contact/transcript token fields in typed imports fail without logging their values.",
+        "Import preserves source files and performs no network call before participant review."
+      ],
+      "test_cases": [
+        "TestBriefImport",
+        "TestRejectSensitiveFields",
+        "TestImportNoSideEffects"
+      ],
+      "verification": "go test ./internal/brief -count=1; go vet ./internal/brief",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 11,
+      "repository": "anza"
+    },
+    {
+      "id": "T4.3",
+      "title": "Implement accessible interview wizard",
+      "deps": [
+        "T4.1",
+        "T4.2",
+        "T2.1"
+      ],
+      "owned_paths": [
+        "internal/cli/wizard.go",
+        "internal/cli/input.go",
+        "internal/cli/wizard_test.go"
+      ],
+      "use_cases": [
+        "UC-002",
+        "UC-003",
+        "UC-004",
+        "UC-017"
+      ],
+      "steps": [
+        "Build line-oriented prompts with injectable input/output; one question at a time, plain language, beginner/developer explanation levels and skip/back/resume.",
+        "Preview facts/brief upload and the existing shared backend privacy disclosure before generating a private recovery token and starting setup. No invitation code or duplicate sign-up is needed.",
+        "Use server context updates for back/edit and invalidate recommendation approval when facts change. Detect non-TTY/EOF, suppress ANSI and save private progress; no tool installation occurs here."
+      ],
+      "acceptance": [
+        "Scripted beginner/developer sessions reach a typed recommendation through the shared chat protocol.",
+        "EOF/Ctrl-C saves/respects contract exit states and never records consent silently.",
+        "Plain terminal output needs no color/cursor control and never displays the recovery token."
+      ],
+      "test_cases": [
+        "TestWizardBeginnerDeveloper",
+        "TestWizardEOFResume",
+        "TestWizardConsent",
+        "TestPlainTerminal"
+      ],
+      "verification": "go test ./internal/cli -run TestWizard -count=1; go vet ./internal/cli",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 12,
+      "repository": "anza"
+    },
+    {
+      "id": "T4.4",
+      "title": "Implement exact-plan review and digest approval",
+      "deps": [
+        "T1.2"
+      ],
+      "owned_paths": [
+        "internal/cli/review.go",
+        "internal/cli/review_test.go"
+      ],
+      "use_cases": [
+        "UC-005"
+      ],
+      "steps": [
+        "Render plan tools, purpose, versions, downloads, privilege, costs/account owner, config diff, manual steps and reversal limits in plain text and JSON.",
+        "Prompt for explicit approval and store Approval bound to the canonical digest. Display refusal, editing and expired-plan paths.",
+        "Implement noninteractive --approve-digest validation only; --yes or profile selection cannot stand in for exact approval."
+      ],
+      "acceptance": [
+        "Any plan edit/expiry invalidates prior approval.",
+        "JSON stdout is parseable and diagnostic prose stays on stderr.",
+        "Participant can decline without installations/config writes."
+      ],
+      "test_cases": [
+        "TestReviewAllEffects",
+        "TestExactDigestApproval",
+        "TestReviewDecline",
+        "TestReviewJSON"
+      ],
+      "verification": "go test ./internal/cli -run TestReview -count=1; go vet ./internal/cli",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 8,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.1",
+      "title": "Load and validate versioned recipe and pack catalog",
+      "deps": [
+        "T1.2",
+        "T1.3",
+        "T1.4"
+      ],
+      "owned_paths": [
+        "internal/catalog/catalog.go",
+        "internal/catalog/catalog_test.go",
+        "catalog/manifest.json"
+      ],
+      "use_cases": [
+        "UC-004",
+        "UC-006",
+        "UC-007"
+      ],
+      "steps": [
+        "Implement catalog loading from an injected fs.FS, checksums, unique IDs, supported platform predicates and dependency cycle validation. Test with real temporary catalog fixtures; production embedding is T5.7.",
+        "Validate each recipe/pack/exercise against v1 fields and provenance; references must resolve. Missing optional domain recipes remain unsupported until added.",
+        "Expose read-only catalog interfaces for server/planner without runtime network fetch. Produce initial manifest metadata; T5.7 seals its inventory after content workers finish."
+      ],
+      "acceptance": [
+        "Unknown recipe, digest mismatch, cycle and missing license/source are rejected.",
+        "Same release yields the same catalog digest across OS builds.",
+        "Partial catalog never claims tools exist if their executable recipe is absent."
+      ],
+      "test_cases": [
+        "TestCatalogValidation",
+        "TestCatalogDigest",
+        "TestCatalogCycle",
+        "TestMissingProvenance"
+      ],
+      "verification": "go test ./internal/catalog -count=1; go vet ./internal/catalog",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 4,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.2",
+      "title": "Author portable common teaching skills",
+      "deps": [
+        "T5.1"
+      ],
+      "owned_paths": [
+        "catalog/packs/core.json",
+        "catalog/skills/anza-scope/SKILL.md",
+        "catalog/skills/anza-plan/SKILL.md",
+        "catalog/skills/anza-build/SKILL.md",
+        "catalog/skills/anza-check/SKILL.md",
+        "catalog/skills/anza-review/SKILL.md",
+        "catalog/skills/anza-continue/SKILL.md",
+        "catalog/provenance/core.json"
+      ],
+      "use_cases": [
+        "UC-007",
+        "UC-011"
+      ],
+      "steps": [
+        "Author six concise original/adapted workflows for real projects using content-inventory decisions; include useful-slice acceptance and continuation notes.",
+        "Separate instructions from optional scripts; remove founder paths, fleet infrastructure, model names, unavailable tool calls and obligatory external actions.",
+        "Record per-asset attribution/license/adaptation and ensure beginner wording explains verification. Same workflow intent must work in both agents."
+      ],
+      "acceptance": [
+        "Each skill names trigger, inputs, concrete outputs and how the participant checks completion.",
+        "No skill silently publishes, spends, reads secrets or requires a private tool.",
+        "Pack resolves all asset hashes/provenance and passes catalog validation."
+      ],
+      "test_cases": [
+        "TestCatalogValidation against core pack; human review of six workflows using a sample real project"
+      ],
+      "verification": "go test ./internal/catalog -run TestCatalog -count=1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 5,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.3",
+      "title": "Define base agent and Git installation recipes",
+      "deps": [
+        "T5.1"
+      ],
+      "owned_paths": [
+        "catalog/recipes/base.json",
+        "catalog/provenance/base.json"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-006"
+      ],
+      "steps": [
+        "Encode qualified Codex, Claude Code and Git methods per supported platform from compatibility evidence, with exact detection/verification and privilege disclosures.",
+        "Prefer verified per-user artifact installation where available; vendor scripts/package-manager methods must disclose bootstrap trust and remain explicitly reviewed.",
+        "Set existing installations to preserve/use if compatible; require a separate reviewed upgrade when incompatible. Mark SDK/license/OS-owned dependencies manual."
+      ],
+      "acceptance": [
+        "Both agents are selected by the base profile; install detection prevents duplicate installations.",
+        "Every automated target has real source/version/integrity data or a documented vendor trust method; placeholders fail validation.",
+        "Git installation cannot run a privileged command without a distinct prompt."
+      ],
+      "test_cases": [
+        "TestCatalogValidation",
+        "TestPlatformRecipeCoverage"
+      ],
+      "verification": "go test ./internal/catalog -count=1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 6,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.4",
+      "title": "Define web and automation toolchain packs",
+      "deps": [
+        "T5.1"
+      ],
+      "owned_paths": [
+        "catalog/recipes/web.json",
+        "catalog/packs/web.json",
+        "catalog/packs/automation.json",
+        "catalog/exercises/web.json",
+        "catalog/provenance/web.json"
+      ],
+      "use_cases": [
+        "UC-006",
+        "UC-007",
+        "UC-011"
+      ],
+      "steps": [
+        "Define Node-based web and optional browser-automation capabilities with pinned qualified tool methods and explicit download sizes/licenses.",
+        "Keep editor, GitHub CLI and browser tooling optional; select by project facts, not all-at-once defaults.",
+        "Define a non-destructive new scratch project or read-only existing-project check; package scripts require preview and separate execution consent."
+      ],
+      "acceptance": [
+        "Web needs select only prerequisites and relevant skills; no unnecessary paid hosting provisioning.",
+        "Existing project source is not overwritten by an exercise.",
+        "Unavailable browser/system requirements return manual actions rather than ready."
+      ],
+      "test_cases": [
+        "TestCatalogValidation",
+        "TestExerciseDescriptors"
+      ],
+      "verification": "go test ./internal/catalog -count=1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 5,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.5",
+      "title": "Define Python, data/ML and Go packs",
+      "deps": [
+        "T5.1"
+      ],
+      "owned_paths": [
+        "catalog/recipes/python-go.json",
+        "catalog/packs/data-ml.json",
+        "catalog/packs/go.json",
+        "catalog/exercises/python-go.json",
+        "catalog/provenance/python-go.json"
+      ],
+      "use_cases": [
+        "UC-006",
+        "UC-007",
+        "UC-011"
+      ],
+      "steps": [
+        "Define per-project Python environments and Go tooling with qualified methods; preserve existing interpreter/module versions.",
+        "Separate CPU readiness from optional GPU/CUDA/remote-compute requirements. Zerfoo is optional where fit is established, never a universal ML requirement.",
+        "Provide exercises that check local imports/build/run on a scratch example or participant-approved existing commands, without downloading customer datasets."
+      ],
+      "acceptance": [
+        "Existing Python/Go projects retain declared versions and lockfiles.",
+        "GPU-required project on CPU machine reports unmet requirement explicitly.",
+        "No cloud/GPU allocation or model training charges occur during setup."
+      ],
+      "test_cases": [
+        "TestCatalogValidation",
+        "TestMLCapabilityConstraints"
+      ],
+      "verification": "go test ./internal/catalog -count=1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 5,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.6",
+      "title": "Define mobile, desktop and unsupported-domain paths",
+      "deps": [
+        "T5.1"
+      ],
+      "owned_paths": [
+        "catalog/recipes/mobile-desktop.json",
+        "catalog/packs/mobile-desktop.json",
+        "catalog/exercises/mobile-desktop.json",
+        "catalog/provenance/mobile-desktop.json"
+      ],
+      "use_cases": [
+        "UC-004",
+        "UC-006",
+        "UC-011"
+      ],
+      "steps": [
+        "Encode platform prerequisites for iOS, Android and desktop projects, distinguishing automatically installable components from manual SDK/store/license/device steps.",
+        "For any unmodeled domain preserve project goal and return a useful manual recommendation with missing capability IDs; never narrow the interview to only shipped packs.",
+        "Record architecture/storage/reboot constraints for SDKs and prohibit automatic license acceptance or device provisioning."
+      ],
+      "acceptance": [
+        "iOS on Windows/Linux produces a macOS requirement, not a fake successful install.",
+        "Android/desktop setup shows manual SDK/license steps where qualification is absent.",
+        "Unknown stack can finish interview with partial readiness and actionable guidance."
+      ],
+      "test_cases": [
+        "TestCatalogValidation",
+        "TestUnsupportedProjectRecommendations"
+      ],
+      "verification": "go test ./internal/catalog -count=1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 6,
+      "repository": "anza"
+    },
+    {
+      "id": "T5.7",
+      "title": "Seal and embed the complete reviewed content catalog",
+      "deps": [
+        "T5.2",
+        "T5.3",
+        "T5.4",
+        "T5.5",
+        "T5.6"
+      ],
+      "owned_paths": [
+        "catalog/assets.go",
+        "catalog/manifest.json",
+        "internal/catalog/embed.go",
+        "internal/catalog/bundled_test.go",
+        "scripts/catalog-manifest.py",
+        "schemas/setup-catalog.schema.json"
+      ],
+      "use_cases": [
+        "UC-004",
+        "UC-006",
+        "UC-007",
+        "UC-011"
+      ],
+      "steps": [
+        "Implement root catalog package embedding the named data directories; internal/catalog loads that embedded filesystem. Do not attempt a go:embed path containing parent-directory traversal.",
+        "Generate a sorted manifest of content files/digests/provenance references and catalog version from reviewed assets. Exclude Go files and local state; generator --check is read-only.",
+        "Run complete reference/recipe/license/platform validation against bundled content and freeze a digest for service/CLI interoperability.",
+        "Generate a sanitized setup recommendation catalog artifact containing IDs, purposes, platform constraints and content version/digest only. The chat contract owner copies/pins it at build time; no executable commands/download URLs or private module dependency cross that boundary."
+      ],
+      "acceptance": [
+        "Production CLI/service use the same immutable bundled catalog digest.",
+        "Missing asset, stale manifest, duplicate ID, unlicensed content or unknown dependency fails qualification.",
+        "Regeneration is deterministic and contains no machine-specific paths."
+      ],
+      "test_cases": [
+        "TestBundledCatalog",
+        "TestManifestDrift"
+      ],
+      "verification": "python3 scripts/catalog-manifest.py --check; go test ./internal/catalog -count=1; go vet ./internal/catalog",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 7,
+      "repository": "anza"
+    },
+    {
+      "id": "T6.1",
+      "title": "Build deterministic local installation plans",
+      "deps": [
+        "T2.1",
+        "T2.6",
+        "T5.7",
+        "T6.2",
+        "T6.3"
+      ],
+      "owned_paths": [
+        "internal/planner/build.go",
+        "internal/planner/resolve.go",
+        "internal/planner/build_test.go"
+      ],
+      "use_cases": [
+        "UC-004",
+        "UC-005",
+        "UC-006",
+        "UC-007"
+      ],
+      "steps": [
+        "Resolve validated recipe/pack IDs and pure agent adapter outputs into dependency-ordered operations using actual machine/project facts and existing state. Compute approval digest only after both adapters have contributed all configuration changes.",
+        "Reject cycles, unsupported targets, escaping logical destinations, unknown privileges and data-derived commands. Preserve compatible installed tools and existing user files.",
+        "Calculate preimage/postimage digests, warnings/manual steps and expiry with injected clock/ID; output identical plans for identical inputs."
+      ],
+      "acceptance": [
+        "Changing machine facts/catalog/preimages changes approval digest.",
+        "Unsupported capabilities become explicit manual constraints and cannot enter executable operations.",
+        "Repeat planning on an already completed setup yields no duplicate install/config writes."
+      ],
+      "test_cases": [
+        "TestPlanDeterministic",
+        "TestPlanUnsupported",
+        "TestPlanPreservesExisting",
+        "TestPlanRejectsModelCommands"
+      ],
+      "verification": "go test ./internal/planner -count=1; go vet ./internal/planner",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 9,
+      "repository": "anza"
+    },
+    {
+      "id": "T6.2",
+      "title": "Implement Codex configuration adapter",
+      "deps": [
+        "T2.6",
+        "T5.2",
+        "T1.3"
+      ],
+      "owned_paths": [
+        "internal/adapters/codex/adapter.go",
+        "internal/adapters/codex/adapter_test.go"
+      ],
+      "use_cases": [
+        "UC-007",
+        "UC-008"
+      ],
+      "steps": [
+        "Produce config patches and managed skill copy operations for the qualified Codex versions using compatibility.md.",
+        "Support native subscription mode and named OpenRouter selection without defaulting global provider changes; provider key reference is symbolic only.",
+        "Preserve existing AGENTS.md, config tables, trust settings, hooks and skills. Conflicts and unsupported versions return explicit results."
+      ],
+      "acceptance": [
+        "Fixtures preserve unrelated TOML/comments and global instructions.",
+        "No permission bypass, auto-trust or subscription token export appears in generated config.",
+        "OpenRouter adapter contains no secret and maps to the qualified provider syntax."
+      ],
+      "test_cases": [
+        "TestCodexSubscriptionConfig",
+        "TestCodexOpenRouterConfig",
+        "TestCodexPreserveUserConfig",
+        "TestCodexVersionGate"
+      ],
+      "verification": "go test ./internal/adapters/codex -count=1; go vet ./internal/adapters/codex",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 7,
+      "repository": "anza"
+    },
+    {
+      "id": "T6.3",
+      "title": "Implement Claude Code configuration adapter",
+      "deps": [
+        "T2.6",
+        "T5.2",
+        "T1.3"
+      ],
+      "owned_paths": [
+        "internal/adapters/claude/adapter.go",
+        "internal/adapters/claude/adapter_test.go"
+      ],
+      "use_cases": [
+        "UC-007",
+        "UC-008"
+      ],
+      "steps": [
+        "Produce supported Claude project configuration/skills and provider launch environment descriptors from qualified compatibility data.",
+        "Handle shared/symlinked skill directories and existing CLAUDE.md/settings without replacing them; ensure one managed copy per real target.",
+        "Detect subscription/OpenRouter conflict and explain participant action instead of deleting cached auth. Leave permission mode and hooks untouched unless explicitly selected."
+      ],
+      "acceptance": [
+        "Existing settings and global instruction files survive; malformed settings are refused.",
+        "OpenRouter variables are injected at launch with explicit conflicting-key handling, never secret config values.",
+        "Duplicate discovery roots do not create conflicting skill copies."
+      ],
+      "test_cases": [
+        "TestClaudeSubscriptionConfig",
+        "TestClaudeOpenRouterConfig",
+        "TestClaudeExistingAuthConflict",
+        "TestClaudeSharedSkillRoots"
+      ],
+      "verification": "go test ./internal/adapters/claude -count=1; go vet ./internal/adapters/claude",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 8,
+      "repository": "anza"
+    },
+    {
+      "id": "T6.4",
+      "title": "Execute approved operations with receipts and crash recovery",
+      "deps": [
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T4.4"
+      ],
+      "owned_paths": [
+        "internal/executor/apply.go",
+        "internal/executor/operations.go",
+        "internal/executor/recover.go",
+        "internal/executor/apply_test.go"
+      ],
+      "use_cases": [
+        "UC-005",
+        "UC-006",
+        "UC-007",
+        "UC-009"
+      ],
+      "steps": [
+        "Apply only matching fresh digest under state locks; adapters have already contributed operations in the reviewed plan. Never add operations after approval. Recheck preimages immediately before each effect.",
+        "Implement typed copy/config/download/vendor/package operations through injected filesystem/process boundaries. Journal intent, effect result and ownership with durable receipts.",
+        "On crash reconcile each running operation by postcondition; unknown package effects remain manual. Roll back only unchanged Anza-owned file/key edits; privilege denial returns resumable state."
+      ],
+      "acceptance": [
+        "Stale approval or changed preimage produces zero new writes.",
+        "Fault injection before/after each operation yields recoverable valid state and never duplicates a proven successful install.",
+        "Unowned file/symlink appearing after planning is preserved and yields conflict."
+      ],
+      "test_cases": [
+        "TestApplyExactApproval",
+        "TestCrashAtEveryBoundary",
+        "TestTOCTOUConflict",
+        "TestInstallReconcile"
+      ],
+      "verification": "go test ./internal/executor -count=1; go vet ./internal/executor",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 10,
+      "repository": "anza"
+    },
+    {
+      "id": "T7.1",
+      "title": "Launch both agents with independent access choices",
+      "deps": [
+        "T6.2",
+        "T6.3",
+        "T2.5",
+        "T2.3"
+      ],
+      "owned_paths": [
+        "internal/launch/launch.go",
+        "internal/launch/launch_test.go"
+      ],
+      "use_cases": [
+        "UC-008",
+        "UC-010"
+      ],
+      "steps": [
+        "Resolve provider per agent/workspace, acquire OpenRouter key from OS store/session env, and inject only into the owned child environment.",
+        "Guide native subscription login using vendor-supported interactive commands; do not ingest or forward native tokens. Handle cancellations without claiming authenticated.",
+        "Implement anza run argument forwarding and explain difference from ordinary vendor launches; no shell aliases or profiles containing secrets."
+      ],
+      "acceptance": [
+        "Mixed subscription/OpenRouter choices launch distinct correct child environments.",
+        "Secrets are absent from argv/logs/receipts; parent/global environment is unchanged.",
+        "Missing credentials or vendor conflict returns actionable instructions without automatic logout."
+      ],
+      "test_cases": [
+        "TestMixedAgentProviders",
+        "TestSecretChildEnvironment",
+        "TestNativeLoginCancellation",
+        "TestAgentArgumentForwarding"
+      ],
+      "verification": "go test ./internal/launch -count=1; go vet ./internal/launch",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 9,
+      "repository": "anza"
+    },
+    {
+      "id": "T7.2",
+      "title": "Report local and paid readiness separately",
+      "deps": [
+        "T6.4",
+        "T7.1"
+      ],
+      "owned_paths": [
+        "internal/doctor/check.go",
+        "internal/doctor/live.go",
+        "internal/doctor/check_test.go"
+      ],
+      "use_cases": [
+        "UC-010",
+        "UC-015"
+      ],
+      "steps": [
+        "Check installed executable versions, config validity, selected skills, account availability and unresolved platform/manual steps per required capability.",
+        "Keep default checks local. Implement optional tiny live agent check only after separate cost/account disclosure and participant confirmation; enforce timeout and record real evidence.",
+        "Aggregate mandatory statuses conservatively; skipped live checks remain unverified and never imply account entitlement or model success."
+      ],
+      "acceptance": [
+        "Installed-but-unauthenticated is action_required; local-ready-but-no-live-evidence is clearly distinguished.",
+        "Denied live confirmation causes zero provider/agent requests.",
+        "Unsupported mandatory platform requirement prevents overall ready status."
+      ],
+      "test_cases": [
+        "TestReadinessEvidenceLevels",
+        "TestLiveCheckConsent",
+        "TestMandatoryFailureAggregation"
+      ],
+      "verification": "go test ./internal/doctor -count=1; go vet ./internal/doctor",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 12,
+      "repository": "anza"
+    },
+    {
+      "id": "T7.3",
+      "title": "Run a project-specific first verification exercise",
+      "deps": [
+        "T5.4",
+        "T5.5",
+        "T5.6",
+        "T2.3",
+        "T2.2"
+      ],
+      "owned_paths": [
+        "internal/exercise/exercise.go",
+        "internal/exercise/exercise_test.go"
+      ],
+      "use_cases": [
+        "UC-011"
+      ],
+      "steps": [
+        "Resolve a reviewed catalog exercise by project needs; show commands and expected output before execution.",
+        "For new projects use a dedicated Anza-owned scratch directory; for existing projects default to read-only checks and ask separately before package scripts or writes.",
+        "Return observed outcome, limitations and next-step instructions. Never claim completion of a customer feature from a toolchain exercise."
+      ],
+      "acceptance": [
+        "A selected exercise produces real recorded output or an explicit unmet prerequisite.",
+        "Existing participant files are unchanged by default.",
+        "Failure/cancellation preserves useful diagnostics without customer/source upload."
+      ],
+      "test_cases": [
+        "TestScratchExercise",
+        "TestExistingProjectReadOnly",
+        "TestExerciseFailureAndCancel"
+      ],
+      "verification": "go test ./internal/exercise -count=1; go vet ./internal/exercise",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 12,
+      "repository": "anza"
+    },
+    {
+      "id": "T8.1",
+      "title": "Implement catalog and binary update planning",
+      "deps": [
+        "T6.4",
+        "T2.4"
+      ],
+      "owned_paths": [
+        "internal/lifecycle/update.go",
+        "internal/lifecycle/update_test.go"
+      ],
+      "use_cases": [
+        "UC-012",
+        "UC-014"
+      ],
+      "steps": [
+        "Fetch verified release metadata under explicit check/update commands; no background auto-update daemon.",
+        "Compare installed catalog/binary versions and produce a new reviewed plan with compatibility changes and migration effects.",
+        "Keep prior verified binary/receipt until the new executable passes local version check; refuse downgrade/replay without explicit selection and supported migration."
+      ],
+      "acceptance": [
+        "Update check makes no configuration or binary changes.",
+        "Bad signature/digest or incompatible state leaves old installation usable.",
+        "User-edited managed content yields conflict, not forced replacement."
+      ],
+      "test_cases": [
+        "TestUpdateCheckReadOnly",
+        "TestUpdateIntegrityFailure",
+        "TestUpdateDriftConflict"
+      ],
+      "verification": "go test ./internal/lifecycle -run TestUpdate -count=1; go vet ./internal/lifecycle",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 13,
+      "repository": "anza"
+    },
+    {
+      "id": "T8.2",
+      "title": "Implement ownership-limited uninstall and repair",
+      "deps": [
+        "T6.4",
+        "T2.6"
+      ],
+      "owned_paths": [
+        "internal/lifecycle/remove.go",
+        "internal/lifecycle/repair.go",
+        "internal/lifecycle/remove_test.go"
+      ],
+      "use_cases": [
+        "UC-009",
+        "UC-013"
+      ],
+      "steps": [
+        "Preview receipt-owned removals and inverse patches; preserve participant edits and external/preexisting tools.",
+        "Remove only matching Anza-created files/keys after explicit confirmation, retain unresolved conflicts and disclose system packages left installed.",
+        "Repair re-detects real state and creates a new reviewed plan; never replays old approvals or blindly reinstalls unknown operations."
+      ],
+      "acceptance": [
+        "Uninstall preserves every unowned or modified fixture path and native login credential.",
+        "Partially removed state remains valid and a second removal is idempotent.",
+        "Repair cannot overwrite drift or claim a failed action succeeded."
+      ],
+      "test_cases": [
+        "TestRemoveOwnership",
+        "TestRemoveModifiedFiles",
+        "TestRemoveIdempotent",
+        "TestRepairNewApproval"
+      ],
+      "verification": "go test ./internal/lifecycle -run \"TestRemove|TestRepair\" -count=1; go vet ./internal/lifecycle",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 13,
+      "repository": "anza"
+    },
+    {
+      "id": "T8.3",
+      "title": "Create opt-in redacted diagnostics and local deletion",
+      "deps": [
+        "T2.2",
+        "T7.2"
+      ],
+      "owned_paths": [
+        "internal/diagnostics/export.go",
+        "internal/diagnostics/export_test.go"
+      ],
+      "use_cases": [
+        "UC-015",
+        "UC-016"
+      ],
+      "steps": [
+        "Export only allowlisted version/platform/status/operation metadata; no automatic upload, interview text, raw config, paths or environment.",
+        "Preview destination/content summary; use private permissions and redact unexpected secrets in errors as defense in depth.",
+        "Delete local setup session state and use existing chat DELETE /api/conversation with its recovery token for server deletion. Report shared AWS TTL, provider-copy limits and minimal anti-replay retention honestly."
+      ],
+      "acceptance": [
+        "Seeded secrets in all error/config fixtures never appear in diagnostics.",
+        "Export requires explicit output request and performs no network upload.",
+        "Local delete cannot remove project source, unrelated state or vendor auth."
+      ],
+      "test_cases": [
+        "TestDiagnosticsAllowlist",
+        "TestDiagnosticsSecretSeeds",
+        "TestDeleteSessionOnly"
+      ],
+      "verification": "go test ./internal/diagnostics -count=1; go vet ./internal/diagnostics",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 13,
+      "repository": "anza"
+    },
+    {
+      "id": "T9.1",
+      "title": "Wire the full CLI command graph",
+      "deps": [
+        "T4.3",
+        "T4.4",
+        "T6.4",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T8.1",
+        "T8.2",
+        "T8.3"
+      ],
+      "owned_paths": [
+        "cmd/anza/main.go",
+        "cmd/anza/main_test.go",
+        "internal/cli/app.go",
+        "internal/cli/app_test.go"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-003",
+        "UC-005",
+        "UC-009",
+        "UC-010",
+        "UC-011",
+        "UC-012",
+        "UC-013",
+        "UC-015"
+      ],
+      "steps": [
+        "Wire every CLI command in v1 to real package implementations, with injected stdio/context and documented exit codes.",
+        "Make default wizard interview -> plan -> review -> apply -> login guidance -> doctor -> exercise, with truthful partial readiness on user skip.",
+        "Verify noninteractive operation refuses missing consent/credentials instead of hanging; ensure help/version stay side-effect-free."
+      ],
+      "acceptance": [
+        "A subprocess integration fixture traverses the whole command graph with temporary HOME and local fake provider/download servers.",
+        "Every command has a reachable handler; unknown commands return 2.",
+        "Cancellation/status output respects stdout/stderr/exit contracts."
+      ],
+      "test_cases": [
+        "TestCLIEndToEndFixture",
+        "TestCLICommandRegistry",
+        "TestCLINoninteractive",
+        "TestCLIExitCodes"
+      ],
+      "verification": "go test ./cmd/anza ./internal/cli -count=1; go vet ./cmd/anza ./internal/cli",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 14,
+      "repository": "anza"
+    },
+    {
+      "id": "T9.2",
+      "title": "Implement POSIX one-line bootstrap",
+      "deps": [
+        "T2.4",
+        "T1.3"
+      ],
+      "owned_paths": [
+        "install.sh",
+        "scripts/tests/bootstrap-posix.sh"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-014"
+      ],
+      "steps": [
+        "Implement sh-compatible OS/architecture detection and HTTPS download using a versioned installer with an embedded expected release-manifest SHA256. Verify manifest hash, then artifact hash, using supported native SHA256 tools. The HTTPS-delivered installer is the initial trust root; do not claim independent signature verification in shell.",
+        "Install into per-user bin without requiring Go/Node/admin; preserve an existing incompatible binary until explicit update. Explain PATH and support version override.",
+        "Use /dev/tty only when available for wizard input after piped bootstrap; noninteractive mode downloads/prints next step without hanging or reading script stdin."
+      ],
+      "acceptance": [
+        "POSIX fixtures cover macOS/Linux architectures, unsupported target, missing fetch/hash tool, bad manifest/artifact digest, interrupted download and paths with spaces.",
+        "Bootstrap cannot execute an unverified download or overwrite an unowned binary.",
+        "Interactive successful bootstrap invokes installed Anza once; noninteractive invocation does not wait."
+      ],
+      "test_cases": [
+        "bootstrap-posix.sh fixture matrix"
+      ],
+      "verification": "sh -n install.sh; sh scripts/tests/bootstrap-posix.sh",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 15,
+      "repository": "anza"
+    },
+    {
+      "id": "T9.3",
+      "title": "Implement native PowerShell bootstrap",
+      "deps": [
+        "T2.4",
+        "T1.3"
+      ],
+      "owned_paths": [
+        "install.ps1",
+        "scripts/tests/bootstrap-windows.ps1"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-014"
+      ],
+      "steps": [
+        "Implement Windows architecture/version detection and release download using a versioned installer with an embedded expected manifest SHA256; verify manifest and artifact with native cryptographic hashing.",
+        "Use per-user bin and atomic replacement with executable-in-use handling; update only user PATH after disclosure and preserve unrelated PATH entries.",
+        "Handle constrained execution policy/admin absence with actionable instructions; never disable policy globally or require WSL silently."
+      ],
+      "acceptance": [
+        "Windows fixtures cover spaces/non-ASCII home, locked binary, unsupported arch, corrupt manifest/artifact and cancelled download.",
+        "No admin or Go compiler is required for supported bootstrap.",
+        "Policy restriction returns guidance without modifying machine security settings."
+      ],
+      "test_cases": [
+        "bootstrap-windows.ps1 fixture matrix"
+      ],
+      "verification": "powershell -NoProfile -File scripts/tests/bootstrap-windows.ps1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 15,
+      "repository": "anza"
+    },
+    {
+      "id": "T9.4",
+      "title": "Prepare reproducible artifacts, integrity and CI",
+      "deps": [
+        "T9.1",
+        "T9.2",
+        "T9.3"
+      ],
+      "owned_paths": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "scripts/release.sh",
+        "scripts/release.ps1",
+        "docs/release.md"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-014",
+        "infrastructure"
+      ],
+      "steps": [
+        "Build explicit GOOS/GOARCH artifacts for qualified matrix using pinned Go/deps, trimpath and version metadata. Produce SBOM/licenses/checksums and Ed25519-signed release metadata for CLI updates; stamp manifest SHA256 into versioned bootstrap scripts after artifact build.",
+        "Run targeted tests, whole-module integration and go vet/lint on required native runners; missing native runner means unqualified, not pass.",
+        "Prepare manual gated release workflow with minimal permissions and no publish on ordinary PRs; include rollback/revocation/compromised-release procedure.",
+        "Release only the Anza CLI and content artifacts from this repository. Shared backend image/config is built and deployed through chat existing infrastructure; coordinate advertised catalog compatibility and deploy the additive backend first.",
+        "Payload manifest covers binaries/content only. Generate bootstrap scripts afterward with its digest; do not recursively include those scripts in that same manifest. Record script hashes separately."
+      ],
+      "acceptance": [
+        "CI rejects missing tests, failed native jobs, changed generated schemas and integrity failures.",
+        "Every artifact has exact platform/name/version/digest. Both bootstraps pin manifest hashes; the Go updater verifies Ed25519 signatures using an embedded public key. Document initial HTTPS trust and signing-key rotation/revocation.",
+        "No production release is created by this preparation task."
+      ],
+      "test_cases": [
+        "Run workflow validation and local artifact dry-run; actual release is T11.3"
+      ],
+      "verification": "python3 scripts/check-plan.py; go test ./... -count=1; go vet ./...; golangci-lint run ./...",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 16,
+      "repository": "anza"
+    },
+    {
+      "id": "T10.1",
+      "title": "Test fresh, existing and interrupted complete journeys",
+      "deps": [
+        "T9.4",
+        "T3.6"
+      ],
+      "owned_paths": [
+        "internal/acceptance/journeys_test.go",
+        "internal/acceptance/fixtures.go",
+        "scripts/tests/chat-contract.sh"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-002",
+        "UC-003",
+        "UC-004",
+        "UC-005",
+        "UC-006",
+        "UC-007",
+        "UC-009",
+        "UC-013",
+        "UC-017"
+      ],
+      "steps": [
+        "Run real Anza CLI subprocesses against the actual chat router in TestAnzaContractFixture, using synthetic storage/provider and temporary private roots. Coordinator supplies the checked-out chat source path as ANZA_CHAT_SOURCE; no Go import of the private repository. Ordinary Anza go test ./... must run without private chat access; the cross-repository case skips explicitly when ANZA_CHAT_SOURCE is absent, while the dedicated contract script fails if it is absent.",
+        "Cover new beginner/developer setup, optional text/typed brief, stable recovery token, setup messages through /api/ask, typed recommendation, mismatch/disabled feature and existing website route smoke checks.",
+        "Exercise interrupted setup/network replay across CLI and server boundaries. Record both reviewed repository commits/digests at execution time, not hardcoded plan-time SHAs."
+      ],
+      "acceptance": [
+        "A real Anza subprocess completes interview/recommendation against the shared chat router and cannot use legacy prose as an executable plan.",
+        "Disabled setup or catalog mismatch produces an actionable CLI error while website intake remains usable.",
+        "A deliberately broken route/token/version mapping fails the contract test; local fakes are not claimed as native/live qualification."
+      ],
+      "test_cases": [
+        "TestFreshJourney",
+        "TestExistingJourney",
+        "TestInterruptedJourney",
+        "TestBriefImportJourney",
+        "TestSharedChatContract"
+      ],
+      "verification": "ANZA_CHAT_SOURCE=<coordinator-supplied-chat-worktree> sh scripts/tests/chat-contract.sh; go test ./internal/acceptance -count=1; go vet ./internal/acceptance",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 17,
+      "repository": "anza"
+    },
+    {
+      "id": "T10.2",
+      "title": "Qualify real native platform installs and recovery",
+      "deps": [
+        "T9.4"
+      ],
+      "owned_paths": [
+        "docs/evidence/platform-qualification.md",
+        "scripts/qualify-platform.sh",
+        "scripts/qualify-platform.ps1"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-006",
+        "UC-007",
+        "UC-009",
+        "UC-012",
+        "UC-013"
+      ],
+      "steps": [
+        "Run bootstraps and real vendor installers only in disposable native/VM accounts for each required compatibility target; capture versions and sanitized command results.",
+        "Exercise first install, repeat, existing custom config, PATH restart, interrupted vendor install, update, uninstall, non-admin and offline cached path.",
+        "Record each combination separately with exact observed result and reproduction steps. Lack of hardware/runner stays blocked; cross-compilation is not native qualification."
+      ],
+      "acceptance": [
+        "Each claimed supported matrix cell has real install and preservation evidence.",
+        "Participant-auth/live provider checks are separate T10.4 evidence.",
+        "Failure produces a concrete task or downgraded support classification, not a waived pass."
+      ],
+      "test_cases": [
+        "Native platform checklist with before/after owned/unowned file digests"
+      ],
+      "verification": "Run scripts/qualify-platform.sh on qualified POSIX targets; run scripts/qualify-platform.ps1 on Windows; attach sanitized evidence",
+      "kind": "any",
+      "estimate_minutes": 90,
+      "target_model": "Coordinator/founder",
+      "certification": "not_run",
+      "wave": 17,
+      "repository": "anza"
+    },
+    {
+      "id": "T10.3",
+      "title": "Exercise installer and backend adversarial boundaries",
+      "deps": [
+        "T10.1"
+      ],
+      "owned_paths": [
+        "internal/acceptance/security_test.go",
+        "docs/evidence/security-review.md"
+      ],
+      "use_cases": [
+        "UC-005",
+        "UC-009",
+        "UC-014",
+        "UC-015",
+        "UC-016"
+      ],
+      "steps": [
+        "Test model injection, poisoned brief, archive traversal/reparse/case collisions, malicious manifests, redirects, secret leakage and stale-plan race in Anza.",
+        "Drive the real shared chat fixture to test purpose/token isolation, recommendation versions, deletion and retry behavior. Backend-specific quota/race tests run under chat task contracts, not a new Anza server package.",
+        "Review owned process cancellation, privilege prompts, config inverses and credential lifetime. Include shared intake regression evidence and unresolved findings."
+      ],
+      "acceptance": [
+        "Each named boundary has a negative test which fails if its guard is deliberately disabled.",
+        "Race tests and corruption recovery demonstrate limits rather than only checking happy-path mocks.",
+        "No high-severity data loss/credential leakage/unbounded spending finding remains unaddressed at release."
+      ],
+      "test_cases": [
+        "TestMaliciousInputs",
+        "TestQuotaReplayIsolation",
+        "TestCredentialLeakCanaries",
+        "TestApprovalTOCTOU"
+      ],
+      "verification": "go test ./internal/acceptance -run \"TestMalicious|TestQuota|TestCredential|TestApproval\" -count=1; go test -race ./internal/executor ./internal/state -count=1",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 18,
+      "repository": "anza"
+    },
+    {
+      "id": "T10.4",
+      "title": "Qualify real agent authentication and model round trips",
+      "deps": [
+        "T10.2",
+        "T7.1",
+        "T7.2",
+        "T11.2"
+      ],
+      "owned_paths": [
+        "docs/evidence/provider-qualification.md"
+      ],
+      "use_cases": [
+        "UC-008",
+        "UC-010"
+      ],
+      "steps": [
+        "Prepare an exact smoke procedure for ChatGPT subscription, Claude subscription, Codex/OpenRouter and Claude/OpenRouter using participant/operator-owned authorized test accounts.",
+        "After scoped cost authorization, run tiny harmless prompts and one tool-call fixture in a disposable workspace; record version/model/provider and observed outcome without tokens/content.",
+        "Test mixed-provider modes, missing/expired credential, account conflict and revoked key; separate entitlement failures from installer failures."
+      ],
+      "acceptance": [
+        "All four advertised access paths have real evidence or the release gate remains blocked.",
+        "Auth status alone is not considered model/tool-call success.",
+        "Paid requests stay within recorded test budget; no silent provider/model fallback."
+      ],
+      "test_cases": [
+        "Four provider cells plus negative credential/conflict cells"
+      ],
+      "verification": "Execute the reviewed provider-qualification checklist under its recorded authorization; no paid call before T11.2 scope approval",
+      "kind": "any",
+      "estimate_minutes": 90,
+      "target_model": "Coordinator/founder",
+      "certification": "not_run",
+      "wave": 19,
+      "repository": "anza"
+    },
+    {
+      "id": "T11.1",
+      "title": "Write participant/operator guides and license packet",
+      "deps": [
+        "T9.1",
+        "T1.4"
+      ],
+      "owned_paths": [
+        "docs/participant-guide.md",
+        "docs/troubleshooting.md",
+        "docs/privacy-draft.md",
+        "docs/third-party-notices.md",
+        "docs/license-decision.md"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-008",
+        "UC-009",
+        "UC-015",
+        "UC-016"
+      ],
+      "steps": [
+        "Document actual OS commands, shared-chat setup flow, reviewed fact sharing, subscription/OpenRouter ownership, manual steps and project-specific readiness.",
+        "Explain disabled/unavailable shared setup mode, unsupported catalog, interrupted install, locked keychain, configuration conflict, PATH issue, quota exhaustion and resume/delete.",
+        "Prepare participant privacy notice using chat verified retention/provider policy and setup mail exclusion. Propose Anza license separately; do not publish new service terms or invent consent to owner emails."
+      ],
+      "acceptance": [
+        "Every troubleshooting state links to an existing command or specific human action.",
+        "Guides do not promise earnings, complete customer project delivery or universal automatic SDK installation.",
+        "All bundled content has traceable rights; unresolved rights prevent release."
+      ],
+      "test_cases": [
+        "Walk docs against real command help and qualification evidence"
+      ],
+      "verification": "python3 scripts/check-plan.py --content; review links and run documented local help/version examples",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 16,
+      "repository": "anza"
+    },
+    {
+      "id": "T11.2",
+      "title": "Review shared-backend rollout and bounded live-check scope",
+      "deps": [
+        "T3.6",
+        "T9.4",
+        "T11.1",
+        "T11.5"
+      ],
+      "owned_paths": [
+        "docs/launch-authorization.md"
+      ],
+      "use_cases": [
+        "UC-016",
+        "UC-014"
+      ],
+      "steps": [
+        "Present concrete additive chat diff/infra preview, selected existing provider route, incremental setup daily/session caps, existing total provider limits, smoke budget, existing origin, retention/mail behavior and Anza license.",
+        "Check existing scoped authorizations before asking for missing decisions: record exactly which shared-backend code/resource/spend changes are already covered and which need founder approval. Reuse does not automatically expand budgets.",
+        "Record backend-first rollout, rollback disabling setup only, catalog compatibility, CLI publication scope and authorized operator. Do not request selection of a brand-new service host."
+      ],
+      "acceptance": [
+        "Launch record names the existing chat target, additive resources/config, maximum incremental spend and applicable existing/new authorizations.",
+        "Provider smoke and deployment scopes are explicit; no increase to approved shared budgets is inferred.",
+        "Participant data policy and Anza license decisions precede publication."
+      ],
+      "test_cases": [
+        "Human review of concrete launch packet"
+      ],
+      "verification": "Coordinator verifies each requested external action has matching recorded scope",
+      "kind": "human",
+      "estimate_minutes": 45,
+      "target_model": "Coordinator/founder",
+      "certification": "not_run",
+      "wave": 18,
+      "repository": "anza"
+    },
+    {
+      "id": "T11.3",
+      "title": "Roll out shared setup mode and publish the qualified CLI",
+      "deps": [
+        "T11.2",
+        "T10.1",
+        "T10.2",
+        "T10.3",
+        "T10.4",
+        "T11.1"
+      ],
+      "owned_paths": [
+        "docs/evidence/production-verification.md",
+        "docs/release-record.md"
+      ],
+      "use_cases": [
+        "UC-001",
+        "UC-003",
+        "UC-006",
+        "UC-008",
+        "UC-014",
+        "UC-016"
+      ],
+      "steps": [
+        "Under recorded scope, roll out additive setup quota/config and the reviewed chat image using its existing Lambda/HTTP API/Pulumi path. Keep setup disabled until capability and legacy intake/brief/title/booking checks pass.",
+        "Enable setup on the existing origin, verify catalog protocol, then publish qualified signed Anza artifacts and one-line URLs. No separate interview host or service executable.",
+        "Run a tiny authorized production setup interview/recommendation/delete and existing website regression checks. On failure disable setup/roll back the reviewed chat image without discarding stored conversations."
+      ],
+      "acceptance": [
+        "A clean CLI uses the existing Sanifu API origin and completes setup recommendation through shared conversation routes.",
+        "Existing website intake, brief approval, titles and booking fixture semantics remain intact after deployment.",
+        "Release record contains both repository revisions, catalog digest, live observations and setup-only rollback procedure."
+      ],
+      "test_cases": [
+        "Live production route/status checks and published artifact clean install"
+      ],
+      "verification": "Execute docs/release.md and record actual production URLs/status/digests; respect launch-authorization.md",
+      "kind": "any",
+      "estimate_minutes": 90,
+      "target_model": "Coordinator/founder",
+      "certification": "not_run",
+      "wave": 20,
+      "repository": "anza"
+    },
+    {
+      "id": "T11.4",
+      "title": "Pilot with real participant projects and revise recipes",
+      "deps": [
+        "T11.3"
+      ],
+      "owned_paths": [
+        "docs/evidence/pilot-summary.md",
+        "docs/pilot-next-actions.md"
+      ],
+      "use_cases": [
+        "UC-003",
+        "UC-004",
+        "UC-010",
+        "UC-011"
+      ],
+      "steps": [
+        "Observe consenting beginner/developer participants on their own projects, with client projects optional. Use at least one case per supported OS before broad support claims.",
+        "Measure active setup time, missing recipes, manual help, accurate readiness and first meaningful check; record anonymized aggregates only.",
+        "Turn failures into scoped follow-up tasks. Change defaults only with new reviewed catalog/version and preservation checks."
+      ],
+      "acceptance": [
+        "Pilot summary distinguishes observed cases from untested domains and records unresolved blockers.",
+        "No customer code/transcript/contact details are committed.",
+        "Participants can resume independently and explain their next project step; failed cases remain visible."
+      ],
+      "test_cases": [
+        "Human-observed real project readiness and continuation checklist"
+      ],
+      "verification": "Complete consented pilot observation checklist and review anonymized results",
+      "kind": "human",
+      "estimate_minutes": 90,
+      "target_model": "Coordinator/founder",
+      "certification": "not_run",
+      "wave": 21,
+      "repository": "anza"
+    },
+    {
+      "id": "T11.5",
+      "title": "Prepare additive setup configuration in the existing deployment",
+      "deps": [
+        "T3.6"
+      ],
+      "owned_paths": [
+        "infra/lambda/index.ts",
+        "infra/lambda/README.md",
+        "infra/lambda/setup_config_check.py",
+        "docs/anza-rollout.md"
+      ],
+      "use_cases": [
+        "UC-016",
+        "infrastructure"
+      ],
+      "steps": [
+        "Extend the existing Pulumi Lambda stack with a setup coordination DynamoDB table/TTL and least-privilege transact/update permissions for that table only. Reuse existing transcript table, provider secret references, Lambda image and HTTP API origin.",
+        "Pass feature flag, setup table/catalog/limits/retention configuration through reviewed nonsecret variables. Default new setup capability off; existing stack/table/secret resource identities must not be replaced.",
+        "Prepare local config checks and a Pulumi preview from the authorized stack, showing no deletions/replacements of existing resources and no secret output. No pulumi up, provider calls or new hosting deployment in this task.",
+        "Document backend-first rollout, compatible client/catalog version range, shared retention and setup-only rollback. Include concurrency/IAM/table outage effects on legacy intake."
+      ],
+      "acceptance": [
+        "The reviewed infra change adds setup coordination/config to the existing stack without replacing its transcript table, Lambda identity or public API.",
+        "Absent or failed setup coordination storage leaves setup disabled/unavailable while existing intake is operational.",
+        "Rollout packet includes exact shared resource/config changes, IAM scope and reversible setup disable before any live apply."
+      ],
+      "test_cases": [
+        "Setup config fixture validation",
+        "Existing Pulumi TypeScript check",
+        "Authorized no-change/destructive-change preview review"
+      ],
+      "verification": "python3 infra/lambda/setup_config_check.py; npm --prefix infra/lambda run check; review scoped pulumi preview per infra/lambda/README.md",
+      "kind": "agent",
+      "estimate_minutes": 90,
+      "target_model": "GPT-6-Luna",
+      "certification": "not_run",
+      "wave": 17,
+      "repository": "chat"
+    }
+  ],
+  "waves": [
+    {
+      "id": 1,
+      "workers": 1,
+      "tasks": [
+        "T1.1"
+      ]
+    },
+    {
+      "id": 2,
+      "workers": 2,
+      "tasks": [
+        "T1.2",
+        "T1.5"
+      ]
+    },
+    {
+      "id": 3,
+      "workers": 3,
+      "tasks": [
+        "T1.3",
+        "T1.4",
+        "T2.6"
+      ]
+    },
+    {
+      "id": 4,
+      "workers": 3,
+      "tasks": [
+        "T5.1",
+        "T2.2",
+        "T2.1"
+      ]
+    },
+    {
+      "id": 5,
+      "workers": 3,
+      "tasks": [
+        "T5.2",
+        "T5.4",
+        "T5.5"
+      ]
+    },
+    {
+      "id": 6,
+      "workers": 3,
+      "tasks": [
+        "T5.6",
+        "T5.3",
+        "T2.3"
+      ]
+    },
+    {
+      "id": 7,
+      "workers": 3,
+      "tasks": [
+        "T5.7",
+        "T2.4",
+        "T6.2"
+      ]
+    },
+    {
+      "id": 8,
+      "workers": 3,
+      "tasks": [
+        "T6.3",
+        "T4.4",
+        "T2.5"
+      ]
+    },
+    {
+      "id": 9,
+      "workers": 3,
+      "tasks": [
+        "T6.1",
+        "T3.1",
+        "T7.1"
+      ]
+    },
+    {
+      "id": 10,
+      "workers": 3,
+      "tasks": [
+        "T6.4",
+        "T3.2",
+        "T3.3"
+      ]
+    },
+    {
+      "id": 11,
+      "workers": 3,
+      "tasks": [
+        "T3.7",
+        "T4.1",
+        "T4.2"
+      ]
+    },
+    {
+      "id": 12,
+      "workers": 3,
+      "tasks": [
+        "T7.2",
+        "T4.3",
+        "T7.3"
+      ]
+    },
+    {
+      "id": 13,
+      "workers": 3,
+      "tasks": [
+        "T8.1",
+        "T8.2",
+        "T8.3"
+      ]
+    },
+    {
+      "id": 14,
+      "workers": 3,
+      "tasks": [
+        "T3.4",
+        "T9.1",
+        "T3.8"
+      ]
+    },
+    {
+      "id": 15,
+      "workers": 3,
+      "tasks": [
+        "T3.5",
+        "T9.2",
+        "T9.3"
+      ]
+    },
+    {
+      "id": 16,
+      "workers": 3,
+      "tasks": [
+        "T3.6",
+        "T9.4",
+        "T11.1"
+      ]
+    },
+    {
+      "id": 17,
+      "workers": 3,
+      "tasks": [
+        "T11.5",
+        "T10.1",
+        "T10.2"
+      ]
+    },
+    {
+      "id": 18,
+      "workers": 1,
+      "tasks": [
+        "T11.2",
+        "T10.3"
+      ]
+    },
+    {
+      "id": 19,
+      "workers": 1,
+      "tasks": [
+        "T10.4"
+      ]
+    },
+    {
+      "id": 20,
+      "workers": 1,
+      "tasks": [
+        "T11.3"
+      ]
+    },
+    {
+      "id": 21,
+      "workers": 0,
+      "tasks": [
+        "T11.4"
+      ]
+    }
+  ],
+  "max_parallel_workers": 3,
+  "coordinator_slots": 1,
+  "planned_worker_minutes": 4560,
+  "revision": 2,
+  "architecture": "shared-chat-backend",
+  "repositories": {
+    "anza": "public Go CLI and master plan",
+    "chat": "existing private Go backend; separate worktree/authorization boundary"
+  }
+}

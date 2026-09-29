@@ -1,0 +1,9 @@
+ajent.social
+ajent.social.*
+.claude/scratch/
+.anza/
+dist/
+coverage.out
+*.test
+.env
+.env.*
