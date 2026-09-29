@@ -827,7 +827,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 worker commit 93e64a9adeaef471110dd72e6535c01aa0bca614; coordinator merge 82c9550; post-merge tests/vet passed (10 package tests); hosted route parity remains pending",
       "wave": 11,
       "repository": "anza"
     },
@@ -864,7 +864,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 worker commit c2cd690cce3d9f85c36a26c91e6661a48b649dbe; coordinator merge 99a1e71; post-merge tests/vet passed (3 package tests)",
       "wave": 11,
       "repository": "anza"
     },
