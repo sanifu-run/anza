@@ -151,8 +151,8 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 6: Dispatch (3 workers)
 
-- [ ] T5.6 Define mobile, desktop and unsupported-domain paths
-- [ ] T5.3 Define base agent and Git installation recipes
+- [x] T5.6 Define mobile, desktop and unsupported-domain paths
+- [x] T5.3 Define base agent and Git installation recipes
 - [x] T2.3 Implement bounded child process execution
 
 ### Wave 7: Dispatch (3 workers)
@@ -289,7 +289,7 @@ Wave 2: T1.2 and T1.5 completed on isolated task branches. The current chat sour
 
 ## Hand off Notes
 
-Waves 1-5 are locally accepted. T5.2, T5.4 and T5.5 are integrated; see task evidence for synthetic/catalog checks and limits. T2.3 is integrated. User authorized the catalog schema extensions; the coordinator implemented and locally verified the contract/loader amendment in an isolated worktree. T5.3 and T5.6 are now being resumed against the new interface. No dependent Wave 7 task has started. Source-backed chat wrapper parity remains scheduled for T3.6 TestAnzaContractFixture. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
+Waves 1-5 are locally accepted. T5.2, T5.4 and T5.5 are integrated; see task evidence for synthetic/catalog checks and limits. T2.3 is integrated. User authorized the catalog schema extensions; the coordinator implemented and locally verified the contract/loader amendment in an isolated worktree. T5.3 and T5.6 resumed against the new interface and are locally accepted; see Wave 6 evidence below. No dependent Wave 7 task has started. Source-backed chat wrapper parity remains scheduled for T3.6 TestAnzaContractFixture. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
 
 The launch gate reviews existing chat deployment/provider grants and asks only for missing incremental setup limits/resource/live-check/publication scopes. Reuse the existing origin and data policy; verify setup mail exclusion and Anza licensing. No new host or invitation system is proposed. Unknown caps must not be guessed by workers.
 
@@ -302,3 +302,5 @@ The launch gate reviews existing chat deployment/provider grants and asks only f
 - [Source audit](research/source-audit.md)
 - [Execution instructions](execution.md)
 - [Roadmap](roadmap.md)
+
+Wave 6 local acceptance: T5.3 and T5.6 were implemented in isolated GPT-6-Luna worktrees and integrated after coordinator review. T5.3 commit `8feff0f4442dbe3a0b4018c467b5fd090d638c51` adds separate Codex CLI, Claude Code and Git manual recipes; all omit artifacts and report zero estimated download bytes because Anza has no verified installation path. T5.6 commit `14e38c9761d016a3c5846d315705d98951dc1e77` adds mobile/desktop recipes and seven versioned manual/unsupported Exercise scenarios, with dated vendor-source facts; retrieval-date correction is `a628eaef73ecef230405e9d1f9031be637339453`. After integration, `go test ./internal/catalog -count=1`, `go vet ./internal/catalog`, all three plan validators, and `git diff --check` passed. The Exercise entries are not yet in a sealed manifest; end-to-end recommendation projection remains unqualified until its consumer exists. No install, account/license acceptance, project inspection, Chat change, external publication or native qualification occurred. Wave 7 is now dependency-ready.
