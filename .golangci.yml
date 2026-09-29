@@ -1,0 +1,13 @@
+version: "2"
+
+run:
+  go: "1.27"
+  tests: true
+  timeout: 3m
+
+linters:
+  default: standard
+
+formatters:
+  enable:
+    - gofmt
