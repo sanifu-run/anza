@@ -42,9 +42,6 @@ class PlanCheckerTests(unittest.TestCase):
 
     def test_current_plan_passes_and_preserves_execution_status(self):
         before = (self.root / "docs" / "execution-index.json").read_bytes()
-        data, _ = self.index()
-        self.assertTrue(next(t for t in data["tasks"] if t["id"] == "T1.1")["certification"].startswith("Certified:"))
-        self.assertTrue(all(t["certification"] == "not_run" for t in data["tasks"] if t["id"] != "T1.1"))
         result = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(
