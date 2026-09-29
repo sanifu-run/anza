@@ -289,7 +289,7 @@ Wave 2: T1.2 and T1.5 completed on isolated task branches. The current chat sour
 
 ## Hand off Notes
 
-Waves 1-5 are locally accepted. T5.2, T5.4 and T5.5 are integrated; see task evidence for synthetic/catalog checks and limits. Proceed with Wave 6 tasks T5.6, T5.3 and T2.3. Source-backed chat wrapper parity remains scheduled for T3.6 TestAnzaContractFixture. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
+Waves 1-5 are locally accepted. T5.2, T5.4 and T5.5 are integrated; see task evidence for synthetic/catalog checks and limits. Wave 6 has started with T5.3 and T2.3 in isolated worktrees. T5.6 is held pending a versioned Exercise/unsupported-project interface; see the development log. Resume the wave only after that interface gate is resolved. Source-backed chat wrapper parity remains scheduled for T3.6 TestAnzaContractFixture. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
 
 The launch gate reviews existing chat deployment/provider grants and asks only for missing incremental setup limits/resource/live-check/publication scopes. Reuse the existing origin and data policy; verify setup mail exclusion and Anza licensing. No new host or invitation system is proposed. Unknown caps must not be guessed by workers.
 
