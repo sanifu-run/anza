@@ -564,7 +564,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 worker commits 7887b382a3a68795102f57cb61b0ded1ff97d837 and b4bb06b6ebe6a9a379cb0888f8345a6bc2d7a1ad; coordinator merges 2ef2d7b and dc3dd5b; post-merge tests/vet and changed-code lint passed; live smoke skipped",
       "wave": 10,
       "repository": "chat"
     },

@@ -45,7 +45,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E2](plans/E2.md).
 
-### E3 -- Shared chat setup interview -> docs/plans/E3.md (2/8)
+### E3 -- Shared chat setup interview -> docs/plans/E3.md (3/8)
 
 [Open E3](plans/E3.md).
 
@@ -177,7 +177,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 - [x] T6.4 Execute approved operations with receipts and crash recovery
 - [x] T3.2 Add persistent setup-only admission to the shared backend
-- [ ] T3.3 Extract and reuse the existing model transport
+- [x] T3.3 Extract and reuse the existing model transport
 
 ### Wave 11: Dispatch (3 workers)
 
