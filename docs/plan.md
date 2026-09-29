@@ -1,6 +1,6 @@
 # Anza implementation plan
 
-Date: 2026 09 28. Revision: 2, shared chat reuse. Status: planned, not implemented. Execution target: GPT-6-Luna.
+Date: 2026 09 28. Revision: 3, shared chat reuse and authorized native-only credentials dependency. Status: in progress. Execution target: GPT-6-Luna.
 
 ## Context
 
@@ -163,7 +163,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 8: Dispatch (3 workers)
 
-- [ ] T6.3 Implement Claude Code configuration adapter
+- [x] T6.3 Implement Claude Code configuration adapter
 - [ ] T4.4 Implement exact-plan review and digest approval
 - [ ] T2.5 Implement OS credential storage and session-only fallback
 

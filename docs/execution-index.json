@@ -371,14 +371,16 @@
       "owned_paths": [
         "internal/credentials/store.go",
         "internal/credentials/platform.go",
-        "internal/credentials/store_test.go"
+        "internal/credentials/store_test.go",
+        "go.mod",
+        "go.sum"
       ],
       "use_cases": [
         "UC-008",
         "UC-015"
       ],
       "steps": [
-        "Use reviewed OS credential-store adapters with service name anza and credential IDs scoped to provider/workspace. Never place secrets in arguments, receipts or project config.",
+        "Use github.com/byteness/keyring v1.13.2 with service name anza and credential IDs scoped to provider/workspace. Build with keyring_no1password, keyring_nofile, keyring_nopass, keyring_nopassage and keyring_noprotonpass tags. Runtime allowlist selects exactly the current OS-native backend: keychain, wincred, or secret-service. Never auto-select or fall back to file, password-manager, kernel-keyring or another service; never place secrets in arguments, receipts or project config.",
         "Provide masked terminal acquisition at the CLI seam and an in-memory session-only path if the store is unavailable; persist no plaintext fallback.",
         "Delete only credentials recorded as created by Anza. Existing vendor credentials are outside ownership."
       ],
@@ -397,7 +399,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "Certified: GPT-6-Luna 2026-09-28 81fd21413dd6de2729aaa7ac6d2366c142de613f; package tests/vet/lint passed; runtime/provider behavior documentation-only",
+      "certification": "not_run",
       "wave": 8,
       "repository": "anza"
     },
@@ -1355,7 +1357,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-28 81fd21413dd6de2729aaa7ac6d2366c142de613f; package tests/vet/lint passed; runtime/provider behavior documentation-only",
       "wave": 8,
       "repository": "anza"
     },
