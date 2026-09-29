@@ -1,0 +1,38 @@
+{
+  "id": "git",
+  "version": "platform-managed",
+  "description": "Manual, platform-managed Git availability guidance. There is no single official cross-platform binary/version target in the reviewed sources; Anza never runs an installer or package manager.",
+  "purpose": "Ensure a participant-selected Git installation is available while preserving the existing executable and leaving distribution-specific installation choices to the participant.",
+  "supported_platforms": [
+    "darwin-arm64",
+    "darwin-amd64",
+    "windows-amd64",
+    "windows-arm64",
+    "wsl2-amd64",
+    "linux-ubuntu-22.04-amd64",
+    "linux-ubuntu-22.04-arm64",
+    "linux-ubuntu-24.04-amd64",
+    "linux-ubuntu-24.04-arm64",
+    "linux-debian-12-amd64",
+    "linux-debian-12-arm64",
+    "linux-alpine-3.19-amd64",
+    "linux-alpine-3.19-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Check whether `git` is already resolvable on PATH and, if so, read `git --version`. Preserve an existing installation when it satisfies the participant's project constraints; do not install a duplicate or perform an upgrade. If absent or incompatible, show the official Git installation guidance for the observed operating system and leave the participant to choose a distribution-specific source. The upstream Git version and package-manager versions can differ; do not treat a version string as proof of compatibility.",
+  "install_strategy": "manual",
+  "privileges": [
+    "Anza requests no elevation; install scope is participant-selected.",
+    "Linux package managers and some macOS developer tools may need OS authorization.",
+    "System-wide Windows installer choices require separate participant approval."
+  ],
+  "license_notes": "The Git project states that Git is covered by GPL version 2, with some components under compatible different licenses. Platform distributions may bundle other separately licensed components. The participant must review the selected distributor's notices; Anza does not redistribute or repackage Git.",
+  "estimated_download_bytes": 0,
+  "side_effects": [
+    "Anza makes no filesystem or PATH changes for this manual recipe.",
+    "A participant-selected installer or package manager may alter user or system package state; no global package action is automatic or reversible by Anza.",
+    "The official Git site identifies macOS non-source distributions as third-party and directs Linux users to their distribution package managers. Version and trust evidence therefore vary by platform."
+  ],
+  "verification": "After the participant chooses and completes a manual installation, `git --version` may confirm the reported version. On 2026-09-28, Git upstream 2.56.0 was released and Git for Windows v2.56.0.windows.1 published x64/ARM64 installers with release SHA-256 metadata; Mac and Linux installation sources remain distribution-specific. This recipe has no global target version, digest, size, or portable artifact and does not claim integrity or native qualification. Installation and upgrade readiness remain manual/unmet.",
+  "reversal_class": "manual"
+}

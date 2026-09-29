@@ -1,0 +1,38 @@
+{
+  "id": "claude-code",
+  "version": "2.1.276",
+  "description": "Manual Claude Code setup guidance for documented targets. Anza does not download, install, update, or claim verification of the vendor binary.",
+  "purpose": "Make Claude Code available while preserving any existing installation and requiring separate review for upgrades, account access, and unsupported platform constraints.",
+  "supported_platforms": [
+    "darwin-arm64",
+    "darwin-amd64",
+    "windows-amd64",
+    "windows-arm64",
+    "wsl1-amd64",
+    "wsl2-amd64",
+    "linux-ubuntu-22.04-amd64",
+    "linux-ubuntu-22.04-arm64",
+    "linux-ubuntu-24.04-amd64",
+    "linux-ubuntu-24.04-arm64",
+    "linux-debian-12-amd64",
+    "linux-debian-12-arm64",
+    "linux-alpine-3.19-amd64",
+    "linux-alpine-3.19-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Check whether `claude` is already resolvable on PATH and, if so, read `claude --version`. Preserve an existing installation when it satisfies the participant's project constraints; do not install a duplicate, change the release channel, or perform an upgrade. A detected version alone does not prove platform floors, account access, or project compatibility. If absent or incompatible, present Anthropic's official setup documentation as a manual step and leave readiness unqualified until separately reviewed. Do not inspect authentication state.",
+  "install_strategy": "manual",
+  "privileges": [
+    "Anza requests no elevation; native install is per-user.",
+    "APT, DNF, APK, or system-scope installs may need participant-approved elevation."
+  ],
+  "license_notes": "Claude Code is distributed under Anthropic's vendor terms; the public setup documentation does not grant Anza redistribution rights. The participant must review applicable product and account terms. Anza does not redistribute or repackage Claude Code.",
+  "estimated_download_bytes": 0,
+  "side_effects": [
+    "Anza makes no filesystem or PATH changes for this manual recipe.",
+    "A participant-selected native installer may install into per-user directories and auto-update in the background; package-manager update behavior differs by method.",
+    "Anthropic documents signed release manifests and per-platform SHA-256 checksums. Anza has not implemented or qualified signature verification or native platform behavior."
+  ],
+  "verification": "After a separately reviewed participant installation, `claude --version` may confirm the reported version. For the observed pin, the expected output is 2.1.276. The versioned manifest contains platform checksums and sizes, and Anthropic documents detached signature verification using its published key fingerprint; this worker fetched but did not cryptographically verify the detached signature. Version output alone does not prove artifact integrity, native operation, project compatibility, authentication, or readiness. Alpine package prerequisites and all untested cells remain manual/unmet.",
+  "reversal_class": "manual"
+}

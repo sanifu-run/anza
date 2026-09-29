@@ -1,0 +1,32 @@
+[
+  {
+    "id": "codex-cli-source",
+    "source": "https://github.com/openai/codex/releases/tag/rust-v0.157.1; https://github.com/openai/codex/blob/main/scripts/install/install.sh (retrieved 2026-09-28)",
+    "license": "Source and platform claims reviewed; no vendor content is redistributed by Anza. See the separately recorded license terms."
+  },
+  {
+    "id": "codex-cli-apache-2.0",
+    "source": "https://github.com/openai/codex/blob/main/codex-cli/package.json; https://github.com/openai/codex/blob/main/NOTICE (retrieved 2026-09-28)",
+    "license": "Codex CLI declares Apache-2.0; repository NOTICE identifies Ratatui-derived code under MIT. Review bundled notices; Anza does not redistribute the CLI."
+  },
+  {
+    "id": "claude-code-source",
+    "source": "https://code.claude.com/docs/en/setup; https://downloads.claude.ai/claude-code-releases/2.1.276/manifest.json; https://downloads.claude.ai/claude-code-releases/2.1.276/manifest.json.sig (retrieved 2026-09-28)",
+    "license": "Source and platform claims reviewed; no vendor binary is redistributed by Anza. See the separately recorded vendor terms."
+  },
+  {
+    "id": "claude-code-vendor-terms",
+    "source": "https://code.claude.com/docs/en/setup (retrieved 2026-09-28)",
+    "license": "Anthropic vendor/product terms apply; public setup documentation grants no Anza redistribution rights. A participant must review applicable terms."
+  },
+  {
+    "id": "git-source",
+    "source": "https://git-scm.com/install/mac; https://git-scm.com/install/linux; https://git-scm.com/install/windows; https://github.com/git-for-windows/git/releases/tag/v2.56.0.windows.1 (retrieved 2026-09-28)",
+    "license": "Source and platform claims reviewed; no software is redistributed by Anza. See the separately recorded upstream and distribution terms."
+  },
+  {
+    "id": "git-gpl-2.0",
+    "source": "https://github.com/git/git/blob/master/README.md (retrieved 2026-09-28)",
+    "license": "Git upstream is covered by GPL version 2; some components use compatible different licenses. Distribution packages may include additional notices; review the selected distributor's terms."
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "id": "codex-cli",
+  "version": "0.157.1",
+  "description": "Manual Codex CLI setup guidance for documented targets. Anza does not download, install, update, or claim verification of the vendor binary.",
+  "purpose": "Make the OpenAI Codex CLI available while preserving any existing installation and requiring separate review for upgrades or unsupported project constraints.",
+  "supported_platforms": [
+    "darwin-arm64",
+    "darwin-amd64",
+    "windows-amd64",
+    "windows-arm64",
+    "wsl2-amd64",
+    "linux-ubuntu-22.04-amd64",
+    "linux-ubuntu-24.04-amd64",
+    "linux-debian-12-amd64",
+    "linux-debian-12-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Check whether `codex` is already resolvable on PATH and, if so, read `codex --version`. Preserve an existing installation when it satisfies the participant's project constraints; do not install a duplicate or perform an upgrade. A detected version alone does not prove project compatibility. If absent or incompatible, present the official OpenAI install/release documentation as a manual step and leave readiness unqualified until separately reviewed. Do not inspect login credentials or project files.",
+  "install_strategy": "manual",
+  "privileges": [
+    "Anza requests no elevation; vendor default is per-user.",
+    "Any alternate install scope is a separate participant choice."
+  ],
+  "license_notes": "The Codex CLI repository declares Apache-2.0; its NOTICE identifies included Ratatui-derived code under MIT. The participant must review current vendor and bundled-component notices. Anza does not redistribute or repackage the CLI.",
+  "estimated_download_bytes": 0,
+  "side_effects": [
+    "Anza makes no filesystem or PATH changes for this manual recipe.",
+    "A participant may choose a vendor installer that adds or updates a per-user executable and may use vendor-managed update behavior.",
+    "The Codex installer documents release metadata and package checksum verification over HTTPS; Anza has not implemented or qualified that verification path."
+  ],
+  "verification": "After a separately reviewed participant installation, `codex --version` may confirm the reported version. For the observed stable pin, the expected output is 0.157.1. Version output alone does not prove artifact integrity, native operation, project compatibility, authentication, or readiness. Windows/native and Alpine cells retain the documentation discrepancy recorded in T1.3; unsupported or unknown OS floors stay manual/unmet.",
+  "reversal_class": "manual"
+}
