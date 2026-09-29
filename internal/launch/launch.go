@@ -69,7 +69,7 @@ type Request struct {
 type Result struct {
 	Agent         Agent          `json:"agent"`
 	Provider      Provider       `json:"provider"`
-	Args          []string       `json:"args"`
+	ArgumentCount int            `json:"argument_count"`
 	Execution     process.Result `json:"execution"`
 	Authenticated bool           `json:"authenticated"`
 	Instructions  string         `json:"instructions,omitempty"`
@@ -177,7 +177,7 @@ func Launch(ctx context.Context, request Request) (Result, error) {
 		return result, fmt.Errorf("unsupported agent %q", request.Agent)
 	}
 
-	result.Args = append([]string(nil), spec.Args...)
+	result.ArgumentCount = len(spec.Args)
 	result.Execution, err = runner(ctx, spec)
 	if err != nil {
 		if provider == ProviderSubscription && errors.Is(err, context.Canceled) {
