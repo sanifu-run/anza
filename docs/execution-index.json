@@ -1075,7 +1075,6 @@
         "catalog/recipes/web.json",
         "catalog/packs/web.json",
         "catalog/packs/automation.json",
-        "catalog/exercises/web.json",
         "catalog/provenance/web.json"
       ],
       "use_cases": [
@@ -1086,16 +1085,16 @@
       "steps": [
         "Define Node-based web and optional browser-automation capabilities with pinned qualified tool methods and explicit download sizes/licenses.",
         "Keep editor, GitHub CLI and browser tooling optional; select by project facts, not all-at-once defaults.",
-        "Define a non-destructive new scratch project or read-only existing-project check; package scripts require preview and separate execution consent."
+        "Define proposed non-destructive exercise intent in design notes only if needed to explain the pack; do not create catalog/exercises descriptors until a versioned Exercise schema and loader validator exist. Existing project package scripts require preview and separate execution consent."
       ],
       "acceptance": [
         "Web needs select only prerequisites and relevant skills; no unnecessary paid hosting provisioning.",
         "Existing project source is not overwritten by an exercise.",
-        "Unavailable browser/system requirements return manual actions rather than ready."
+        "Unavailable browser/system requirements return manual actions rather than ready.",
+        "No exercise descriptor is emitted until a versioned Exercise schema exists; no entry may bypass catalog validation."
       ],
       "test_cases": [
-        "TestCatalogValidation",
-        "TestExerciseDescriptors"
+        "TestCatalogValidation against synthetic recipe/pack fixtures"
       ],
       "verification": "go test ./internal/catalog -count=1",
       "kind": "agent",
@@ -1115,7 +1114,6 @@
         "catalog/recipes/python-go.json",
         "catalog/packs/data-ml.json",
         "catalog/packs/go.json",
-        "catalog/exercises/python-go.json",
         "catalog/provenance/python-go.json"
       ],
       "use_cases": [
@@ -1126,15 +1124,16 @@
       "steps": [
         "Define per-project Python environments and Go tooling with qualified methods; preserve existing interpreter/module versions.",
         "Separate CPU readiness from optional GPU/CUDA/remote-compute requirements. Zerfoo is optional where fit is established, never a universal ML requirement.",
-        "Provide exercises that check local imports/build/run on a scratch example or participant-approved existing commands, without downloading customer datasets."
+        "Defer exercise descriptors until a versioned Exercise schema and loader validator exist. Do not download datasets or execute package scripts; any later existing-project check requires participant approval."
       ],
       "acceptance": [
         "Existing Python/Go projects retain declared versions and lockfiles.",
         "GPU-required project on CPU machine reports unmet requirement explicitly.",
-        "No cloud/GPU allocation or model training charges occur during setup."
+        "No cloud/GPU allocation or model training charges occur during setup.",
+        "No exercise descriptor is emitted until a versioned Exercise schema exists; no entry may bypass catalog validation."
       ],
       "test_cases": [
-        "TestCatalogValidation",
+        "TestCatalogValidation against synthetic recipe/pack fixtures",
         "TestMLCapabilityConstraints"
       ],
       "verification": "go test ./internal/catalog -count=1",
@@ -1212,12 +1211,13 @@
         "Implement root catalog package embedding the named data directories; internal/catalog loads that embedded filesystem. Do not attempt a go:embed path containing parent-directory traversal.",
         "Generate a sorted manifest of content files/digests/provenance references and catalog version from reviewed assets. Exclude Go files and local state; generator --check is read-only.",
         "Run complete reference/recipe/license/platform validation against bundled content and freeze a digest for service/CLI interoperability.",
-        "Generate a sanitized setup recommendation catalog artifact containing IDs, purposes, platform constraints and content version/digest only. The chat contract owner copies/pins it at build time; no executable commands/download URLs or private module dependency cross that boundary."
+        "Generate a sanitized setup recommendation catalog artifact containing IDs, purposes, platform constraints and content version/digest only. The chat contract owner copies/pins it at build time; no executable commands/download URLs or private module dependency cross that boundary. Keep Exercise entries absent and fail closed until a versioned Exercise schema and loader validator are added; selected_exercise_id remains empty for this catalog version."
       ],
       "acceptance": [
         "Production CLI/service use the same immutable bundled catalog digest.",
         "Missing asset, stale manifest, duplicate ID, unlicensed content or unknown dependency fails qualification.",
-        "Regeneration is deterministic and contains no machine-specific paths."
+        "Regeneration is deterministic and contains no machine-specific paths.",
+        "Exercise descriptors are not embedded or advertised until their versioned schema and loader validation exist."
       ],
       "test_cases": [
         "TestBundledCatalog",
