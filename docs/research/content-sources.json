@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-09-29",
+  "assets": [
+    {
+      "id": "founder-plan",
+      "source_revision": "a60c9957fc7207cc6ffdbac84f2f26dbc46c6a95",
+      "source_path": "plan/SKILL.md",
+      "supporting_paths": [
+        "plan/DISCOVERY.md",
+        "plan/STRUCTURE.md",
+        "plan/SYNC.md",
+        "plan/scripts/parse_plan.py",
+        "plan/scripts/sync.py",
+        "plan/scripts/sync_waves.py",
+        "plan/scripts/sync_status.py",
+        "plan/scripts/sync_issues.py",
+        "plan/scripts/sync_setup.py"
+      ],
+      "purpose": "Project discovery, work-type classification, use-case-linked decomposition, dependency planning, and ADR creation.",
+      "license_proof": "No tracked LICENSE or NOTICE in the inspected shared skills checkout; no license field in this file. Redistribution permission is unverified.",
+      "attribution": "Private founder workflow; do not redistribute or adapt source wording absent written permission.",
+      "personal_or_harness_assumptions": "Claude Code file tools, slash-command invocation, deferred agent/Workflow tools, local project files, and project docs conventions.",
+      "tools_and_scripts": "Supporting discovery/structure references and Python synchronization scripts; script configuration connects to external planning systems and must not be assumed portable.",
+      "decision": "exclude",
+      "replacement_task": "Author original anza-plan workflow with explicit dependencies and evidence gates; no founder text copied.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "founder-apply",
+      "source_revision": "a60c9957fc7207cc6ffdbac84f2f26dbc46c6a95",
+      "source_path": "apply/SKILL.md",
+      "supporting_paths": [
+        "apply/PHASES.md",
+        "apply/RULES.md",
+        "apply/POOL.md",
+        "apply/KAZI-EXEC.md"
+      ],
+      "purpose": "Dispatch planned work, coordinate isolated execution, verify each wave, and record progress.",
+      "license_proof": "No tracked LICENSE or NOTICE in the inspected shared skills checkout; no license field in this file. Redistribution permission is unverified.",
+      "attribution": "Private founder workflow; exclude source text and harness-specific instructions.",
+      "personal_or_harness_assumptions": "Claude Code teams, worktree tools, atomic Git claim refs, Kazi CLI, repo-specific roadmaps, and model-pool behavior.",
+      "tools_and_scripts": "Phase/rule/pool references; claim skill and kazi command are external prerequisites in this harness. No portable script identified as independently reusable.",
+      "decision": "exclude",
+      "replacement_task": "Author original anza-build and anza-plan guidance around Anza task contracts, isolated changes, and evidence; do not import pool/Kazi mechanics.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "founder-verify",
+      "source_revision": "a60c9957fc7207cc6ffdbac84f2f26dbc46c6a95",
+      "source_path": "verify/SKILL.md",
+      "supporting_paths": [
+        "verify/PHASES.md",
+        "verify/TEMPLATES.md"
+      ],
+      "purpose": "Audit architecture, user journeys, wiring, tests, and remediation status.",
+      "license_proof": "No tracked LICENSE or NOTICE in the inspected shared skills checkout; no license field in this file. Redistribution permission is unverified.",
+      "attribution": "Private founder workflow; do not redistribute source wording absent permission.",
+      "personal_or_harness_assumptions": "Claude Code slash command, optional browser agent, scratch artifacts, mutable plan file, and claim-based concurrent-write guard.",
+      "tools_and_scripts": "Phase and template documents; agent-browser/curl/httpie may be harness tools. No universal project check command is established.",
+      "decision": "exclude",
+      "replacement_task": "Author original anza-check that selects checks from the target repository and labels evidence level without assuming browser or production access.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "founder-review",
+      "source_revision": "a60c9957fc7207cc6ffdbac84f2f26dbc46c6a95",
+      "source_path": "review/SKILL.md",
+      "supporting_paths": [],
+      "purpose": "Route a review request to a bug-focused or security-focused review workflow.",
+      "license_proof": "No tracked LICENSE or NOTICE in the inspected shared skills checkout; no license field in this file. Redistribution permission is unverified.",
+      "attribution": "Private founder workflow; source excluded.",
+      "personal_or_harness_assumptions": "Claude Code slash command and a specific AskQuestion tool; fixed review-agent names.",
+      "tools_and_scripts": "Delegates to separate review skills unavailable as self-contained content in this file.",
+      "decision": "exclude",
+      "replacement_task": "Author original anza-review checklist that works with or without a review subagent.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "founder-journal",
+      "source_revision": "a60c9957fc7207cc6ffdbac84f2f26dbc46c6a95",
+      "source_path": "journal/SKILL.md",
+      "supporting_paths": [],
+      "purpose": "Record findings, debugging, and benchmark evidence in a project development log.",
+      "license_proof": "No tracked LICENSE or NOTICE in the inspected shared skills checkout; no license field in this file. Redistribution permission is unverified.",
+      "attribution": "Private founder workflow; source excluded.",
+      "personal_or_harness_assumptions": "Claude Code slash command, project-local docs/devlog.md, and founder-specific log format.",
+      "tools_and_scripts": "File append/edit operation; no standalone script.",
+      "decision": "exclude",
+      "replacement_task": "Author original anza-continue handoff format using only approved Anza evidence destinations.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "founder-go",
+      "source_revision": "a60c9957fc7207cc6ffdbac84f2f26dbc46c6a95",
+      "source_path": "go/SKILL.md",
+      "supporting_paths": [],
+      "purpose": "Go implementation and review conventions for errors, tests, package boundaries, and concurrency.",
+      "license_proof": "No tracked LICENSE or NOTICE in the inspected shared skills checkout; no license field in this file. Redistribution permission is unverified.",
+      "attribution": "Private founder workflow; source excluded, including generic-seeming rules until permission is established.",
+      "personal_or_harness_assumptions": "Founder repository conventions, golangci-lint availability, and Go-specific test commands.",
+      "tools_and_scripts": "gofmt/goimports, go test, optional golangci-lint; the race-test recommendation is Go-only and must be scoped by Anza policy.",
+      "decision": "exclude",
+      "replacement_task": "If needed, write a fresh Anza Go domain recipe from public Go documentation and Anza's own tested conventions.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-plan-orchestrate",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "skills/plan-orchestrate/SKILL.md",
+      "supporting_paths": [
+        "agents/",
+        "commands/",
+        "workflows/",
+        "README.md",
+        "LICENSE"
+      ],
+      "purpose": "Translate a multi-step plan into sequential agent-chain prompts using an ECC catalogue.",
+      "license_proof": "ECC repository LICENSE at this revision is MIT; selected tracked file is within this checkout. Preserve copyright/license notice for substantial copied material. No text is copied here.",
+      "attribution": "ECC project attribution is recorded; Anza adaptation must retain MIT notices if it includes substantial source-derived material.",
+      "personal_or_harness_assumptions": "Claude Code/ECC slash commands, plugin-versus-legacy installation, home-directory layout, ECC agent catalogue, and orchestrator-specific prompt format.",
+      "tools_and_scripts": "Reads a plan and ECC agent catalog; no independent portable executable. Requires installed ECC agents and orchestrate command to execute its output.",
+      "decision": "adapt",
+      "replacement_task": "Use only the high-level idea of bounded dependency-aware work prompts in original anza-plan prose; omit ECC chains, names, syntax, and copied text.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-verification-loop",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "skills/verification-loop/SKILL.md",
+      "supporting_paths": [
+        "LICENSE"
+      ],
+      "purpose": "Run build, type, lint, test, security, and diff review phases and report results.",
+      "license_proof": "File declares MIT in frontmatter; ECC repository LICENSE is also MIT at this revision. This does not license any named third-party tools or dependencies.",
+      "attribution": "ECC attribution/license required for substantial derivative or copied material; Anza version should be freshly written.",
+      "personal_or_harness_assumptions": "Claude Code sessions and slash command; examples assume Node/Python project commands and grep-like utilities.",
+      "tools_and_scripts": "npm/pnpm, TypeScript compiler, pyright, ruff, test scripts, grep, Git; applicability depends on repository configuration.",
+      "decision": "adapt",
+      "replacement_task": "Write original anza-check around observed project toolchain, with no fixed language commands and clear local/live evidence labels.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-golang-testing",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "skills/golang-testing/SKILL.md",
+      "supporting_paths": [
+        "rules/common/testing.md",
+        "LICENSE"
+      ],
+      "purpose": "Go-specific test patterns including table tests, subtests, benchmarks, fuzzing, and TDD.",
+      "license_proof": "ECC repository LICENSE at this revision is MIT; selected tracked file is within this checkout. No separate per-file license field was observed. Third-party examples/dependencies are not covered by this finding.",
+      "attribution": "Record ECC attribution and include MIT notice for substantial adaptation; no source prose or code copied into this audit.",
+      "personal_or_harness_assumptions": "Go language and standard Go test toolchain; examples are illustrative and some placeholder code is unsuitable for production guidance.",
+      "tools_and_scripts": "go test and Go compiler; no ECC runtime required for the testing concepts.",
+      "decision": "adapt",
+      "replacement_task": "Create an optional fresh Go recipe only after reviewing and replacing unsuitable placeholder examples; do not make it part of the portable core.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-install-profiles",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "manifests/install-profiles.json",
+      "supporting_paths": [
+        "manifests/",
+        "scripts/",
+        "LICENSE"
+      ],
+      "purpose": "Map named install profiles to categorized modules and make the complete profile explicit.",
+      "license_proof": "ECC repository LICENSE at this revision is MIT and the JSON file is tracked there. Root license is evidence for this selected repository file only, not all referenced modules or dependencies.",
+      "attribution": "Retain MIT notice if substantial manifest structure/text is reused; Anza should author its own catalog and IDs.",
+      "personal_or_harness_assumptions": "ECC profile names and module taxonomy; consumers must have the corresponding ECC modules and installer resolver.",
+      "tools_and_scripts": "ECC installer resolver and module manifests; manifest is not independently actionable.",
+      "decision": "adapt",
+      "replacement_task": "Design an Anza-native small profile/catalog model rather than copying ECC profile names or module inventory.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-ownership-guard",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "scripts/lib/install/ownership-guard.js",
+      "supporting_paths": [
+        "scripts/lib/install-state.js",
+        "scripts/lib/install/codex-user-config.js",
+        "scripts/lib/install/",
+        "LICENSE"
+      ],
+      "purpose": "Avoid overwriting unowned user files, preserve edits, and keep installer ownership state consistent.",
+      "license_proof": "ECC repository LICENSE at this revision is MIT and this JS file is tracked. Its imported modules and runtime dependencies require their own review; no code is proposed for reuse.",
+      "attribution": "ECC attribution/MIT notice apply to substantial source reuse. Anza should implement the behavior independently in Go.",
+      "personal_or_harness_assumptions": "ECC migration-plan/state structures, Codex configuration adapter, Node.js fs/path APIs, and ECC-specific ownership ledger.",
+      "tools_and_scripts": "Node.js and imported ECC install-state/config modules; not portable as a standalone file.",
+      "decision": "adapt",
+      "replacement_task": "Implement Anza-specific preserving install semantics from its own contract and tests; do not import this script or its schema.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-hook-consent",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "scripts/lib/install/hook-consent.js",
+      "supporting_paths": [
+        "scripts/lib/install/",
+        "LICENSE"
+      ],
+      "purpose": "Gate installation of an automatic hook runtime behind explicit user consent and disclose capabilities.",
+      "license_proof": "ECC repository LICENSE at this revision is MIT and this JS file is tracked. The file itself attributes capability disclosure and held-materialization semantics to contributor Samarjeet Singh Tomar in PR #2634; this attribution is directly visible in source.",
+      "attribution": "If any substantial contribution is adapted, preserve ECC MIT notice and the file's named contributor attribution; preferred Anza implementation is independently authored from its own consent contract.",
+      "personal_or_harness_assumptions": "ECC module IDs, operation formats, settings updates, and installer state-preview structures; assumes a hook runtime model Anza does not bundle.",
+      "tools_and_scripts": "Node.js plus ECC install plan helpers; no portable standalone behavior.",
+      "decision": "adapt",
+      "replacement_task": "Use Anza's explicit approval and capability disclosure requirements to write original Go behavior; do not bundle an automatic hook runtime.",
+      "source_date": "2026-09-29"
+    },
+    {
+      "id": "ecc-codex-home-target",
+      "source_revision": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "source_path": "scripts/lib/install-targets/codex-home.js",
+      "supporting_paths": [
+        "scripts/lib/install-targets/helpers.js",
+        "scripts/lib/install-targets/",
+        "LICENSE"
+      ],
+      "purpose": "Declare the Codex home-directory target through ECC's shared install-target adapter.",
+      "license_proof": "ECC repository LICENSE at this revision is MIT and this JS file is tracked. Imported helper behavior and other target rules are separate code requiring review; no code is proposed for reuse.",
+      "attribution": "ECC attribution/MIT notice apply to substantial source reuse; Anza should derive target paths from its own cross-platform contract.",
+      "personal_or_harness_assumptions": "ECC helper API, Codex-specific home layout, and Node.js path conventions.",
+      "tools_and_scripts": "Node.js and ECC target-adapter helper; not standalone.",
+      "decision": "adapt",
+      "replacement_task": "Implement Anza's owned target-path mapping from the approved platform contract without importing ECC code.",
+      "source_date": "2026-09-29"
+    }
+  ]
+}
