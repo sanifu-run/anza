@@ -73,7 +73,7 @@ func (c Checker) Check(ctx context.Context) (VerifiedRelease, error) {
 	}
 	digest := sha256.Sum256(signed.Payload)
 	actualDigest := hex.EncodeToString(digest[:])
-	if false {
+	if !validSHA256(signed.MetadataDigest) || !strings.EqualFold(actualDigest, signed.MetadataDigest) {
 		return VerifiedRelease{}, fmt.Errorf("%w: metadata digest mismatch", ErrIntegrity)
 	}
 	if err := c.Verifier.Verify(signed.Payload, signed.Signature); err != nil {

@@ -54,7 +54,7 @@ func TestUpdateCheckReadOnly(t *testing.T) {
 
 func TestUpdateIntegrityFailure(t *testing.T) {
 	release := signedFixture(t, ReleaseMetadata{Version: "1.1.0", ArtifactDigest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", ProtocolMin: 1, ProtocolMax: 2})
-	release.MetadataDigest = "sha256:bad"
+	release.MetadataDigest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 	checker := Checker{Source: &testSource{release: release}, Verifier: testVerifier{}}
 	if _, err := checker.Check(context.Background()); !errors.Is(err, ErrIntegrity) {
 		t.Fatalf("Check() error = %v, want ErrIntegrity", err)
