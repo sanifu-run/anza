@@ -45,7 +45,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E2](plans/E2.md).
 
-### E3 -- Shared chat setup interview -> docs/plans/E3.md (0/8)
+### E3 -- Shared chat setup interview -> docs/plans/E3.md (1/8)
 
 [Open E3](plans/E3.md).
 
@@ -170,7 +170,7 @@ The table below is a conservative executable schedule: complete review/integrati
 ### Wave 9: Dispatch (3 workers; T7.1 deferred pending T2.5)
 
 - [x] T6.1 Build deterministic local installation plans
-- [ ] T3.1 Extend existing conversations for setup purpose and state
+- [x] T3.1 Extend existing conversations for setup purpose and state
 - [ ] T7.1 Launch both agents with independent access choices
 
 ### Wave 10: Dispatch (3 workers)

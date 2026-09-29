@@ -484,7 +484,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 b1ab337779352ad4e71ad1aa5b913b75baf4665e; coordinator merge 2ace8a40fa0818ffc40f87f46589b1766ae20bb3; scoped tests/vet/lint passed, live DynamoDB skipped",
       "wave": 9,
       "repository": "chat"
     },
