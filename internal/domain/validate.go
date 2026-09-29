@@ -185,8 +185,12 @@ func decodeStrict(data []byte, dst any, required ...string) error {
 		return fmt.Errorf("JSON: %w", err)
 	}
 	for _, name := range required {
-		if _, ok := fields[name]; !ok {
+		value, ok := fields[name]
+		if !ok {
 			return fmt.Errorf("%s: required field is missing", name)
+		}
+		if bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
+			return fieldError(name, "must not be null")
 		}
 	}
 	dec := json.NewDecoder(bytes.NewReader(trimmed))
@@ -490,6 +494,9 @@ func validatePlan(v Plan) error {
 		if op.RecipeID != "" && !validID(op.RecipeID) {
 			return fieldError(fmt.Sprintf("operations[%d].recipe_id", i), "invalid recipe ID")
 		}
+		if op.Dependencies == nil {
+			return fieldError(fmt.Sprintf("operations[%d].dependencies", i), "must be an array")
+		}
 		if len(op.Dependencies) > 500 {
 			return fieldError(fmt.Sprintf("operations[%d].dependencies", i), "too many dependencies")
 		}
@@ -559,7 +566,18 @@ func hexDigest(s string) bool {
 	return true
 }
 func safeRelative(s string) bool {
-	return s != "" && !strings.HasPrefix(s, "/") && !strings.Contains(s, `\`) && s != ".." && !strings.HasPrefix(s, "../") && !strings.Contains(s, "/../")
+	if s == "" || strings.HasPrefix(s, "/") || strings.Contains(s, `\`) {
+		return false
+	}
+	if len(s) >= 2 && ((s[0] >= 'A' && s[0] <= 'Z') || (s[0] >= 'a' && s[0] <= 'z')) && s[1] == ':' {
+		return false
+	}
+	for _, segment := range strings.Split(s, "/") {
+		if segment == "." || segment == ".." {
+			return false
+		}
+	}
+	return true
 }
 func parseUTC(field, value string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339, value)

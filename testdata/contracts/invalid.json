@@ -332,6 +332,422 @@
         },
         "raw_path": "/private"
       }
+    },
+    {
+      "name": "null-brief-constraints",
+      "type": "project_brief",
+      "json": {
+        "schema_version": 1,
+        "project_summary": "A tiny café inventory app ☕",
+        "desired_slice": "Track tea stock",
+        "experience": "beginner",
+        "constraints": null,
+        "known_stack": [
+          "go",
+          "sqlite"
+        ],
+        "project_kind": "inventory",
+        "existing_project": false
+      }
+    },
+    {
+      "name": "null-brief-known_stack",
+      "type": "project_brief",
+      "json": {
+        "schema_version": 1,
+        "project_summary": "A tiny café inventory app ☕",
+        "desired_slice": "Track tea stock",
+        "experience": "beginner",
+        "constraints": [
+          "Works offline"
+        ],
+        "known_stack": null,
+        "project_kind": "inventory",
+        "existing_project": false
+      }
+    },
+    {
+      "name": "null-machine-capabilities",
+      "type": "machine_facts",
+      "json": {
+        "os": "darwin",
+        "arch": "arm64",
+        "os_version": "15.0",
+        "shell_kind": "zsh",
+        "capabilities": null
+      }
+    },
+    {
+      "name": "null-recommendation-selected_recipe_ids",
+      "type": "recommendation",
+      "json": {
+        "schema_version": 1,
+        "catalog_version": "2026.09",
+        "summary": "Start with a local prototype.",
+        "selected_recipe_ids": null,
+        "selected_pack_ids": [
+          "anza-go-basics"
+        ],
+        "selected_exercise_id": "inventory-exercise",
+        "reasons": {
+          "go-toolchain": "Matches the desired slice."
+        },
+        "unresolved_questions": [],
+        "manual_steps": [
+          "Create a sample inventory file."
+        ],
+        "readiness_constraints": [
+          "No live deployment yet."
+        ]
+      }
+    },
+    {
+      "name": "null-recommendation-selected_pack_ids",
+      "type": "recommendation",
+      "json": {
+        "schema_version": 1,
+        "catalog_version": "2026.09",
+        "summary": "Start with a local prototype.",
+        "selected_recipe_ids": [
+          "go-toolchain"
+        ],
+        "selected_pack_ids": null,
+        "selected_exercise_id": "inventory-exercise",
+        "reasons": {
+          "go-toolchain": "Matches the desired slice."
+        },
+        "unresolved_questions": [],
+        "manual_steps": [
+          "Create a sample inventory file."
+        ],
+        "readiness_constraints": [
+          "No live deployment yet."
+        ]
+      }
+    },
+    {
+      "name": "null-recommendation-reasons",
+      "type": "recommendation",
+      "json": {
+        "schema_version": 1,
+        "catalog_version": "2026.09",
+        "summary": "Start with a local prototype.",
+        "selected_recipe_ids": [
+          "go-toolchain"
+        ],
+        "selected_pack_ids": [
+          "anza-go-basics"
+        ],
+        "selected_exercise_id": "inventory-exercise",
+        "reasons": null,
+        "unresolved_questions": [],
+        "manual_steps": [
+          "Create a sample inventory file."
+        ],
+        "readiness_constraints": [
+          "No live deployment yet."
+        ]
+      }
+    },
+    {
+      "name": "null-recommendation-unresolved_questions",
+      "type": "recommendation",
+      "json": {
+        "schema_version": 1,
+        "catalog_version": "2026.09",
+        "summary": "Start with a local prototype.",
+        "selected_recipe_ids": [
+          "go-toolchain"
+        ],
+        "selected_pack_ids": [
+          "anza-go-basics"
+        ],
+        "selected_exercise_id": "inventory-exercise",
+        "reasons": {
+          "go-toolchain": "Matches the desired slice."
+        },
+        "unresolved_questions": null,
+        "manual_steps": [
+          "Create a sample inventory file."
+        ],
+        "readiness_constraints": [
+          "No live deployment yet."
+        ]
+      }
+    },
+    {
+      "name": "null-recommendation-manual_steps",
+      "type": "recommendation",
+      "json": {
+        "schema_version": 1,
+        "catalog_version": "2026.09",
+        "summary": "Start with a local prototype.",
+        "selected_recipe_ids": [
+          "go-toolchain"
+        ],
+        "selected_pack_ids": [
+          "anza-go-basics"
+        ],
+        "selected_exercise_id": "inventory-exercise",
+        "reasons": {
+          "go-toolchain": "Matches the desired slice."
+        },
+        "unresolved_questions": [],
+        "manual_steps": null,
+        "readiness_constraints": [
+          "No live deployment yet."
+        ]
+      }
+    },
+    {
+      "name": "null-recommendation-readiness_constraints",
+      "type": "recommendation",
+      "json": {
+        "schema_version": 1,
+        "catalog_version": "2026.09",
+        "summary": "Start with a local prototype.",
+        "selected_recipe_ids": [
+          "go-toolchain"
+        ],
+        "selected_pack_ids": [
+          "anza-go-basics"
+        ],
+        "selected_exercise_id": "inventory-exercise",
+        "reasons": {
+          "go-toolchain": "Matches the desired slice."
+        },
+        "unresolved_questions": [],
+        "manual_steps": [
+          "Create a sample inventory file."
+        ],
+        "readiness_constraints": null
+      }
+    },
+    {
+      "name": "null-plan-providers",
+      "type": "plan",
+      "json": {
+        "schema_version": 1,
+        "id": "plan-1",
+        "workspace_id": "workspace-1",
+        "catalog_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "facts_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "recommendation_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "created_at": "2026-09-28T10:00:00Z",
+        "expires_at": "2026-09-29T10:00:00Z",
+        "profile": "beginner",
+        "providers": null,
+        "operations": [
+          {
+            "id": "op-1",
+            "kind": "write",
+            "dependencies": [],
+            "target_root": "project",
+            "relative_path": "README.md",
+            "expected_postimage_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "reversible": true,
+            "privilege": "user",
+            "description": "Write project README"
+          }
+        ],
+        "warnings": [],
+        "manual_steps": [],
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "null-operation-dependencies",
+      "type": "plan",
+      "json": {
+        "schema_version": 1,
+        "id": "plan-1",
+        "workspace_id": "workspace-1",
+        "catalog_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "facts_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "recommendation_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "created_at": "2026-09-28T10:00:00Z",
+        "expires_at": "2026-09-29T10:00:00Z",
+        "profile": "beginner",
+        "providers": {
+          "codex": "openrouter"
+        },
+        "operations": [
+          {
+            "id": "op-1",
+            "kind": "write",
+            "dependencies": null,
+            "target_root": "project",
+            "relative_path": "README.md",
+            "expected_postimage_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "reversible": true,
+            "privilege": "user",
+            "description": "Write project README"
+          }
+        ],
+        "warnings": [],
+        "manual_steps": [],
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "unsafe-relative-path-C:_foo",
+      "type": "plan",
+      "json": {
+        "schema_version": 1,
+        "id": "plan-1",
+        "workspace_id": "workspace-1",
+        "catalog_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "facts_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "recommendation_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "created_at": "2026-09-28T10:00:00Z",
+        "expires_at": "2026-09-29T10:00:00Z",
+        "profile": "beginner",
+        "providers": {
+          "codex": "openrouter"
+        },
+        "operations": [
+          {
+            "id": "op-1",
+            "kind": "write",
+            "dependencies": [],
+            "target_root": "project",
+            "relative_path": "C:/foo",
+            "expected_postimage_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "reversible": true,
+            "privilege": "user",
+            "description": "Write project README"
+          }
+        ],
+        "warnings": [],
+        "manual_steps": [],
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "unsafe-relative-path-a_..",
+      "type": "plan",
+      "json": {
+        "schema_version": 1,
+        "id": "plan-1",
+        "workspace_id": "workspace-1",
+        "catalog_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "facts_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "recommendation_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "created_at": "2026-09-28T10:00:00Z",
+        "expires_at": "2026-09-29T10:00:00Z",
+        "profile": "beginner",
+        "providers": {
+          "codex": "openrouter"
+        },
+        "operations": [
+          {
+            "id": "op-1",
+            "kind": "write",
+            "dependencies": [],
+            "target_root": "project",
+            "relative_path": "a/..",
+            "expected_postimage_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "reversible": true,
+            "privilege": "user",
+            "description": "Write project README"
+          }
+        ],
+        "warnings": [],
+        "manual_steps": [],
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "unsafe-relative-path-._a",
+      "type": "plan",
+      "json": {
+        "schema_version": 1,
+        "id": "plan-1",
+        "workspace_id": "workspace-1",
+        "catalog_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "facts_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "recommendation_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "created_at": "2026-09-28T10:00:00Z",
+        "expires_at": "2026-09-29T10:00:00Z",
+        "profile": "beginner",
+        "providers": {
+          "codex": "openrouter"
+        },
+        "operations": [
+          {
+            "id": "op-1",
+            "kind": "write",
+            "dependencies": [],
+            "target_root": "project",
+            "relative_path": "./a",
+            "expected_postimage_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "reversible": true,
+            "privilege": "user",
+            "description": "Write project README"
+          }
+        ],
+        "warnings": [],
+        "manual_steps": [],
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "unsafe-relative-path-a_._b",
+      "type": "plan",
+      "json": {
+        "schema_version": 1,
+        "id": "plan-1",
+        "workspace_id": "workspace-1",
+        "catalog_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "facts_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "recommendation_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "created_at": "2026-09-28T10:00:00Z",
+        "expires_at": "2026-09-29T10:00:00Z",
+        "profile": "beginner",
+        "providers": {
+          "codex": "openrouter"
+        },
+        "operations": [
+          {
+            "id": "op-1",
+            "kind": "write",
+            "dependencies": [],
+            "target_root": "project",
+            "relative_path": "a/./b",
+            "expected_postimage_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "reversible": true,
+            "privilege": "user",
+            "description": "Write project README"
+          }
+        ],
+        "warnings": [],
+        "manual_steps": [],
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "name": "null-receipt-owned-paths",
+      "type": "receipt",
+      "json": {
+        "schema_version": 1,
+        "plan_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "operations": [
+          {
+            "id": "op-1",
+            "state": "succeeded",
+            "started_at": "2026-09-28T10:00:00Z",
+            "finished_at": "2026-09-28T10:00:01Z"
+          }
+        ],
+        "owned_paths": null,
+        "owned_keys": [],
+        "pre_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "post_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+        "backup_references": [],
+        "started_at": "2026-09-28T10:00:00Z",
+        "finished_at": "2026-09-28T10:00:01Z",
+        "pending_manual_actions": []
+      }
     }
   ]
 }

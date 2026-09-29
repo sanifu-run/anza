@@ -14,7 +14,7 @@ A read-only inspection of the peer chat checkout found `requestId` on the existi
 - Recommendation lists are capped at 30 recipe IDs and 10 pack IDs. Each explanatory collection is bounded to 100 items and 2000 characters per item. Recommendation fields named `command`, `url`, `path`, or any other undeclared key fail strict decoding.
 - Recipe strategies are limited to `verified_archive`, `vendor_installer`, `package_manager` and `manual`; recipe and catalog identifiers use lowercase ASCII IDs. Download sizes must be nonnegative integers.
 - Pack skill IDs must start with `anza-`; files, compatibility maps and ID collections have explicit count and string bounds.
-- Plans preserve operation order, require logical target roots and safe relative paths, use lowercase SHA-256 digest strings, and use UTC RFC3339 timestamps with expiry after creation. The canonical plan digest omits its `digest` property, sorts object map keys, and preserves arrays.
+- Plans preserve operation order, require logical target roots and safe relative paths, use lowercase SHA-256 digest strings, reject drive-prefixed paths and `.`/`..` path segments, and use UTC RFC3339 timestamps with expiry after creation. The canonical plan digest omits its `digest` property, sorts object map keys, and preserves arrays.
 - Receipt operation state and rollback state follow the contract's listed state values. Timestamps use UTC RFC3339. Fixtures use synthetic values only.
 
 ## Published schema files
