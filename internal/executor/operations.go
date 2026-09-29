@@ -48,7 +48,7 @@ func validatePayload(p Payload, op domain.Operation) error {
 		if !ok {
 			return fmt.Errorf("%w: write_config requires ConfigPayload", ErrUnsupportedOperation)
 		}
-		if v.Edit.PostimageHash != hash(v.Edit.Bytes) || v.Edit.PostimageHash != op.ExpectedPostimageHash {
+		if v.Edit.PostimageHash != digest(v.Edit.Bytes) || v.Edit.PostimageHash != op.ExpectedPostimageHash {
 			return fmt.Errorf("%w: config postimage does not match approved hash", ErrPreimageConflict)
 		}
 		if op.PreimageHash != "" && v.Edit.PreimageHash != op.PreimageHash {
@@ -62,7 +62,7 @@ func validatePayload(p Payload, op domain.Operation) error {
 		if !ok {
 			return fmt.Errorf("%w: install_artifact requires ArtifactPayload", ErrUnsupportedOperation)
 		}
-		if hash(v.Bytes) != op.ExpectedPostimageHash {
+		if digest(v.Bytes) != op.ExpectedPostimageHash {
 			return fmt.Errorf("%w: artifact bytes differ from approved hash", ErrPreimageConflict)
 		}
 	default:
