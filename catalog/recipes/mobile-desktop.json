@@ -1,0 +1,25 @@
+{
+  "id": "mobile-desktop-manual-review",
+  "version": "1.0.0",
+  "description": "Artifact-free manual review guidance for native mobile, desktop, and unmodeled projects. It does not install or select an SDK.",
+  "purpose": "Preserve the requested project goal while identifying platform, SDK, license, storage, architecture, and device requirements that need participant review.",
+  "supported_platforms": [
+    "darwin-amd64",
+    "darwin-arm64",
+    "windows-amd64",
+    "windows-arm64",
+    "linux-amd64",
+    "linux-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Use only the participant-approved project kind and coarse machine OS/architecture facts to select guidance. Inspect existing toolchain declarations before proposing changes; unknown details remain unresolved.",
+  "install_strategy": "manual",
+  "privileges": [],
+  "license_notes": "Original Anza-authored metadata only; no vendor SDK, installer, or documentation content is included. Anza product-license approval remains pending.",
+  "estimated_download_bytes": 0,
+  "side_effects": [
+    "This record performs no installation, package download, license acceptance, device provisioning, project edit, or account change."
+  ],
+  "verification": "Confirm all project-specific platform and SDK requirements with the participant and current vendor documentation; this manual record alone does not qualify any native runtime or build.",
+  "reversal_class": "manual"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "mobile-desktop-pack",
+  "version": "1.0.0",
+  "skill_ids": [
+    "anza-build",
+    "anza-check"
+  ],
+  "prerequisites": [],
+  "license_ids": [
+    "mobile-desktop-product-rights-pending",
+    "apple-xcode-sdk-terms",
+    "android-sdk-terms"
+  ],
+  "provenance_ids": [
+    "mobile-desktop-anza-content",
+    "apple-xcode-support",
+    "apple-xcode-sdk-terms",
+    "android-studio-requirements",
+    "android-sdk-terms"
+  ],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}
