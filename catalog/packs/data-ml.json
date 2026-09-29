@@ -1,0 +1,14 @@
+{
+  "id": "data-ml-pack",
+  "version": "1.0.0",
+  "skill_ids": [],
+  "prerequisites": [],
+  "license_ids": [
+    "python-psf-2"
+  ],
+  "provenance_ids": [
+    "python-psf-2"
+  ],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}

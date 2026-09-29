@@ -1,0 +1,26 @@
+{
+  "id": "go-1.27.1-darwin-arm64",
+  "version": "1.27.1",
+  "description": "Go 1.27.1 official platform archive. Manual only because the coarse v1 platform predicate cannot enforce the documented OS/kernel floor.",
+  "purpose": "Offer a pinned Go toolchain artifact for explicitly selected projects while preserving any existing Go version and module files.",
+  "supported_platforms": [
+    "darwin-arm64"
+  ],
+  "prerequisites": [],
+  "detection": "Before proposing, inspect only the participant-approved project go.mod go/toolchain declarations and current go version. If the installed version satisfies the project declaration, do not select this recipe. Confirm the vendor floor (macOS ARM64; Go download page states macOS 13 or later); unknown OS/kernel version means manual/unmet. Do not edit go.mod, go.sum, or the module cache.",
+  "install_strategy": "manual",
+  "artifact": {
+    "digest": "ee215d57e0ec269c60cc9ceca68e6bda321ba9ee5afe24f4b0988703c2d87d12",
+    "size": 68100347,
+    "origin": "https://go.dev/dl/go1.27.1.darwin-arm64.tar.gz"
+  },
+  "privileges": [],
+  "license_notes": "Go is distributed under its BSD-style license. The Go distribution may contain separately licensed components; preserve and review bundled notices. This recipe does not repackage the artifact.",
+  "estimated_download_bytes": 68100347,
+  "side_effects": [
+    "No automated extraction or installation is supported by this record.",
+    "A participant-selected manual install must use an explicit side-by-side destination and must not replace an existing Go installation or alter project module files."
+  ],
+  "verification": "Manual/unmet until the OS/kernel floor is known and satisfied. After a separately approved side-by-side install, run the explicit executable with version reporting and verify it matches the project declaration before selecting it.",
+  "reversal_class": "manual"
+}

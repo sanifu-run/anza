@@ -1,0 +1,14 @@
+{
+  "id": "go-pack",
+  "version": "1.0.0",
+  "skill_ids": [],
+  "prerequisites": [],
+  "license_ids": [
+    "go-bsd-3-clause"
+  ],
+  "provenance_ids": [
+    "go-bsd-3-clause"
+  ],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}
