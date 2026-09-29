@@ -57,7 +57,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E5](plans/E5.md).
 
-### E6 -- Deterministic planning and installation -> docs/plans/E6.md (3/4)
+### E6 -- Deterministic planning and installation -> docs/plans/E6.md (4/4)
 
 [Open E6](plans/E6.md).
 
@@ -175,7 +175,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 10: Dispatch (3 workers)
 
-- [ ] T6.4 Execute approved operations with receipts and crash recovery
+- [x] T6.4 Execute approved operations with receipts and crash recovery
 - [ ] T3.2 Add persistent setup-only admission to the shared backend
 - [ ] T3.3 Extract and reuse the existing model transport
 
