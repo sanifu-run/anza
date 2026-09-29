@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "planned_not_executed",
+  "status": "in_progress",
   "tasks": [
     {
       "id": "T1.1",
@@ -35,7 +35,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna 2026-09-29 1072410e29613a73936def25021d3402a648cef4",
       "wave": 1,
       "repository": "anza"
     },

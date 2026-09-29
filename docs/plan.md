@@ -124,7 +124,7 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 1: Dispatch (1 workers)
 
-- [ ] T1.1 Create the Go CLI and dependency baseline
+- [x] T1.1 Create the Go CLI and dependency baseline
 
 ### Wave 2: Dispatch (2 workers)
 
@@ -277,11 +277,15 @@ Tests are planned for every implementation, API route and negative boundary. Anz
 
 ## Progress Log
 
-2026 09 28: Revised to 53 task contracts across Anza/chat, 11 epics and 17 use cases. Contract v1 revision 2 and ADR 006 replace the separate-service design; ADR 005 is superseded. No implementation or certification performed.
+2026 09 28: Revised to 53 task contracts across Anza/chat, 11 epics and 17 use cases. Contract v1 revision 2 and ADR 006 replace the separate-service design; ADR 005 is superseded. No implementation or certification had been performed at that revision.
+
+2026-09-29T01:24Z: Preflight found Anza on unborn main with 85 planning files, Chat clean at 26d79ab after contact-intake reconciliation, 6.8 GB free, one-minute load 11.25, and Go 1.27.1 darwin/arm64. No Anza or Chat worker was visible by command line; cwd inspection was unavailable because macOS could not resolve uid 501. GitHub task claim acquisition failed with `No user exists for uid 501`; work uses the documented serialized single-coordinator fallback. The planning baseline is local commit 0acc30b.
+
+Wave 1: GPT-6-Luna completed T1.1 on isolated branch task/T1.1 as commit 1072410e29613a73936def25021d3402a648cef4. The coordinator reviewed and fast-forward integrated it, then reran `go test ./cmd/anza -count=1` (3 tests) and `go vet ./cmd/anza` with temporary HOME/cache and module lookup disabled; both passed. Red/green and disabled-behavior evidence is in [T1.1 evidence](evidence/T1.1.md). No Chat files, paid calls, or publication changed.
 
 ## Hand off Notes
 
-Start with T1.1. Do not execute all commands in task files now: they describe future implementation checks. Native runtime qualification and repository initialization are coordinator prerequisites. Initial plan files are local and uncommitted; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
+T1.1 is locally implemented and reviewed. Resume with Wave 2 tasks T1.2 and T1.5 after the accepted T1.1 dependency is integrated. Initial plan and implementation commits are local; no remote publication is implied. Optional brief import and immutable setup mode respect the shared Sanifu intake boundary. All local dotfile inspection details stay in private discovery records; only sanitized design is in this public repository.
 
 The launch gate reviews existing chat deployment/provider grants and asks only for missing incremental setup limits/resource/live-check/publication scopes. Reuse the existing origin and data policy; verify setup mail exclusion and Anza licensing. No new host or invitation system is proposed. Unknown caps must not be guessed by workers.
 

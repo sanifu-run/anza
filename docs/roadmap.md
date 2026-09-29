@@ -6,7 +6,7 @@ No Anza/setup extension implementation shipped; the existing chat foundation is 
 
 ## In progress
 
-Shared-chat reuse revision prepared; no implementation worker running.
+T1.1 CLI foundation locally implemented and reviewed. Wave 2 tasks T1.2 and T1.5 are next after T1.1 integration.
 
 ## Planned
 
