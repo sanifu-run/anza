@@ -79,3 +79,7 @@ GPT-6-Luna completed T3.1 in isolated Chat worktree commits `d997425` and `b1ab3
 ## 2026-09-29 - T6.4 local acceptance
 
 GPT-6-Luna implemented T6.4 in isolated Anza commit `e278c72`; coordinator review found no blocker and merged it locally as `42e0405`. Seven executor tests with six subtests passed, as did worker and post-merge `go vet ./internal/executor`; formatting and diff checks passed. The executor validates approval/digest and preimages, journals operations and recovers only from exact postconditions. It supports the two operation kinds emitted by the current planner and refuses unknown kinds before effects. Tests use injected synthetic effects; no platform install ran. T6.4 is locally accepted, not natively qualified.
+
+## 2026-09-29 - T3.2 local acceptance
+
+GPT-6-Luna implemented the setup-only durable quota component in Chat commits `7080a05` and `83cb527`; coordinator review caught and the worker fixed a replay-after-delete race before integration. Chat main now includes merge `3f98192`; the seven-test quota suite, vet and coordinator post-merge tests/vet passed. Tests model transaction predicates and use synthetic concurrency/deletion records. No DynamoDB table, AWS credentials, or provider was used. Table/IAM and setup-handler integration remain outstanding; T3.2 is locally accepted, not live-qualified.
