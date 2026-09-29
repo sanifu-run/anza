@@ -208,6 +208,34 @@
         "finished_at": "2026-09-28T10:00:01Z",
         "pending_manual_actions": []
       }
+    },
+    {
+      "type": "exercise",
+      "json": {
+        "schema_version": 1,
+        "id": "mobile-desktop",
+        "version": "1.0.0",
+        "description": "Manual guidance for mobile, desktop, and unknown project requirements.",
+        "scenarios": [
+          {
+            "id": "ios-host-requirement",
+            "project_kind": "ios",
+            "supported_platforms": [
+              "linux-amd64"
+            ],
+            "status": "unsupported",
+            "summary": "Native iOS builds require a macOS host.",
+            "manual_steps": [
+              "Choose a macOS host before planning native build or signing work."
+            ],
+            "readiness_constraints": [
+              "No iOS SDK installation or device provisioning is performed."
+            ],
+            "verification": "Confirm the selected host is macOS before treating native iOS build prerequisites as met.",
+            "missing_capability_ids": []
+          }
+        ]
+      }
     }
   ]
 }

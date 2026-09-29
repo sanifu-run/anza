@@ -57,27 +57,49 @@ type Recommendation struct {
 }
 
 type Recipe struct {
-	ID                     string   `json:"id"`
-	Version                string   `json:"version"`
-	Description            string   `json:"description"`
-	Purpose                string   `json:"purpose"`
-	SupportedPlatforms     []string `json:"supported_platforms"`
-	Prerequisites          []string `json:"prerequisites"`
-	Detection              string   `json:"detection"`
-	InstallStrategy        string   `json:"install_strategy"`
-	Artifact               Artifact `json:"artifact"`
-	Privileges             []string `json:"privileges"`
-	LicenseNotes           string   `json:"license_notes"`
-	EstimatedDownloadBytes int64    `json:"estimated_download_bytes"`
-	SideEffects            []string `json:"side_effects"`
-	Verification           string   `json:"verification"`
-	ReversalClass          string   `json:"reversal_class"`
+	ID                     string    `json:"id"`
+	Version                string    `json:"version"`
+	Description            string    `json:"description"`
+	Purpose                string    `json:"purpose"`
+	SupportedPlatforms     []string  `json:"supported_platforms"`
+	Prerequisites          []string  `json:"prerequisites"`
+	Detection              string    `json:"detection"`
+	InstallStrategy        string    `json:"install_strategy"`
+	Artifact               *Artifact `json:"artifact,omitempty"`
+	Privileges             []string  `json:"privileges"`
+	LicenseNotes           string    `json:"license_notes"`
+	EstimatedDownloadBytes int64     `json:"estimated_download_bytes"`
+	SideEffects            []string  `json:"side_effects"`
+	Verification           string    `json:"verification"`
+	ReversalClass          string    `json:"reversal_class"`
 }
 
 type Artifact struct {
 	Digest string `json:"digest"`
 	Size   int64  `json:"size"`
 	Origin string `json:"origin"`
+}
+
+// Exercise is a catalog-authored, non-executable manual guidance descriptor.
+// Scenarios can only report manual or unsupported readiness.
+type Exercise struct {
+	SchemaVersion int                `json:"schema_version"`
+	ID            string             `json:"id"`
+	Version       string             `json:"version"`
+	Description   string             `json:"description"`
+	Scenarios     []ExerciseScenario `json:"scenarios"`
+}
+
+type ExerciseScenario struct {
+	ID                   string   `json:"id"`
+	ProjectKind          string   `json:"project_kind"`
+	SupportedPlatforms   []string `json:"supported_platforms"`
+	Status               string   `json:"status"`
+	Summary              string   `json:"summary"`
+	ManualSteps          []string `json:"manual_steps"`
+	MissingCapabilityIDs []string `json:"missing_capability_ids"`
+	ReadinessConstraints []string `json:"readiness_constraints"`
+	Verification         string   `json:"verification"`
 }
 
 type Pack struct {

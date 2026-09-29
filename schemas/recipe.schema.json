@@ -13,7 +13,6 @@
     "prerequisites",
     "detection",
     "install_strategy",
-    "artifact",
     "privileges",
     "license_notes",
     "estimated_download_bytes",
@@ -126,5 +125,52 @@
       "type": "string",
       "maxLength": 100
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "install_strategy": {
+            "enum": [
+              "verified_archive",
+              "vendor_installer",
+              "package_manager"
+            ]
+          }
+        },
+        "required": [
+          "install_strategy"
+        ]
+      },
+      "then": {
+        "required": [
+          "artifact"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "install_strategy": {
+            "const": "manual"
+          }
+        },
+        "required": [
+          "install_strategy"
+        ],
+        "not": {
+          "required": [
+            "artifact"
+          ]
+        }
+      },
+      "then": {
+        "properties": {
+          "estimated_download_bytes": {
+            "const": 0
+          }
+        }
+      }
+    }
+  ]
 }

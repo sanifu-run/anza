@@ -748,6 +748,57 @@
         "finished_at": "2026-09-28T10:00:01Z",
         "pending_manual_actions": []
       }
+    },
+    {
+      "name": "exercise-ready-state-forbidden",
+      "type": "exercise",
+      "json": {
+        "schema_version": 1,
+        "id": "mobile-desktop",
+        "version": "1.0.0",
+        "description": "Invalid ready state.",
+        "scenarios": [
+          {
+            "id": "ready-ios",
+            "project_kind": "ios",
+            "supported_platforms": [
+              "darwin-arm64"
+            ],
+            "status": "ready",
+            "summary": "Ready",
+            "manual_steps": [
+              "Proceed."
+            ],
+            "readiness_constraints": [],
+            "verification": "Verify.",
+            "missing_capability_ids": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "automated-recipe-requires-artifact",
+      "type": "recipe",
+      "json": {
+        "id": "codex",
+        "version": "1.0.0",
+        "description": "Codex tool",
+        "purpose": "Run Codex",
+        "supported_platforms": [
+          "darwin-arm64"
+        ],
+        "prerequisites": [],
+        "detection": "check codex --version",
+        "install_strategy": "verified_archive",
+        "privileges": [
+          "user"
+        ],
+        "license_notes": "License review required.",
+        "estimated_download_bytes": 0,
+        "side_effects": [],
+        "verification": "Check version.",
+        "reversal_class": "manual"
+      }
     }
   ]
 }

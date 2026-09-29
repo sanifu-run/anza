@@ -1,6 +1,6 @@
-# Contract schema decisions (v1 revision 2)
+# Contract schema decisions (v1 revision 3)
 
-These schemas and Go value types materialize `docs/contracts/v1.md` revision 2. They are strict at the new Anza setup boundary. Unknown fields, duplicate object keys, malformed UTF-8, trailing JSON values and enum values outside the contract are rejected before values are used. Field validation errors include the relevant JSON field path and never echo whole payloads.
+These schemas and Go value types materialize `docs/contracts/v1.md` revision 3 (initial revision 2 plus the coordinator-authorized catalog extension). They are strict at the new Anza setup boundary. Unknown fields, duplicate object keys, malformed UTF-8, trailing JSON values and enum values outside the contract are rejected before values are used. Field validation errors include the relevant JSON field path and never echo whole payloads.
 
 ## Wire naming and mapping
 
@@ -12,11 +12,12 @@ A read-only inspection of the peer chat checkout found `requestId` on the existi
 
 - Project summaries use Unicode code-point counts: 1..4000; desired slice is at most 2000; project kind at most 200; constraints at most 20 entries of at most 500 characters; known stack at most 20 catalog IDs.
 - Recommendation lists are capped at 30 recipe IDs and 10 pack IDs. Each explanatory collection is bounded to 100 items and 2000 characters per item. Recommendation fields named `command`, `url`, `path`, or any other undeclared key fail strict decoding.
-- Recipe strategies are limited to `verified_archive`, `vendor_installer`, `package_manager` and `manual`; recipe and catalog identifiers use lowercase ASCII IDs. Download sizes must be nonnegative integers.
+- Recipe strategies are limited to `verified_archive`, `vendor_installer`, `package_manager` and `manual`; recipe and catalog identifiers use lowercase ASCII IDs. Every non-manual strategy requires an Artifact. Manual recipes may omit it only when estimated download bytes are zero. Present artifact metadata still requires source and digest.
 - Pack skill IDs must start with `anza-`; files, compatibility maps and ID collections have explicit count and string bounds.
+- Exercise schema version 1 has non-executable scenarios keyed by project kind and platform. Scenarios can report only manual/unsupported readiness and require explanatory steps, a missing-capability ID array and verification; overlapping project-kind/platform cells and unsupported platform predicates are rejected by Go validation/catalog loading.
 - Plans preserve operation order, require logical target roots and safe relative paths, use lowercase SHA-256 digest strings, reject drive-prefixed paths and `.`/`..` path segments, and use UTC RFC3339 timestamps with expiry after creation. The canonical plan digest omits its `digest` property, sorts object map keys, and preserves arrays.
 - Receipt operation state and rollback state follow the contract's listed state values. Timestamps use UTC RFC3339. Fixtures use synthetic values only.
 
 ## Published schema files
 
-`brief.schema.json` covers ProjectBrief and its optional learner-export source. `recommendation.schema.json`, `recipe.schema.json`, `pack.schema.json`, `plan.schema.json` and `receipt.schema.json` cover the corresponding top-level types. MachineFacts has a Go validator and appears nested in the wrapper fixture; the task's six-schema output list does not include a standalone MachineFacts schema. Approval and CheckResult have Go value types, strict decoders and canonical round-trip fixtures, but are not persisted as one of these six schema files.
+`brief.schema.json` covers ProjectBrief and its optional learner-export source. `recommendation.schema.json`, `recipe.schema.json`, `exercise.schema.json`, `pack.schema.json`, `plan.schema.json` and `receipt.schema.json` cover the corresponding top-level types. MachineFacts has a Go validator and appears nested in the wrapper fixture; the task's six-schema output list does not include a standalone MachineFacts schema. Approval and CheckResult have Go value types, strict decoders and canonical round-trip fixtures, but are not persisted as one of these six schema files.

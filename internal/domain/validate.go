@@ -61,10 +61,25 @@ func DecodeRecommendation(data []byte) (Recommendation, error) {
 
 func DecodeRecipe(data []byte) (Recipe, error) {
 	var value Recipe
-	if err := decodeStrict(data, &value, "id", "version", "description", "purpose", "supported_platforms", "prerequisites", "detection", "install_strategy", "artifact", "privileges", "license_notes", "estimated_download_bytes", "side_effects", "verification", "reversal_class"); err != nil {
+	if err := decodeStrict(data, &value, "id", "version", "description", "purpose", "supported_platforms", "prerequisites", "detection", "install_strategy", "privileges", "license_notes", "estimated_download_bytes", "side_effects", "verification", "reversal_class"); err != nil {
 		return value, err
 	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return value, fmt.Errorf("recipe: %w", err)
+	}
+	if artifact, ok := fields["artifact"]; ok && bytes.Equal(bytes.TrimSpace(artifact), []byte("null")) {
+		return value, fieldError("artifact", "must be omitted rather than null")
+	}
 	return value, validateRecipe(value)
+}
+
+func DecodeExercise(data []byte) (Exercise, error) {
+	var value Exercise
+	if err := decodeStrict(data, &value, "schema_version", "id", "version", "description", "scenarios"); err != nil {
+		return value, err
+	}
+	return value, validateExercise(value)
 }
 
 func DecodePack(data []byte) (Pack, error) {
@@ -148,6 +163,9 @@ func DecodeFixture(kind string, data []byte) error {
 		return err
 	case "recipe":
 		_, err := DecodeRecipe(data)
+		return err
+	case "exercise":
+		_, err := DecodeExercise(data)
 		return err
 	case "pack":
 		_, err := DecodePack(data)
@@ -391,11 +409,23 @@ func validateRecipe(v Recipe) error {
 	if !oneOf(v.InstallStrategy, "verified_archive", "vendor_installer", "package_manager", "manual") {
 		return fieldError("install_strategy", "unknown strategy")
 	}
-	if v.EstimatedDownloadBytes < 0 || v.Artifact.Size < 0 {
+	if v.EstimatedDownloadBytes < 0 {
 		return fieldError("estimated_download_bytes", "must not be negative")
 	}
-	if !boundedNonEmpty(v.Artifact.Digest, 128) || !boundedNonEmpty(v.Artifact.Origin, 500) {
-		return fieldError("artifact", "digest and origin are required")
+	if v.Artifact == nil {
+		if v.InstallStrategy != "manual" {
+			return fieldError("artifact", "is required unless install_strategy is manual")
+		}
+		if v.EstimatedDownloadBytes != 0 {
+			return fieldError("estimated_download_bytes", "must be zero when manual recipe has no artifact")
+		}
+	} else {
+		if v.Artifact.Size < 0 {
+			return fieldError("artifact.size", "must not be negative")
+		}
+		if !boundedNonEmpty(v.Artifact.Digest, 128) || !boundedNonEmpty(v.Artifact.Origin, 500) {
+			return fieldError("artifact", "digest and origin are required when artifact is present")
+		}
 	}
 	if err := boundedStrings("supported_platforms", v.SupportedPlatforms, 20, 100); err != nil {
 		return err
@@ -408,6 +438,86 @@ func validateRecipe(v Recipe) error {
 	}
 	if err := boundedStrings("side_effects", v.SideEffects, 100, 1000); err != nil {
 		return err
+	}
+	return nil
+}
+
+func validateExercise(v Exercise) error {
+	if v.SchemaVersion != 1 {
+		return fieldError("schema_version", "must be 1")
+	}
+	if !validID(v.ID) || !boundedNonEmpty(v.Version, 100) || !boundedNonEmpty(v.Description, 2000) {
+		return fieldError("exercise", "id, version and description are required and bounded")
+	}
+	if len(v.Scenarios) == 0 || len(v.Scenarios) > 64 {
+		return fieldError("scenarios", "must contain 1..64 scenarios")
+	}
+	scenarioIDs := make(map[string]struct{}, len(v.Scenarios))
+	platformCells := make(map[string]string)
+	for i, scenario := range v.Scenarios {
+		prefix := fmt.Sprintf("scenarios[%d]", i)
+		if !validID(scenario.ID) {
+			return fieldError(prefix+".id", "invalid scenario ID")
+		}
+		if _, exists := scenarioIDs[scenario.ID]; exists {
+			return fieldError(prefix+".id", "duplicate scenario ID")
+		}
+		scenarioIDs[scenario.ID] = struct{}{}
+		if !validID(scenario.ProjectKind) {
+			return fieldError(prefix+".project_kind", "invalid project kind")
+		}
+		if !oneOf(scenario.Status, "manual", "unsupported") {
+			return fieldError(prefix+".status", "must be manual or unsupported")
+		}
+		if !boundedNonEmpty(scenario.Summary, 2000) || !boundedNonEmpty(scenario.Verification, 2000) {
+			return fieldError(prefix, "summary and verification are required and bounded")
+		}
+		if len(scenario.SupportedPlatforms) == 0 || len(scenario.SupportedPlatforms) > 20 {
+			return fieldError(prefix+".supported_platforms", "must contain 1..20 platform predicates")
+		}
+		seenPlatforms := make(map[string]struct{}, len(scenario.SupportedPlatforms))
+		for j, platform := range scenario.SupportedPlatforms {
+			if !boundedNonEmpty(platform, 100) {
+				return fieldError(fmt.Sprintf("%s.supported_platforms[%d]", prefix, j), "must contain 1..100 characters")
+			}
+			if _, exists := seenPlatforms[platform]; exists {
+				return fieldError(prefix+".supported_platforms", "contains a duplicate platform")
+			}
+			seenPlatforms[platform] = struct{}{}
+			cell := scenario.ProjectKind + "\x00" + platform
+			if previous, exists := platformCells[cell]; exists {
+				return fieldError(prefix, "overlaps platform scenario "+previous)
+			}
+			platformCells[cell] = scenario.ID
+		}
+		if err := boundedStrings(prefix+".manual_steps", scenario.ManualSteps, 20, 2000); err != nil {
+			return err
+		}
+		if len(scenario.ManualSteps) == 0 {
+			return fieldError(prefix+".manual_steps", "requires at least one plain-language step")
+		}
+		if scenario.MissingCapabilityIDs == nil {
+			return fieldError(prefix+".missing_capability_ids", "must be an array, which may be empty")
+		}
+		if len(scenario.MissingCapabilityIDs) > 20 {
+			return fieldError(prefix+".missing_capability_ids", "must contain at most 20 IDs")
+		}
+		missingSeen := make(map[string]struct{}, len(scenario.MissingCapabilityIDs))
+		for j, id := range scenario.MissingCapabilityIDs {
+			if !validID(id) {
+				return fieldError(fmt.Sprintf("%s.missing_capability_ids[%d]", prefix, j), "invalid capability ID")
+			}
+			if _, exists := missingSeen[id]; exists {
+				return fieldError(prefix+".missing_capability_ids", "contains a duplicate ID")
+			}
+			missingSeen[id] = struct{}{}
+		}
+		if scenario.ReadinessConstraints == nil {
+			return fieldError(prefix+".readiness_constraints", "must be an array, which may be empty")
+		}
+		if err := boundedStrings(prefix+".readiness_constraints", scenario.ReadinessConstraints, 20, 2000); err != nil {
+			return err
+		}
 	}
 	return nil
 }

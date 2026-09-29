@@ -48,11 +48,12 @@ type manifest struct {
 // Catalog is immutable after Load. Accessors return copies so callers cannot
 // mutate the validated snapshot.
 type Catalog struct {
-	version string
-	digest  string
-	recipes map[string]domain.Recipe
-	packs   map[string]domain.Pack
-	skills  map[string]struct{}
+	version   string
+	digest    string
+	recipes   map[string]domain.Recipe
+	packs     map[string]domain.Pack
+	exercises map[string]domain.Exercise
+	skills    map[string]struct{}
 }
 
 // Load reads and validates a catalog rooted at fsys. All reads are relative to
@@ -94,10 +95,11 @@ func Load(fsys fs.FS) (*Catalog, error) {
 	}
 
 	cat := &Catalog{
-		version: m.Version,
-		recipes: make(map[string]domain.Recipe),
-		packs:   make(map[string]domain.Pack),
-		skills:  make(map[string]struct{}),
+		version:   m.Version,
+		recipes:   make(map[string]domain.Recipe),
+		packs:     make(map[string]domain.Pack),
+		exercises: make(map[string]domain.Exercise),
+		skills:    make(map[string]struct{}),
 	}
 	entries := make(map[string]Entry, len(m.Entries))
 	paths := make(map[string]struct{}, len(m.Entries))
@@ -105,10 +107,7 @@ func Load(fsys fs.FS) (*Catalog, error) {
 		if !validID(entry.ID) {
 			return nil, fmt.Errorf("entry has invalid id %q", entry.ID)
 		}
-		if entry.Kind == "exercise" {
-			return nil, fmt.Errorf("exercise %q is unsupported: no versioned exercise schema is defined", entry.ID)
-		}
-		if entry.Kind != "recipe" && entry.Kind != "pack" && entry.Kind != "skill" {
+		if entry.Kind != "recipe" && entry.Kind != "pack" && entry.Kind != "skill" && entry.Kind != "exercise" {
 			return nil, fmt.Errorf("entry %q has unsupported kind %q", entry.ID, entry.Kind)
 		}
 		if _, exists := entries[entry.ID]; exists {
@@ -149,8 +148,11 @@ func Load(fsys fs.FS) (*Catalog, error) {
 			if value.ID != entry.ID {
 				return nil, fmt.Errorf("recipe entry id %q does not match payload id %q", entry.ID, value.ID)
 			}
-			if strings.TrimSpace(value.LicenseNotes) == "" || strings.TrimSpace(value.Artifact.Origin) == "" {
-				return nil, fmt.Errorf("recipe %q requires license notes and artifact source", entry.ID)
+			if strings.TrimSpace(value.LicenseNotes) == "" {
+				return nil, fmt.Errorf("recipe %q requires license notes", entry.ID)
+			}
+			if value.Artifact != nil && strings.TrimSpace(value.Artifact.Origin) == "" {
+				return nil, fmt.Errorf("recipe %q has an artifact with no source", entry.ID)
 			}
 			if err := validatePlatforms(value.SupportedPlatforms); err != nil {
 				return nil, fmt.Errorf("recipe %q: %w", entry.ID, err)
@@ -192,6 +194,20 @@ func Load(fsys fs.FS) (*Catalog, error) {
 				}
 			}
 			cat.packs[entry.ID] = value
+		case "exercise":
+			value, err := domain.DecodeExercise(contents)
+			if err != nil {
+				return nil, fmt.Errorf("validating exercise %q: %w", entry.ID, err)
+			}
+			if value.ID != entry.ID {
+				return nil, fmt.Errorf("exercise entry id %q does not match payload id %q", entry.ID, value.ID)
+			}
+			for _, scenario := range value.Scenarios {
+				if err := validatePlatforms(scenario.SupportedPlatforms); err != nil {
+					return nil, fmt.Errorf("exercise %q scenario %q: %w", entry.ID, scenario.ID, err)
+				}
+			}
+			cat.exercises[entry.ID] = value
 		case "skill":
 			if !strings.HasPrefix(entry.ID, "anza-") || len(contents) == 0 {
 				return nil, fmt.Errorf("skill %q must use anza- ID and contain content", entry.ID)
@@ -240,9 +256,28 @@ func (c *Catalog) Recipe(id string) (domain.Recipe, bool) {
 		return domain.Recipe{}, false
 	}
 	v.SupportedPlatforms = cloneStrings(v.SupportedPlatforms)
+	if v.Artifact != nil {
+		artifact := *v.Artifact
+		v.Artifact = &artifact
+	}
 	v.Prerequisites = cloneStrings(v.Prerequisites)
 	v.Privileges = cloneStrings(v.Privileges)
 	v.SideEffects = cloneStrings(v.SideEffects)
+	return v, true
+}
+
+func (c *Catalog) Exercise(id string) (domain.Exercise, bool) {
+	v, ok := c.exercises[id]
+	if !ok {
+		return domain.Exercise{}, false
+	}
+	v.Scenarios = append([]domain.ExerciseScenario(nil), v.Scenarios...)
+	for i := range v.Scenarios {
+		v.Scenarios[i].SupportedPlatforms = cloneStrings(v.Scenarios[i].SupportedPlatforms)
+		v.Scenarios[i].ManualSteps = cloneStrings(v.Scenarios[i].ManualSteps)
+		v.Scenarios[i].ReadinessConstraints = cloneStrings(v.Scenarios[i].ReadinessConstraints)
+		v.Scenarios[i].MissingCapabilityIDs = cloneStrings(v.Scenarios[i].MissingCapabilityIDs)
+	}
 	return v, true
 }
 
