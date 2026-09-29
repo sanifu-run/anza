@@ -440,7 +440,7 @@ func validateArchiveComponent(part string) error {
 	}
 	base := strings.ToUpper(strings.SplitN(part, ".", 2)[0])
 	switch base {
-	case "CON", "PRN", "AUX", "NUL":
+	case "CON", "PRN", "AUX", "NUL", "COM¹", "COM²", "COM³", "LPT¹", "LPT²", "LPT³":
 		return errors.New("archive path component is a reserved Windows device name")
 	}
 	if len(base) == 4 && (strings.HasPrefix(base, "COM") || strings.HasPrefix(base, "LPT")) && base[3] >= '1' && base[3] <= '9' {
