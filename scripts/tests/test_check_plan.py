@@ -85,7 +85,61 @@ class PlanCheckerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("T1.2", result.stdout + result.stderr)
         self.assertIn("T1.5", result.stdout + result.stderr)
+
+    def test_windows_drive_owned_path(self):
+        data, path = self.index()
+        task = next(item for item in data["tasks"] if item["id"] == "T1.2")
+        task["owned_paths"][0] = "C:/outside/file.txt"
+        self.save_index(data, path)
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
         self.assertIn("T1.2", result.stdout + result.stderr)
+        self.assertIn("owned path", result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stdout + result.stderr)
+
+    def test_dot_segment_owned_path(self):
+        data, path = self.index()
+        task = next(item for item in data["tasks"] if item["id"] == "T1.2")
+        task["owned_paths"][0] = "internal/../outside.go"
+        self.save_index(data, path)
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("T1.2", result.stdout + result.stderr)
+        self.assertIn("owned path", result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stdout + result.stderr)
+
+    def test_non_integer_task_wave(self):
+        data, path = self.index()
+        task = next(item for item in data["tasks"] if item["id"] == "T1.2")
+        task["wave"] = [2]
+        self.save_index(data, path)
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("T1.2", result.stdout + result.stderr)
+        self.assertIn("wave must be an integer", result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stdout + result.stderr)
+
+    def test_non_string_repository(self):
+        data, path = self.index()
+        task = next(item for item in data["tasks"] if item["id"] == "T1.2")
+        task["repository"] = ["anza"]
+        self.save_index(data, path)
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("T1.2", result.stdout + result.stderr)
+        self.assertIn("repository must be anza or chat", result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stdout + result.stderr)
+
+    def test_non_string_dependency(self):
+        data, path = self.index()
+        task = next(item for item in data["tasks"] if item["id"] == "T1.2")
+        task["deps"] = [["T1.1"]]
+        self.save_index(data, path)
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("T1.2", result.stdout + result.stderr)
+        self.assertIn("dependency entries must be task IDs", result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stdout + result.stderr)
 
     def test_compatibility_rejects_missing_source_date(self):
         source_dir = self.root / "docs" / "research"

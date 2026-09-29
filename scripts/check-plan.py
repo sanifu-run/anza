@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ntpath
 import datetime as dt
 import json
 import re
@@ -49,6 +50,9 @@ def task_doc_paths(path: Path) -> tuple[str | None, list[str]]:
 
 def valid_relative_path(value: object) -> bool:
     if not isinstance(value, str) or not value or "\\" in value:
+        return False
+    drive, _ = ntpath.splitdrive(value)
+    if drive:
         return False
     path = PurePosixPath(value)
     return not path.is_absolute() and all(part not in ("", ".", "..") for part in value.split("/"))
@@ -170,6 +174,9 @@ def validate(root: Path, modes: set[str]) -> list[str]:
             check.error(f"wave {wave_id}", "tasks must be a list")
             continue
         for task_id in ids:
+            if not isinstance(task_id, str):
+                check.error(f"wave {wave_id}", f"task IDs must be strings, got {task_id!r}")
+                continue
             if task_id not in by_id:
                 check.error(str(task_id), f"listed in unknown/malformed wave {wave_id}")
                 continue
@@ -197,10 +204,17 @@ def validate(root: Path, modes: set[str]) -> list[str]:
 
     owners_by_wave: dict[tuple[str, int], list[tuple[str, str]]] = defaultdict(list)
     graph: dict[str, list[str]] = {}
+    indexed_cases: dict[str, list[str]] = {}
     for task_id, task in by_id.items():
         repo = task.get("repository")
-        if repo not in {"anza", "chat"}:
+        repo_valid = isinstance(repo, str) and repo in {"anza", "chat"}
+        if not repo_valid:
             check.error(task_id, f"repository must be anza or chat, got {repo!r}")
+        task_wave = task.get("wave")
+        wave_valid = type(task_wave) is int
+        if not wave_valid:
+            check.error(task_id, f"wave must be an integer, got {task_wave!r}")
+        owner_wave = task_wave if wave_valid else -1
         owned = task.get("owned_paths")
         if not isinstance(owned, list) or not owned:
             check.error(task_id, "owned_paths must be a non-empty list")
@@ -210,8 +224,8 @@ def validate(root: Path, modes: set[str]) -> list[str]:
         for path in owned:
             if not valid_relative_path(path):
                 check.error(task_id, f"owned path must be repository-relative: {path!r}")
-            elif repo in {"anza", "chat"}:
-                owners_by_wave[(repo, task.get("wave", -1))].append((path, task_id))
+            elif repo_valid:
+                owners_by_wave[(repo, owner_wave)].append((path, task_id))
 
         doc_path = docs / "tasks" / f"{task_id}.md"
         if not doc_path.is_file():
@@ -231,22 +245,33 @@ def validate(root: Path, modes: set[str]) -> list[str]:
         if not isinstance(cases, list) or not cases:
             check.error(task_id, "use_cases must be a non-empty list")
             cases = []
+        valid_cases = []
         for case_id in cases:
+            if not isinstance(case_id, str):
+                check.error(task_id, f"use-case IDs must be strings, got {case_id!r}")
+                continue
+            valid_cases.append(case_id)
             if case_id != "infrastructure" and case_id not in usecases:
                 check.error(task_id, f"references unknown use case {case_id!r}")
+        indexed_cases[task_id] = valid_cases
 
         deps = task.get("deps")
         if not isinstance(deps, list):
             check.error(task_id, "deps must be a list")
             deps = []
-        graph[task_id] = deps
+        parsed_deps = []
         for dep in deps:
+            if not isinstance(dep, str) or not TASK_ID.fullmatch(dep):
+                check.error(task_id, f"dependency entries must be task IDs, got {dep!r}")
+                continue
+            parsed_deps.append(dep)
             if dep not in by_id:
                 check.error(task_id, f"dependency {dep!r} does not exist")
             elif dep == task_id:
                 check.error(task_id, "task cannot depend on itself")
             elif dep in listed_tasks and task_id in listed_tasks and listed_tasks[dep] >= listed_tasks[task_id]:
                 check.error(task_id, f"dependency {dep} must run in an earlier wave")
+        graph[task_id] = parsed_deps
 
     for (repo, wave), claims in owners_by_wave.items():
         conflicts: set[tuple[str, str, str]] = set()
@@ -289,12 +314,15 @@ def validate(root: Path, modes: set[str]) -> list[str]:
             check.error(case_id, "task_ids must be a list")
             continue
         for task_id in case_tasks:
+            if not isinstance(task_id, str):
+                check.error(case_id, f"task IDs must be strings, got {task_id!r}")
+                continue
             if task_id not in by_id:
                 check.error(case_id, f"maps to unknown task {task_id!r}")
             elif case_id not in by_id[task_id].get("use_cases", []):
                 check.error(task_id, f"use-case mapping {case_id} is missing from execution index")
     for task_id, task in by_id.items():
-        for case_id in task.get("use_cases", []):
+        for case_id in indexed_cases.get(task_id, []):
             if case_id in usecases and task_id not in usecases[case_id].get("task_ids", []):
                 check.error(task_id, f"use-case mapping {case_id} is missing from canonical usecases.json")
 
