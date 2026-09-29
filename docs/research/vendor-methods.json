@@ -6,51 +6,61 @@
       "vendor": "Anthropic",
       "product": "Claude Code CLI",
       "method": "manual",
-      "platform": "macOS 10.15+, Ubuntu 20.04+/Debian 10+, native Windows with Git for Windows/Git Bash; Node.js 18+, 4 GB RAM",
-      "source_url": "https://docs.anthropic.com/en/docs/claude-code/getting-started",
+      "platform": "macOS 13+, Windows 10 1809+/Windows Server 2019+, Ubuntu 20.04+, Debian 10+, Alpine 3.19+; x64 or ARM64; 4 GB RAM; npm requires Node.js 22+ since Claude Code 2.1.198",
+      "source_url": "https://code.claude.com/docs/en/setup",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
       "supported_cli_version": "2.1.276 current npm package listing; retrieved 2026-09-28",
       "version_source_url": "https://www.npmjs.com/package/%40anthropic-ai/claude-code",
-      "install_command": "npm install -g @anthropic-ai/claude-code; for a reviewed pin use @2.1.276",
-      "privileges": "Avoid sudo; user-writable npm prefix required. Administrator provisioning is outside the automated method.",
-      "auto_update": "Enabled by default; startup and periodic background updates. Disable with claude config set autoUpdates false --global or DISABLE_AUTOUPDATER=1.",
-      "pin": "npm exact package version syntax is available. Disable Claude auto-updates to preserve the selected version.",
-      "integrity_verification": "No vendor digest/signature and Anza verification procedure established by cited sources; classify install as manual. Do not substitute npm registry metadata for vendor release verification.",
-      "post_install_detection": ["claude --version", "claude doctor"],
+      "install_command": "npm install -g @anthropic-ai/claude-code; exact npm version may be selected as @<version>",
+      "privileges": "Do not use sudo; requires a user-writable npm global prefix.",
+      "auto_update": "Native and npm installations auto-update by default. DISABLE_AUTOUPDATER=1 stops background checks; DISABLE_UPDATES=1 blocks all update paths.",
+      "pin": "npm exact version selector can install an exact package version; disable auto-updates to preserve it.",
+      "integrity_verification": "Claude setup documents signed native binary manifests but not Anza verification of npm registry integrity. Manual until Anza adopts and checks a registry-integrity policy.",
+      "post_install_detection": [
+        "claude --version",
+        "claude doctor"
+      ],
       "auth_and_configuration": "Claude subscription sign-in is separate from OpenRouter environment configuration; preserve cached authentication unless participant explicitly switches.",
-      "limits": "Documented platform minima do not qualify every distro, CPU architecture, native Windows ARM, or feature combination. No native test or sign-in was run."
+      "limits": "npm platform packages list darwin-arm64/x64, linux-x64/arm64 glibc and musl, win32-x64/arm64. No native target was tested."
     },
     {
       "id": "claude-install",
       "vendor": "Anthropic",
       "product": "Claude Code CLI native installer",
       "method": "manual",
-      "platform": "macOS and Linux; Windows through WSL; installer described as alpha",
-      "source_url": "https://docs.anthropic.com/en/docs/claude-code/getting-started",
+      "platform": "macOS 13+, Windows 10 1809+/Windows Server 2019+, Ubuntu 20.04+, Debian 10+, Alpine 3.19+; x64 or ARM64; 4 GB RAM; WSL 1/2 also documented",
+      "source_url": "https://code.claude.com/docs/en/setup",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
-      "supported_cli_version": "No fixed version stated by installer documentation",
-      "install_command": "Anthropic documents claude install from an existing installation and the official shell/PowerShell bootstrap",
-      "privileges": "Per-user flow; no system-wide privilege requirement is stated by the cited instructions. Do not elevate without a separate reviewed method.",
-      "auto_update": "Claude auto-update defaults on; documented global config and environment controls can disable it.",
-      "pin": "No documented exact version pin syntax in cited install instructions.",
-      "integrity_verification": "No checksum or signature verification method is supplied by cited install instructions; manual only.",
-      "post_install_detection": ["claude --version", "claude doctor"],
-      "limits": "Alpha method. Do not claim specific distro/architecture support or native Windows ARM support."
+      "supported_cli_version": "2.1.276 current package listing; native installer accepts exact release versions",
+      "install_command": "Recommended native installer: curl -fsSL https://claude.ai/install.sh | bash; official PowerShell/CMD Windows variants. Accepts latest, stable, or exact version.",
+      "privileges": "Per-user default; Windows native install explicitly needs no Administrator.",
+      "auto_update": "Background update enabled by default; latest default channel; stable channel delayed/release-screened. minimumVersion sets update floor. DISABLE_AUTOUPDATER=1 stops background checks; DISABLE_UPDATES=1 blocks all update paths.",
+      "pin": "Native installer accepts latest, stable, or exact version. autoUpdatesChannel/minimumVersion configure update policy; managed requiredMinimumVersion/requiredMaximumVersion constrain launch.",
+      "integrity_verification": "Every release has manifest.json SHA256 values; from 2.1.89 onward manifest.json.sig is GPG signed. Verify Anthropic key fingerprint 31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE, detached manifest signature, and installed/downloaded binary SHA256 against manifest. macOS codesign/notarization and Windows Authenticode also documented. Anza must implement verification before automating.",
+      "post_install_detection": [
+        "claude --version",
+        "claude doctor"
+      ],
+      "limits": "No native test or integrity verification was performed."
     },
     {
       "id": "claude-setup",
       "vendor": "Anthropic",
       "product": "Claude Code setup and subscription authentication",
       "method": "manual",
-      "platform": "Claude Code supported installation platforms in the getting-started guide",
-      "source_url": "https://docs.anthropic.com/en/docs/claude-code/getting-started",
+      "platform": "macOS 13+, Windows 10 1809+/Windows Server 2019+, Ubuntu 20.04+, Debian 10+, Alpine 3.19+; x64 or ARM64",
+      "source_url": "https://code.claude.com/docs/en/setup",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
       "supported_cli_version": "2.1.276 npm listing current at retrieval; no minimum authentication version stated",
-      "authentication": "Interactive vendor sign-in when starting Claude Code; Claude plan and Console/API access are vendor-controlled. No login was performed.",
-      "post_install_detection": ["claude --version", "claude doctor", "Claude /status"],
+      "authentication": "Requires Pro, Max, Team, Enterprise, or Console account; free claude.ai plan does not include Claude Code. Run claude and complete browser prompts. If ANTHROPIC_API_KEY is set, Claude prompts to approve that key. No login performed.",
+      "post_install_detection": [
+        "claude --version",
+        "claude doctor",
+        "Claude /status"
+      ],
       "limits": "Platform-independent sign-in does not establish account eligibility, billing, or model feature qualification."
     },
     {
@@ -71,7 +81,7 @@
       "vendor": "OpenRouter",
       "product": "Claude Code integration",
       "method": "manual",
-      "platform": "Claude Code environments supported by Anthropic; OpenRouter documents shell environment setup",
+      "platform": "Claude Code documented OSes: macOS 13+, Windows 10 1809+/Server 2019+, Ubuntu 20.04+, Debian 10+, Alpine 3.19+; x64/ARM64; WSL 1/2.",
       "source_url": "https://openrouter.ai/docs/guides/coding-agents/claude-code-integration",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
@@ -100,19 +110,22 @@
       "vendor": "OpenAI",
       "product": "Codex CLI install requirements and package install",
       "method": "manual",
-      "platform": "macOS 12+, Ubuntu 20.04+/Debian 10+, Windows 11 via WSL2; 4 GB RAM minimum, 8 GB recommended",
+      "platform": "docs/install.md lists macOS 12+, Ubuntu 20.04+/Debian 10+, Windows 11 via WSL2, 4 GB RAM minimum/8 GB recommended. Current repository README also documents native Windows PowerShell install; Windows installer selects x64 and ARM64.",
       "source_url": "https://github.com/openai/codex/blob/main/docs/install.md",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
-      "supported_cli_version": "0.157.1 latest stable GitHub release at retrieval; later prereleases excluded",
+      "supported_cli_version": "0.157.1 latest stable release on 2026-09-28; later alpha prereleases excluded",
       "version_source_url": "https://github.com/openai/codex/releases",
-      "install_command": "npm install -g @openai/codex; exact npm version selector may be used for a pin",
-      "privileges": "Use user-writable npm prefix; no elevated installation procedure qualified.",
-      "auto_update": "Codex checks for updates at startup and surfaces prompts by default. `check_for_update_on_startup = false` disables the check/prompt; source does not claim it is an update lock.",
-      "pin": "Select an exact npm package version or GitHub release tag. Version selection alone is not an integrity guarantee.",
-      "integrity_verification": "No Anza-verified checksum/signature workflow established for this npm method by cited source; manual only.",
-      "post_install_detection": ["codex --version", "codex login status"],
-      "limits": "Official source identifies Windows 11 via WSL2, not native Windows. Linux OS families are named but supported architecture/distro pairings require qualification."
+      "install_command": "Official standalone installers: curl -fsSL https://chatgpt.com/codex/install.sh | sh (macOS/Linux), PowerShell irm https://chatgpt.com/codex/install.ps1 | iex (Windows); npm and Homebrew also documented.",
+      "privileges": "Standalone defaults to user paths: ~/.local/bin (Unix), %LOCALAPPDATA%\\Programs\\OpenAI\\Codex\\bin (Windows).",
+      "auto_update": "Codex checks for updates at startup and surfaces prompts; check_for_update_on_startup=false disables the check/prompt, not explicit update/install actions.",
+      "pin": "Standalone accepts --release VERSION or CODEX_RELEASE; Windows accepts Release parameter/environment. Default is latest.",
+      "integrity_verification": "Standalone installers resolve release metadata, read SHA256 asset digests, verify archive digest and package checksum manifest before extraction. Metadata comes over HTTPS from OpenAI release service or GitHub; no detached signature is documented. Anza must implement/review check before relying on it.",
+      "post_install_detection": [
+        "codex --version",
+        "codex login status"
+      ],
+      "limits": "docs/install.md says Windows 11 via WSL2; README/Windows installer explicitly offer native Windows x64/ARM64. README lists Linux musl assets while docs/install.md lists Ubuntu/Debian. Both discrepancies remain unqualified."
     },
     {
       "id": "codex-release",
@@ -120,11 +133,11 @@
       "product": "Codex CLI release metadata",
       "method": "manual",
       "platform": "Release page lists CLI release assets for multiple OS/architectures",
-      "source_url": "https://github.com/openai/codex/releases",
+      "source_url": "https://github.com/openai/codex/releases/tag/rust-v0.157.1",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
-      "supported_cli_version": "0.157.1 marked latest stable at retrieval; 0.159.0-alpha.9 is a prerelease and is not selected",
-      "integrity_verification": "Release assets display checksums for some artifacts, but no exact Anza CLI asset selection and verification workflow has been qualified; do not infer that every package path is covered.",
+      "supported_cli_version": "0.157.1 latest stable; 0.159.0-alpha.9 prerelease excluded",
+      "integrity_verification": "GitHub release API metadata supplies SHA256 asset digests; official standalone installer verifies the archive and package manifest. No cryptographic release metadata signature is stated.",
       "limits": "Asset availability does not establish OS support or native qualification."
     },
     {
@@ -151,7 +164,9 @@
       "evidence_level": "documented_only",
       "supported_cli_version": "No current version number stated by authentication page",
       "authentication": "Codex supports ChatGPT sign-in and API key authentication as distinct methods. Neither was used in this task.",
-      "post_install_detection": ["codex login status"],
+      "post_install_detection": [
+        "codex login status"
+      ],
       "limits": "A successful local status command does not establish entitlement or API billing."
     },
     {
@@ -159,7 +174,7 @@
       "vendor": "OpenRouter",
       "product": "Codex CLI integration guide",
       "method": "manual",
-      "platform": "Codex CLI supported platforms; OpenRouter documents PowerShell auth command for Windows but Codex install source limits Windows to WSL2",
+      "platform": "Codex-supported environments; README also documents native Windows install while docs/install.md lists Windows via WSL2. OpenRouter guide includes Windows PowerShell auth syntax.",
       "source_url": "https://openrouter.ai/blog/tutorials/codex-cli-openrouter/",
       "source_date": "2026-09-28",
       "evidence_level": "documented_only",
@@ -181,32 +196,257 @@
       "supported_cli_version": "Not applicable; endpoint schema has no CLI version",
       "configuration": "OpenRouter exposes POST /api/v1/responses, used by Codex custom provider with wire_api=responses.",
       "limits": "Endpoint existence does not establish parity for all Codex features/models. No request was sent."
+    },
+    {
+      "id": "claude-linux-repos",
+      "vendor": "Anthropic",
+      "product": "Claude Code apt/dnf/apk package installation",
+      "method": "manual until Anza implements documented key verification and privilege flow",
+      "platform": "Debian/Ubuntu apt; Fedora/RHEL dnf; Alpine apk, within Claude system requirements",
+      "source_url": "https://code.claude.com/docs/en/setup",
+      "source_date": "2026-09-28",
+      "evidence_level": "documented_only",
+      "supported_cli_version": "Stable/latest package channels; version varies by channel",
+      "install_command": "Anthropic documents signed apt, dnf, apk repositories.",
+      "privileges": "System package install/upgrade requires root or sudo.",
+      "auto_update": "Package installs do not auto-update through Claude by default; normal OS package manager workflow. apt/dnf/apk upgrade remains manual/elevated.",
+      "pin": "Stable/latest channels documented; no exact package version claim here.",
+      "integrity_verification": "Signed apt/dnf/apk repositories; verify documented GPG key fingerprint for apt/dnf and documented SHA256 for Alpine public key. Package manager validates signatures.",
+      "post_install_detection": [
+        "claude --version",
+        "claude doctor"
+      ],
+      "limits": "Documentary only; no package or key installed/verified."
+    },
+    {
+      "id": "codex-readme",
+      "vendor": "OpenAI",
+      "product": "Codex CLI standalone installation guide",
+      "method": "manual until Anza implements/reviews checksum verification",
+      "platform": "macOS/Linux shell installer and Windows native PowerShell installer; Windows x64/ARM64; README lists Linux musl x86_64/arm64",
+      "source_url": "https://github.com/openai/codex/blob/main/README.md",
+      "source_date": "2026-09-28",
+      "evidence_level": "documented_only",
+      "supported_cli_version": "0.157.1 latest stable at retrieval",
+      "install_command": "macOS/Linux: curl -fsSL https://chatgpt.com/codex/install.sh | sh. Windows PowerShell: official https://chatgpt.com/codex/install.ps1. Installer defaults to latest.",
+      "privileges": "Per-user install paths; see platform scripts.",
+      "auto_update": "Codex checks at startup and surfaces update prompt by default.",
+      "pin": "Shell accepts --release VERSION or CODEX_RELEASE; Windows accepts Release parameter/environment.",
+      "integrity_verification": "See official platform installer source records; both verify SHA256 release asset metadata/archive and package manifest before extraction.",
+      "post_install_detection": [
+        "codex --version"
+      ],
+      "limits": "README install OS choices differ from docs/install.md requirements; native Windows/Alpine remain documentary pending native qualification."
+    },
+    {
+      "id": "codex-unix-installer",
+      "vendor": "OpenAI",
+      "product": "Codex CLI standalone Unix installer",
+      "method": "manual until Anza implements/reviews verified install procedure",
+      "platform": "macOS and Linux; README release guide lists Linux musl x86_64/arm64 binaries",
+      "source_url": "https://github.com/openai/codex/blob/main/scripts/install/install.sh",
+      "source_date": "2026-09-28",
+      "evidence_level": "documented_only",
+      "supported_cli_version": "0.157.1 stable at retrieval; installer accepts latest or explicit version",
+      "install_command": "Official README pipes https://chatgpt.com/codex/install.sh to sh; --release VERSION or CODEX_RELEASE selects version.",
+      "privileges": "Default binary path ~/.local/bin/codex; per-user Codex home.",
+      "auto_update": "Startup update checks surface prompts; rerunning installer is explicit update path.",
+      "pin": "--release VERSION or CODEX_RELEASE.",
+      "integrity_verification": "Resolves official release metadata, reads SHA256 digest, verifies downloaded archive, reads package_SHA256SUMS and checks package digest before extraction. Metadata is HTTPS OpenAI mirror or GitHub API; no signed metadata claimed.",
+      "post_install_detection": [
+        "codex --version"
+      ],
+      "limits": "Installer source is documentary evidence only. No native installation executed."
+    },
+    {
+      "id": "codex-windows-installer",
+      "vendor": "OpenAI",
+      "product": "Codex CLI standalone Windows installer",
+      "method": "manual until Anza implements/reviews verified install procedure",
+      "platform": "Native 64-bit Windows; installer selects x64 or ARM64; docs/install.md separately says Windows 11 via WSL2",
+      "source_url": "https://github.com/openai/codex/blob/main/scripts/install/install.ps1",
+      "source_date": "2026-09-28",
+      "evidence_level": "documented_only",
+      "supported_cli_version": "0.157.1 stable at retrieval; accepts exact version parameter/environment",
+      "install_command": "Official README invokes https://chatgpt.com/codex/install.ps1; installer supports Release parameter or CODEX_RELEASE.",
+      "privileges": "Default bin directory %LOCALAPPDATA%\\Programs\\OpenAI\\Codex\\bin; content under user Codex home.",
+      "auto_update": "Startup update checks surface prompts; installer is an explicit update path.",
+      "pin": "Release parameter or CODEX_RELEASE.",
+      "integrity_verification": "Reads SHA256 release asset digest from release metadata, verifies archive and package checksum manifest before extraction. Metadata fetched over HTTPS; source does not specify detached signature.",
+      "post_install_detection": [
+        "codex --version"
+      ],
+      "limits": "Installer source is not native execution evidence. docs/install.md specifies WSL2, leaving requirements documentation discrepancy."
     }
   ],
   "platform_cells": [
-    {"platform":"macOS arm64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"documented target; no native test"},
-    {"platform":"macOS arm64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"documented target; no native test"},
-    {"platform":"macOS amd64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"documented target; no native test"},
-    {"platform":"macOS amd64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"documented target; no native test"},
-    {"platform":"Windows 11 amd64 native","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"documented target with Git Bash; no native test"},
-    {"platform":"Windows 11 amd64 native","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"manual/unsupported for automation; cited requirement is Windows 11 via WSL2"},
-    {"platform":"Windows 11 arm64 native","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"manual/unsupported for automation; architecture not documented"},
-    {"platform":"Windows 11 arm64 native","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"manual/unsupported for automation; architecture not documented"},
-    {"platform":"WSL 1","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"manual; documented but not a pilot target"},
-    {"platform":"WSL 1","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"unsupported; source specifies WSL2"},
-    {"platform":"WSL 2 on Windows 11 amd64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"manual; documented but no native/WSL test"},
-    {"platform":"WSL 2 on Windows 11 amd64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"documented target; no native/WSL test"},
-    {"platform":"Ubuntu 22.04 amd64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"documented target; no native test"},
-    {"platform":"Ubuntu 22.04 amd64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"documented target; no native test"},
-    {"platform":"Ubuntu 24.04 amd64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"within documented Ubuntu minimum; no native test"},
-    {"platform":"Ubuntu 24.04 amd64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"within documented Ubuntu minimum; no native test"},
-    {"platform":"Debian 12 amd64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"within documented Debian minimum; no native test"},
-    {"platform":"Debian 12 amd64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"within documented Debian minimum; no native test"},
-    {"platform":"Debian 12 arm64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"manual; Debian minimum stated but architecture pairing is not"},
-    {"platform":"Debian 12 arm64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"manual; verify release architecture and native qualification"},
-    {"platform":"Other glibc Linux x86_64/arm64","product":"Claude Code","method_id":"claude-npm","evidence_level":"documented_only","classification":"manual; distro not enumerated"},
-    {"platform":"Other glibc Linux x86_64/arm64","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"manual; distro/architecture not enumerated"},
-    {"platform":"Linux musl/Alpine","product":"Claude Code","method_id":"claude-install","evidence_level":"documented_only","classification":"unsupported for automation; no vendor musl/Alpine support documented"},
-    {"platform":"Linux musl/Alpine","product":"Codex CLI","method_id":"codex-install","evidence_level":"documented_only","classification":"manual; musl release asset presence is not OS qualification"}
+    {
+      "platform": "macOS arm64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented target; no native test"
+    },
+    {
+      "platform": "macOS arm64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "documented target; no native test"
+    },
+    {
+      "platform": "macOS amd64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented target; no native test"
+    },
+    {
+      "platform": "macOS amd64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "documented target; no native test"
+    },
+    {
+      "platform": "Windows 11 amd64 native",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented native Windows x64; no native test"
+    },
+    {
+      "platform": "Windows 11 amd64 native",
+      "product": "Codex CLI",
+      "method_id": "codex-windows-installer",
+      "evidence_level": "documented_only",
+      "classification": "README and installer document native x64; docs/install.md says WSL2; unresolved discrepancy, no native test"
+    },
+    {
+      "platform": "Windows 11 arm64 native",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented x64/ARM64 requirement and win32-arm64 npm tag; no native test"
+    },
+    {
+      "platform": "Windows 11 arm64 native",
+      "product": "Codex CLI",
+      "method_id": "codex-windows-installer",
+      "evidence_level": "documented_only",
+      "classification": "installer supports native ARM64; docs/install.md says WSL2; no test"
+    },
+    {
+      "platform": "WSL 1",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented; sandbox unsupported; no test"
+    },
+    {
+      "platform": "WSL 1",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "not listed by codex docs/install.md; manual pending qualification"
+    },
+    {
+      "platform": "WSL 2 on Windows 11 amd64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented; no WSL test"
+    },
+    {
+      "platform": "WSL 2 on Windows 11 amd64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "documented by codex docs/install.md; no WSL test"
+    },
+    {
+      "platform": "Ubuntu 22.04 amd64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented target; no native test"
+    },
+    {
+      "platform": "Ubuntu 22.04 amd64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "documented target; no native test"
+    },
+    {
+      "platform": "Ubuntu 24.04 amd64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "within documented Ubuntu minimum; no native test"
+    },
+    {
+      "platform": "Ubuntu 24.04 amd64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "within documented Ubuntu minimum; no native test"
+    },
+    {
+      "platform": "Debian 12 amd64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "within documented Debian minimum; no native test"
+    },
+    {
+      "platform": "Debian 12 amd64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "within documented Debian minimum; no native test"
+    },
+    {
+      "platform": "Debian 12 arm64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented x64/ARM64 system requirement; Debian 12 ARM64 pairing not tested"
+    },
+    {
+      "platform": "Debian 12 arm64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "Debian floor documented; ARM64 release asset exists; no native test"
+    },
+    {
+      "platform": "Other glibc Linux x86_64/arm64",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "manual; distro not individually named; no test"
+    },
+    {
+      "platform": "Other glibc Linux x86_64/arm64",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "Linux release guide is musl-targeted; requirements list Ubuntu/Debian; manual pending target qualification"
+    },
+    {
+      "platform": "Alpine Linux 3.19+ / musl",
+      "product": "Claude Code",
+      "method_id": "claude-install",
+      "evidence_level": "documented_only",
+      "classification": "documented; dependencies and signed apk repo method required; no test"
+    },
+    {
+      "platform": "Alpine Linux 3.19+ / musl",
+      "product": "Codex CLI",
+      "method_id": "codex-unix-installer",
+      "evidence_level": "documented_only",
+      "classification": "README lists musl x86_64/arm64 assets; docs/install.md omits Alpine; manual pending qualification"
+    }
   ]
 }
