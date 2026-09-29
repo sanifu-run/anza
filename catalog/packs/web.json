@@ -1,0 +1,18 @@
+{
+  "id": "web",
+  "version": "1.0.0",
+  "skill_ids": [
+    "anza-build",
+    "anza-check"
+  ],
+  "prerequisites": [],
+  "license_ids": [
+    "nodejs-mit"
+  ],
+  "provenance_ids": [
+    "nodejs-v24.21.0",
+    "nodejs-platform-support"
+  ],
+  "compatible_agent_versions": {},
+  "file_digests": {}
+}
