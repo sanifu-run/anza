@@ -1,6 +1,578 @@
 {
   "schema_version": 1,
-  "version": "0.0.0",
-  "entries": [],
-  "provenance": []
+  "version": "1.0.0",
+  "entries": [
+    {
+      "kind": "exercise",
+      "id": "mobile-desktop-exercise",
+      "path": "exercises/mobile-desktop.json",
+      "sha256": "7ac6a936ec821a74ce7c2edecbec4c6114b8bc960fffa219fc0d696155ef329c",
+      "provenance_ids": [
+        "android-sdk-terms",
+        "android-studio-requirements",
+        "apple-xcode-sdk-terms",
+        "apple-xcode-support",
+        "mobile-desktop-anza-content",
+        "mobile-desktop-product-rights-pending"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "pack",
+      "id": "automation",
+      "path": "packs/automation.json",
+      "sha256": "da25eabd729af0e40ba9da408364289c2eab5ef01bb2c7c10c9391a79c600893",
+      "provenance_ids": [
+        "playwright-apache-2.0",
+        "playwright-browser-requirements",
+        "playwright-v1.63.0-package"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "pack",
+      "id": "base",
+      "path": "packs/base.json",
+      "sha256": "7f6ea639d97bdce86ace796b8ba00ba596e4a89d84e73940352a7f99c3ebcc7c",
+      "provenance_ids": [
+        "claude-code-source",
+        "claude-code-vendor-terms",
+        "codex-cli-apache-2.0",
+        "codex-cli-source",
+        "git-gpl-2.0",
+        "git-source"
+      ],
+      "dependencies": [
+        "claude-code",
+        "codex-cli",
+        "git"
+      ]
+    },
+    {
+      "kind": "pack",
+      "id": "core",
+      "path": "packs/core.json",
+      "sha256": "ddf486af9373ac81c7de6e1e853643ac54ea86c1cc86769bef29fa3b6ea8849e",
+      "provenance_ids": [
+        "anza-original-content",
+        "anza-rights-pending"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "pack",
+      "id": "data-ml-pack",
+      "path": "packs/data-ml.json",
+      "sha256": "e0af63007e6848db67b43b98562c0c9540b00e3a16d4f6b2332969c60203e5e9",
+      "provenance_ids": [
+        "python-psf-2"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "pack",
+      "id": "go-pack",
+      "path": "packs/go.json",
+      "sha256": "142886361f77b57bd6243db5bfc2b1b2188c7d7fbf79aa7dba6de699fa0a26ea",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "pack",
+      "id": "mobile-desktop-pack",
+      "path": "packs/mobile-desktop.json",
+      "sha256": "97bf9b315bff787e2e754647b4bd9e144b42d333ed108794f23ce13087798e3b",
+      "provenance_ids": [
+        "android-sdk-terms",
+        "android-studio-requirements",
+        "apple-xcode-sdk-terms",
+        "apple-xcode-support",
+        "mobile-desktop-anza-content",
+        "mobile-desktop-product-rights-pending"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "pack",
+      "id": "web",
+      "path": "packs/web.json",
+      "sha256": "aa1d8956624fcaa0b1ce7da4af1e8ec7b70d41b31393da204a6b6d026efd9588",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "claude-code",
+      "path": "recipes/base/claude-code.json",
+      "sha256": "964b2e58f6fb464b1110a8a3cae9a2d20e4d2591bfeab2516e0ded4da78424fa",
+      "provenance_ids": [
+        "claude-code-source",
+        "claude-code-vendor-terms"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "codex-cli",
+      "path": "recipes/base/codex-cli.json",
+      "sha256": "a2f27120bdd9db8cfcf765ac4aaea83317a878f78b373b1dc17fa8826b88b272",
+      "provenance_ids": [
+        "codex-cli-apache-2.0",
+        "codex-cli-source"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "git",
+      "path": "recipes/base/git.json",
+      "sha256": "42df691cb588116441ff5c147bee5e811d692dcc7627adcd16e4d9cc8c86f491",
+      "provenance_ids": [
+        "git-gpl-2.0",
+        "git-source"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "go-1.27.1-darwin-amd64",
+      "path": "recipes/python-go/go-1.27.1-darwin-amd64.json",
+      "sha256": "613f04fbcbb725c22320abc9a5313e5e4a6b32857ce9d6b13c48027ed5bf7bfd",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "go-1.27.1-darwin-arm64",
+      "path": "recipes/python-go/go-1.27.1-darwin-arm64.json",
+      "sha256": "cb94d5e8d40848cc5b6e3173c78e078caa0addb673fbc14915cad794db456d09",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "go-1.27.1-linux-amd64",
+      "path": "recipes/python-go/go-1.27.1-linux-amd64.json",
+      "sha256": "13b046d566a1f8cf0b6a071cebd5b84c7805ee41378ebfc736f906b39f10f07b",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "go-1.27.1-linux-arm64",
+      "path": "recipes/python-go/go-1.27.1-linux-arm64.json",
+      "sha256": "bbbc2f51a800335a0475edc8dcfe98f3aeba50d915922a15bd8afa2ca5cca171",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "go-1.27.1-windows-amd64",
+      "path": "recipes/python-go/go-1.27.1-windows-amd64.json",
+      "sha256": "09a7d076be0c485444a9dee79a6a50a2c3e04fc163ebe0fab44f7f128efb6d42",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "go-1.27.1-windows-arm64",
+      "path": "recipes/python-go/go-1.27.1-windows-arm64.json",
+      "sha256": "69265f3f153c8c1342c88197cb7150247d93b018313b0e5e0365be32c0a5cbf4",
+      "provenance_ids": [
+        "go-bsd-3-clause"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "mobile-desktop-manual-review",
+      "path": "recipes/mobile-desktop.json",
+      "sha256": "1f842a582d1dea8345e92b9e61146dbe0a9a4b307cae7b2e5f20003bb5acaf1f",
+      "provenance_ids": [
+        "android-sdk-terms",
+        "android-studio-requirements",
+        "apple-xcode-sdk-terms",
+        "apple-xcode-support",
+        "mobile-desktop-anza-content",
+        "mobile-desktop-product-rights-pending"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-darwin-amd64",
+      "path": "recipes/web/node-24-darwin-amd64.json",
+      "sha256": "2fbd6b51d646d0c882b9403669fd925d5245886ee2d5a6a404f1124b6ee9f943",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-darwin-arm64",
+      "path": "recipes/web/node-24-darwin-arm64.json",
+      "sha256": "f2531efb0b7c8494ee2286bff40ed09b9e4918530168bc468dbdb0de2653c509",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-debian-12-amd64",
+      "path": "recipes/web/node-24-linux-debian-12-amd64.json",
+      "sha256": "e53f02820f24325b4d1d1d2c72b8293127d6e782fff186f211f74e27c6d6b159",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-debian-12-arm64",
+      "path": "recipes/web/node-24-linux-debian-12-arm64.json",
+      "sha256": "38ea26278ffaeac05f8f4bb0451bbc69a95d9ead504616c098bc0f3ae9eb1cde",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-debian-13-amd64",
+      "path": "recipes/web/node-24-linux-debian-13-amd64.json",
+      "sha256": "26bb5c0376f8c96d70522665af355bfc8af4c6e49ccc2d35330d3870f1b9fd0c",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-debian-13-arm64",
+      "path": "recipes/web/node-24-linux-debian-13-arm64.json",
+      "sha256": "de0ee0cac868ef96ce4601122850d029e587e57635e06868b397117792521ff5",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-ubuntu-22-04-amd64",
+      "path": "recipes/web/node-24-linux-ubuntu-22-04-amd64.json",
+      "sha256": "907cfb5ab52649cc70a83f3df32cc6c04ef01d093e89e2e0d490e7478596910b",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-ubuntu-22-04-arm64",
+      "path": "recipes/web/node-24-linux-ubuntu-22-04-arm64.json",
+      "sha256": "69d72bcf25356796185e99c964550c45edf99379f5f82d80224e23af60bba415",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-ubuntu-24-04-amd64",
+      "path": "recipes/web/node-24-linux-ubuntu-24-04-amd64.json",
+      "sha256": "176d0d9e6b2fa24e1d6b37816337887616fe8c6c4855390479f42fd0115ea097",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-ubuntu-24-04-arm64",
+      "path": "recipes/web/node-24-linux-ubuntu-24-04-arm64.json",
+      "sha256": "228a127c66887d852d0a9ec93c88affedaad0e74d9d3cfc0e61acaff5d76db95",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-ubuntu-26-04-amd64",
+      "path": "recipes/web/node-24-linux-ubuntu-26-04-amd64.json",
+      "sha256": "313409e5e617af643d6b5896f2a5f76b8800b3652a6779f7b189b751e8bff2a3",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-linux-ubuntu-26-04-arm64",
+      "path": "recipes/web/node-24-linux-ubuntu-26-04-arm64.json",
+      "sha256": "d7738b8be22e936698d35ac621d7bde2a2ff622a5311fa052aab70a01ffc6b47",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-windows-amd64",
+      "path": "recipes/web/node-24-windows-amd64.json",
+      "sha256": "0e514283852d468d4e49026b7bcff0e245a90bed4ca7ca4ca3916ebe37ce3b25",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "node-24-windows-arm64",
+      "path": "recipes/web/node-24-windows-arm64.json",
+      "sha256": "2c86fb8ee551cbcfa0a76ca0dc048574e2624f966a4b587a554c421b96dcad6e",
+      "provenance_ids": [
+        "nodejs-mit",
+        "nodejs-platform-support",
+        "nodejs-v24.21.0"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "python-3.14.7-darwin-universal2",
+      "path": "recipes/python-go/python-3.14.7-darwin-universal2.json",
+      "sha256": "74639bab2498fdb815e75f991bb46dc50ddf5de25496723a200191f3b7abb3b4",
+      "provenance_ids": [
+        "python-psf-2"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "recipe",
+      "id": "python-3.14.7-windows-amd64",
+      "path": "recipes/python-go/python-3.14.7-windows-amd64.json",
+      "sha256": "3bd5ce247d1a4b38e804fce633f5403966adef3e62f29bf08acc2ebaa449cebf",
+      "provenance_ids": [
+        "python-psf-2"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "skill",
+      "id": "anza-build",
+      "path": "skills/anza-build/SKILL.md",
+      "sha256": "25cd79b16900248b31ff8217632ba43290388da14a0a011ecf5169f5df497c60",
+      "provenance_ids": [
+        "anza-original-content"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "skill",
+      "id": "anza-check",
+      "path": "skills/anza-check/SKILL.md",
+      "sha256": "2117fe0febbd857abb29e6356a484121ab95e2fc83141d767284d64ab741013c",
+      "provenance_ids": [
+        "anza-original-content"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "skill",
+      "id": "anza-continue",
+      "path": "skills/anza-continue/SKILL.md",
+      "sha256": "0afd39be18ec008cce3f2d56f54a8d8633b7bb6260923f82ec6b80cf93a39482",
+      "provenance_ids": [
+        "anza-original-content"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "skill",
+      "id": "anza-plan",
+      "path": "skills/anza-plan/SKILL.md",
+      "sha256": "59ca4aeed87191ceb772a19d2281846a64e301357acc5f602f436791a4b3cbf7",
+      "provenance_ids": [
+        "anza-original-content"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "skill",
+      "id": "anza-review",
+      "path": "skills/anza-review/SKILL.md",
+      "sha256": "8a8fb5a2f578dcdbd5ce2291994864633105704d56086a4810d4a6046035db20",
+      "provenance_ids": [
+        "anza-original-content"
+      ],
+      "dependencies": []
+    },
+    {
+      "kind": "skill",
+      "id": "anza-scope",
+      "path": "skills/anza-scope/SKILL.md",
+      "sha256": "fa2aece16c2bd7a43762b673226e1e1bdc8df0c861b13f3a64d28afdc7216ff0",
+      "provenance_ids": [
+        "anza-original-content"
+      ],
+      "dependencies": []
+    }
+  ],
+  "provenance": [
+    {
+      "id": "android-sdk-terms",
+      "source": "https://developer.android.com/studio/terms and https://developer.android.com/tools/sdkmanager (Android SDK license agreement and per-package license acceptance; retrieved 2026-09-28).",
+      "license": "Android Software Development Kit License Agreement; participant review and acceptance is required before use; no terms accepted here."
+    },
+    {
+      "id": "android-studio-requirements",
+      "source": "https://developer.android.com/studio/install (Android Studio platform, architecture, and storage requirements; retrieved 2026-09-28).",
+      "license": "Android Developers documentation is under Apache License 2.0; referenced for factual requirements only, no text copied."
+    },
+    {
+      "id": "anza-original-content",
+      "source": "Anza product brief and docs/content-inventory.md; new writing only.",
+      "license": "Anza-authored; product license decision pending; no upstream material copied."
+    },
+    {
+      "id": "anza-rights-pending",
+      "source": "Anza product brief: the Anza product license remains a release decision.",
+      "license": "Unapproved; redistribution permission is not asserted."
+    },
+    {
+      "id": "apple-xcode-sdk-terms",
+      "source": "https://developer.apple.com/support/terms/ (Xcode and Apple SDKs Agreement; retrieved 2026-09-28).",
+      "license": "Xcode and Apple SDKs Agreement; participant review and acceptance is required before use; no terms accepted here."
+    },
+    {
+      "id": "apple-xcode-support",
+      "source": "https://developer.apple.com/xcode/system-requirements/ (current Xcode/macOS and SDK support matrix; retrieved 2026-09-28).",
+      "license": "Apple Developer documentation referenced for factual requirements only; no documentation text or software is copied."
+    },
+    {
+      "id": "claude-code-source",
+      "source": "https://code.claude.com/docs/en/setup; https://downloads.claude.ai/claude-code-releases/2.1.276/manifest.json; https://downloads.claude.ai/claude-code-releases/2.1.276/manifest.json.sig (retrieved 2026-09-28)",
+      "license": "Source and platform claims reviewed; no vendor binary is redistributed by Anza. See the separately recorded vendor terms."
+    },
+    {
+      "id": "claude-code-vendor-terms",
+      "source": "https://code.claude.com/docs/en/setup (retrieved 2026-09-28)",
+      "license": "Anthropic vendor/product terms apply; public setup documentation grants no Anza redistribution rights. A participant must review applicable terms."
+    },
+    {
+      "id": "codex-cli-apache-2.0",
+      "source": "https://github.com/openai/codex/blob/main/codex-cli/package.json; https://github.com/openai/codex/blob/main/NOTICE (retrieved 2026-09-28)",
+      "license": "Codex CLI declares Apache-2.0; repository NOTICE identifies Ratatui-derived code under MIT. Review bundled notices; Anza does not redistribute the CLI."
+    },
+    {
+      "id": "codex-cli-source",
+      "source": "https://github.com/openai/codex/releases/tag/rust-v0.157.1; https://github.com/openai/codex/blob/main/scripts/install/install.sh (retrieved 2026-09-28)",
+      "license": "Source and platform claims reviewed; no vendor content is redistributed by Anza. See the separately recorded license terms."
+    },
+    {
+      "id": "git-gpl-2.0",
+      "source": "https://github.com/git/git/blob/master/README.md (retrieved 2026-09-28)",
+      "license": "Git upstream is covered by GPL version 2; some components use compatible different licenses. Distribution packages may include additional notices; review the selected distributor's terms."
+    },
+    {
+      "id": "git-source",
+      "source": "https://git-scm.com/install/mac; https://git-scm.com/install/linux; https://git-scm.com/install/windows; https://github.com/git-for-windows/git/releases/tag/v2.56.0.windows.1 (retrieved 2026-09-28)",
+      "license": "Source and platform claims reviewed; no software is redistributed by Anza. See the separately recorded upstream and distribution terms."
+    },
+    {
+      "id": "go-bsd-3-clause",
+      "source": "https://go.dev/dl/?mode=json; release history: https://go.dev/doc/devel/release; license: https://go.dev/LICENSE; artifact URLs are the go.dev/dl filenames recorded in each recipe",
+      "license": "BSD-3-Clause-style Go Authors license (review bundled notices for separately licensed components)"
+    },
+    {
+      "id": "mobile-desktop-anza-content",
+      "source": "Original Anza-authored summaries based on the official Apple and Android sources listed in this record; no vendor wording or assets are copied.",
+      "license": "Anza product license is undecided; no redistribution permission is asserted."
+    },
+    {
+      "id": "mobile-desktop-product-rights-pending",
+      "source": "Anza product-license decision remains a release gate recorded in the core catalog rights provenance.",
+      "license": "Unapproved; redistribution permission is not asserted."
+    },
+    {
+      "id": "nodejs-mit",
+      "source": "https://github.com/nodejs/node/blob/v24.21.0/LICENSE (Node.js license; retrieved 2026-09-28)",
+      "license": "MIT; bundled external components retain their separate license terms."
+    },
+    {
+      "id": "nodejs-platform-support",
+      "source": "https://github.com/nodejs/node/blob/v24.21.0/BUILDING.md (supported platform floors; retrieved 2026-09-28)",
+      "license": "MIT (Node.js project source; this entry records platform documentation only)."
+    },
+    {
+      "id": "nodejs-v24.21.0",
+      "source": "https://nodejs.org/en/download/archive/v24.21.0 (release files and signed SHASUMS256.txt.asc; retrieved 2026-09-28)",
+      "license": "MIT; Node.js README notes bundled external components have separate license terms; retain distribution notices."
+    },
+    {
+      "id": "playwright-apache-2.0",
+      "source": "https://github.com/microsoft/playwright/blob/v1.63.0/packages/playwright/package.json (license field; retrieved 2026-09-28)",
+      "license": "Apache-2.0; package metadata only, no package content distributed."
+    },
+    {
+      "id": "playwright-browser-requirements",
+      "source": "https://playwright.dev/docs/intro and https://playwright.dev/docs/browsers (platform requirements, matched browser payloads and system dependencies; retrieved 2026-09-28); https://github.com/microsoft/playwright/blob/v1.63.0/LICENSE",
+      "license": "Apache-2.0 (version-pinned upstream repository license); documentation is referenced but not copied or redistributed."
+    },
+    {
+      "id": "playwright-v1.63.0-package",
+      "source": "https://github.com/microsoft/playwright/blob/v1.63.0/packages/playwright/package.json (version 1.63.0, Node >=20, Apache-2.0; retrieved 2026-09-28)",
+      "license": "Apache-2.0; package metadata only, no Playwright package or browser artifact is included."
+    },
+    {
+      "id": "python-psf-2",
+      "source": "https://www.python.org/downloads/release/python-3147/; artifacts: https://www.python.org/ftp/python/3.14.7/python-3.14.7-macos11.pkg and https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe; license: https://docs.python.org/3/license.html",
+      "license": "Python Software Foundation License Version 2 (Python distribution; bundled components may have other licenses)"
+    }
+  ]
 }
