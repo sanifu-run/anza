@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "id": "mobile-desktop-exercise",
+  "version": "1.0.0",
+  "description": "Original, non-executable platform guidance for iOS, Android, desktop, and unmodeled project kinds. All outcomes are manual or unsupported.",
+  "scenarios": [
+    {
+      "id": "ios-windows-unsupported",
+      "project_kind": "ios",
+      "supported_platforms": [
+        "windows-amd64",
+        "windows-arm64"
+      ],
+      "status": "unsupported",
+      "summary": "This Windows host cannot provide the native iOS build toolchain. A macOS host with a mutually compatible macOS and Xcode release is required.",
+      "manual_steps": [
+        "Keep the requested iOS outcome in the plan and report that native compilation is unavailable on this host.",
+        "Ask the project owner to select a supported macOS build host before planning native compilation.",
+        "Do not substitute an Android build, accept Apple terms, sign an app, or provision a device as an automatic workaround."
+      ],
+      "missing_capability_ids": [
+        "ios.macos-build-host",
+        "ios.xcode-sdk"
+      ],
+      "readiness_constraints": [
+        "The local platform predicate is Windows; no compatible macOS host or Xcode SDK was observed.",
+        "This scenario is unsupported for native iOS compilation and cannot be changed to ready by installing a Windows SDK.",
+        "No remote build service, Apple account, signing identity, or device is assumed."
+      ],
+      "verification": "Before native iOS compilation, confirm the participant-selected macOS host and Xcode release pair against Apple’s current support matrix; retain unsupported status until that host is qualified."
+    },
+    {
+      "id": "ios-linux-unsupported",
+      "project_kind": "ios",
+      "supported_platforms": [
+        "linux-amd64",
+        "linux-arm64"
+      ],
+      "status": "unsupported",
+      "summary": "This Linux host cannot provide the native iOS build toolchain. A macOS host with a mutually compatible macOS and Xcode release is required.",
+      "manual_steps": [
+        "Keep the requested iOS outcome in the plan and report that native compilation is unavailable on this host.",
+        "Ask the project owner to select a supported macOS build host before planning native compilation.",
+        "Do not substitute an Android build, accept Apple terms, sign an app, or provision a device as an automatic workaround."
+      ],
+      "missing_capability_ids": [
+        "ios.macos-build-host",
+        "ios.xcode-sdk"
+      ],
+      "readiness_constraints": [
+        "The local platform predicate is Linux; no compatible macOS host or Xcode SDK was observed.",
+        "This scenario is unsupported for native iOS compilation and cannot be changed to ready by installing a Linux SDK.",
+        "No remote build service, Apple account, signing identity, or device is assumed."
+      ],
+      "verification": "Before native iOS compilation, confirm the participant-selected macOS host and Xcode release pair against Apple’s current support matrix; retain unsupported status until that host is qualified."
+    },
+    {
+      "id": "ios-macos-manual",
+      "project_kind": "ios",
+      "supported_platforms": [
+        "darwin-amd64",
+        "darwin-arm64"
+      ],
+      "status": "manual",
+      "summary": "A Mac can host native iOS development, but Xcode and Apple SDK use, signing, and device setup require participant review and are not qualified here.",
+      "manual_steps": [
+        "Preserve the project’s declared Xcode, Swift, deployment target, and package versions; first check whether an existing toolchain already satisfies them.",
+        "Choose an Xcode release compatible with the known macOS version and target SDK by consulting Apple’s current support matrix.",
+        "Review and accept Xcode and Apple SDK terms personally before any installation or use; do not accept terms automatically.",
+        "Review disk space and any restart notice for the chosen release; separately authorize any Apple account, signing, or device provisioning."
+      ],
+      "missing_capability_ids": [
+        "ios.xcode-sdk",
+        "ios.sdk-license-review",
+        "ios.signing-device"
+      ],
+      "readiness_constraints": [
+        "Apple’s supported macOS versions vary by Xcode release; an unknown macOS version remains manual and unmet.",
+        "The reviewed Xcode requirements matrix does not establish one fixed disk-space or restart requirement for every release; check the selected release before manual setup.",
+        "No license acceptance, SDK installation, account setup, signing, device provisioning, or native runtime test occurred."
+      ],
+      "verification": "A participant must confirm the chosen Xcode/macOS/SDK combination in Apple’s current matrix and separately verify the target SDK and signing or device requirements; no native qualification is asserted."
+    },
+    {
+      "id": "android-studio-x64-manual",
+      "project_kind": "android",
+      "supported_platforms": [
+        "darwin-amd64",
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "status": "manual",
+      "summary": "Android development may use Android Studio or a project-matched SDK, but host requirements, SDK package selection, license acceptance, emulator capacity, and devices need participant review.",
+      "manual_steps": [
+        "Preserve project-declared JDK, Gradle, Android Gradle Plugin, SDK, and NDK versions; check existing installations before proposing changes.",
+        "Confirm the host meets the current Android Studio requirements: macOS 12 or later with supported Mac CPU, Windows 10 64-bit, or 64-bit Linux with glibc 2.31 or later and a supported desktop environment.",
+        "Check available storage before any participant-approved setup: Android Studio alone lists 8 GB minimum; Studio with an emulator lists 16 GB, and each additional virtual device may need up to 6 GB more.",
+        "Review and accept each applicable Android SDK package license personally before use; do not accept licenses or download SDK packages automatically.",
+        "Choose a physical device or emulator only after separately reviewing project needs, hardware/virtualization support, account access, and device authorization."
+      ],
+      "missing_capability_ids": [
+        "android.sdk",
+        "android.sdk-license-review",
+        "android.target-device"
+      ],
+      "readiness_constraints": [
+        "The platform predicate gives OS and architecture only; CPU microarchitecture, virtualization, memory, free disk space, and the project’s exact SDK versions remain unverified.",
+        "Current Android Studio guidance lists at least 8 GB free space for Studio and 16 GB for Studio plus an emulator; emulator images and additional virtual devices add storage.",
+        "No reboot requirement is established by this descriptor; if a later vendor installation requests a restart, the participant must review and schedule it.",
+        "No SDK license was accepted, SDK or emulator package was downloaded, account was configured, device was provisioned, or native build was qualified."
+      ],
+      "verification": "Before a participant-approved Android setup, verify the current vendor requirements and project-declared SDK/JDK/Gradle versions, confirm free storage and any emulator prerequisites, and record each license decision; keep readiness manual until the selected target is actually checked."
+    },
+    {
+      "id": "android-studio-arm-unsupported",
+      "project_kind": "android",
+      "supported_platforms": [
+        "windows-arm64",
+        "linux-arm64"
+      ],
+      "status": "unsupported",
+      "summary": "Current Android Studio requirements do not support Windows ARM hosts or Linux ARM hosts; this descriptor cannot claim Android Studio readiness for those platforms.",
+      "manual_steps": [
+        "Preserve the Android project goal and report that the current Android Studio host is unsupported.",
+        "Ask the project owner to choose a vendor-supported host or separately reviewed development approach before changing project tooling.",
+        "Do not treat a manual SDK download, emulator, remote host, or alternative IDE as available without separate evidence and participant approval."
+      ],
+      "missing_capability_ids": [
+        "android-studio.supported-host-architecture"
+      ],
+      "readiness_constraints": [
+        "Android Developers currently marks Windows ARM and Linux ARM machines as unsupported for Android Studio.",
+        "The host is unsupported for this Android Studio guidance even if other OS/architecture details are known; do not report it ready.",
+        "No alternative IDE, CLI SDK support, remote service, emulator, or runtime qualification is asserted."
+      ],
+      "verification": "Recheck Android Developers’ current system requirements for the exact host architecture before selecting any alternative; retain unsupported status until a supported approach is established and qualified."
+    },
+    {
+      "id": "desktop-project-manual",
+      "project_kind": "desktop",
+      "supported_platforms": [
+        "darwin-amd64",
+        "darwin-arm64",
+        "windows-amd64",
+        "windows-arm64",
+        "linux-amd64",
+        "linux-arm64"
+      ],
+      "status": "manual",
+      "summary": "Desktop projects vary by language, target OS, packaging format, native dependencies, and signing needs; the project kind alone is not enough to select an SDK or installer.",
+      "manual_steps": [
+        "Preserve the requested desktop target and record its language, runtime, target operating systems, architecture, packaging format, and existing build-tool versions.",
+        "Ask the project owner to identify required platform SDKs, native libraries, code-signing, store accounts, and distribution constraints before proposing setup.",
+        "Review each selected vendor license personally and check storage, privilege, and restart effects before any separately approved setup.",
+        "Keep unknown requirements visible as manual actions; do not run project scripts, provision signing identities, or alter package and lock files."
+      ],
+      "missing_capability_ids": [
+        "desktop.target-platform",
+        "desktop.packaging",
+        "desktop.native-dependencies",
+        "desktop.signing-review"
+      ],
+      "readiness_constraints": [
+        "The generic desktop project kind does not identify an SDK, runtime, packaging method, or target OS.",
+        "Architecture, storage needs, license requirements, and any reboot requirement depend on the chosen project-specific toolchain and are not inferred.",
+        "No native desktop toolchain or packaging flow was installed or qualified."
+      ],
+      "verification": "Confirm the target operating systems and architecture with the project owner, then verify each project-declared toolchain and vendor requirement before changing the machine or project."
+    },
+    {
+      "id": "unknown-project-kind-manual",
+      "project_kind": "unknown",
+      "supported_platforms": [
+        "darwin-amd64",
+        "darwin-arm64",
+        "windows-amd64",
+        "windows-arm64",
+        "linux-amd64",
+        "linux-arm64"
+      ],
+      "status": "manual",
+      "summary": "The project kind is not modeled by a reviewed catalog path. Preserve the requested outcome and continue with partial readiness while gathering only the missing platform and toolchain facts.",
+      "manual_steps": [
+        "Keep the user’s stated goal unchanged and summarize which project facts remain unknown.",
+        "Ask for the language or framework, target operating systems and architecture, current toolchain versions, and any install or license constraints.",
+        "Offer a bounded manual next step based on those facts after review; do not assume an SDK, installer, command, account, or device is available."
+      ],
+      "missing_capability_ids": [
+        "project.kind-support",
+        "project.toolchain-facts",
+        "project.target-platform"
+      ],
+      "readiness_constraints": [
+        "No catalog model for this project kind was selected; unknown does not mean supported or ready.",
+        "No commands, URLs, paths, installs, license acceptance, or project changes are generated from this descriptor.",
+        "Interview and planning may continue with partial readiness and explicit unresolved questions."
+      ],
+      "verification": "Verify the gathered project kind, toolchain declarations, target platforms, and constraints with the project owner before proposing any specific recipe or exercise."
+    }
+  ]
+}
