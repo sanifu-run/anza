@@ -38,8 +38,27 @@ function Invoke-AnzaDownload {
     param([uri] $Uri, [string] $Destination, [scriptblock] $Downloader)
     if ($Uri.Scheme -ne 'https') { throw "Refusing non-HTTPS download URI: $Uri" }
     if ($Downloader) { & $Downloader $Uri.AbsoluteUri $Destination; return }
-    $ProgressPreference = 'SilentlyContinue'
-    Invoke-WebRequest -Uri $Uri -OutFile $Destination -UseBasicParsing
+    # HttpWebRequest is used here so redirects can be rejected instead of followed.
+    # In particular, a redirect must never downgrade a reviewed HTTPS URL to HTTP.
+    $request = [System.Net.HttpWebRequest]::Create($Uri)
+    $request.AllowAutoRedirect = $false
+    $request.Timeout = 120000
+    $request.ReadWriteTimeout = 120000
+    try { $response = $request.GetResponse() }
+    catch [System.Net.WebException] {
+        if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -ge 300 -and [int]$_.Exception.Response.StatusCode -lt 400) {
+            $_.Exception.Response.Dispose()
+            throw 'Release server returned a redirect; redirects are disabled for bootstrap downloads.'
+        }
+        throw
+    }
+    try {
+        if ([int]$response.StatusCode -ge 300 -and [int]$response.StatusCode -lt 400) { throw 'Release server returned a redirect; redirects are disabled for bootstrap downloads.' }
+        $inputStream = $response.GetResponseStream()
+        $outputStream = [System.IO.File]::Create($Destination)
+        try { $inputStream.CopyTo($outputStream) }
+        finally { $outputStream.Dispose(); $inputStream.Dispose() }
+    } finally { $response.Dispose() }
 }
 
 function Get-AnzaUpdatedUserPath {

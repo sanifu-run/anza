@@ -26,6 +26,11 @@ try {
     $install = Join-Path $root 'User 名 with spaces\Programs\Anza\bin'
     Install-Anza '1.2.3' $manifestHash 'https://releases.anza.dev' $install $syntheticDownload 'amd64' $false
     Assert-True ([IO.File]::ReadAllBytes((Join-Path $install 'anza.exe')).Length -eq $artifactBytes.Length) 'installs verified synthetic artifact beneath non-ASCII, spaced home'
+    $arm64Root = Join-Path $root 'arm64 install'
+    $arm64Marker = Join-Path $root 'arm64-selected-url.txt'
+    $arm64Download = { param($Uri, $Destination); if ($Uri -match '/manifest\.json$') { [IO.File]::WriteAllBytes($Destination, $manifestBytes) } else { [IO.File]::WriteAllText($arm64Marker, $Uri); [IO.File]::WriteAllBytes($Destination, $artifactBytes) } }.GetNewClosure()
+    Install-Anza '1.2.3' $manifestHash 'https://releases.anza.dev' $arm64Root $arm64Download 'arm64' $false
+    Assert-True ((Get-Content -LiteralPath $arm64Marker -Raw) -match 'anza-windows-arm64\.exe$') 'supported arm64 selects and installs its matching synthetic asset'
     Assert-True ((Get-AnzaUpdatedUserPath 'C:\Tools;D:\Existing;C:\Tools\' 'C:\Tools') -eq 'C:\Tools;D:\Existing') 'user PATH update preserves unrelated entries and deduplicates only its own entry'
 
     Assert-Throws { Get-AnzaArchitecture 'x86' } 'unsupported architecture is rejected' 'Unsupported Windows architecture'
