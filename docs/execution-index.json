@@ -613,7 +613,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna worker commit 4bf5048492ea1fcf9d7ce2a76260060f84ccde66; Chat coordinator merge a92096a; coordinator post-merge focused tests, vet and all 11 Lambda tests passed; detailed evidence in docs/evidence/T3.4.md.",
       "wave": 14,
       "repository": "chat"
     },
@@ -786,7 +786,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna worker commit c1b7855fbb8ed17057148af7a85168245478e2d8; Chat coordinator merge 578263d; coordinator post-merge focused tests and vet passed; all 11 Lambda tests passed; detailed evidence in docs/evidence/T3.8.md.",
       "wave": 14
     },
     {

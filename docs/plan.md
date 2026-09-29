@@ -45,7 +45,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E2](plans/E2.md).
 
-### E3 -- Shared chat setup interview -> docs/plans/E3.md (4/8)
+### E3 -- Shared chat setup interview -> docs/plans/E3.md (6/8)
 
 [Open E3](plans/E3.md).
 
@@ -199,9 +199,9 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 14: Dispatch (3 workers)
 
-- [ ] T3.4 Add a setup interview policy and typed recommendations
+- [x] T3.4 Add a setup interview policy and typed recommendations
 - [ ] T9.1 Wire the full CLI command graph
-- [ ] T3.8 Protect shared admin, mail and deletion boundaries
+- [x] T3.8 Protect shared admin, mail and deletion boundaries
 
 ### Wave 15: Dispatch (3 workers)
 
