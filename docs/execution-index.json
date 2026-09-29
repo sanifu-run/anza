@@ -1696,7 +1696,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna worker commit 0a28ee8; coordinator merge 4c13576. Worker and coordinator per-package tests/vet passed; the prescribed combined command could not run because the shared lease claim returned LOST. Full fixture, guarded credentials, partial readiness, and lease evidence in docs/evidence/T9.1.md.",
       "wave": 14,
       "repository": "anza"
     },

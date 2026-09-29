@@ -69,7 +69,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E8](plans/E8.md).
 
-### E9 -- CLI integration bootstrap and artifacts -> docs/plans/E9.md (0/4)
+### E9 -- CLI integration bootstrap and artifacts -> docs/plans/E9.md (1/4)
 
 [Open E9](plans/E9.md).
 
@@ -200,7 +200,7 @@ The table below is a conservative executable schedule: complete review/integrati
 ### Wave 14: Dispatch (3 workers)
 
 - [x] T3.4 Add a setup interview policy and typed recommendations
-- [ ] T9.1 Wire the full CLI command graph
+- [x] T9.1 Wire the full CLI command graph
 - [x] T3.8 Protect shared admin, mail and deletion boundaries
 
 ### Wave 15: Dispatch (3 workers)
