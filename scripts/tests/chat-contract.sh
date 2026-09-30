@@ -14,8 +14,8 @@ if [ -n "$(git -C "$ANZA_CHAT_SOURCE" status --porcelain=v1)" ]; then
 	exit 2
 fi
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-ANZA_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+ANZA_ROOT=$(CDPATH='' cd -- "$SCRIPT_DIR/../.." && pwd)
 ANZA_CHAT_HEAD=$(git -C "$ANZA_CHAT_SOURCE" rev-parse HEAD)
 ANZA_CHAT_TREE=$(git -C "$ANZA_CHAT_SOURCE" rev-parse 'HEAD^{tree}')
 ANZA_CHAT_STATUS_BEFORE=$(git -C "$ANZA_CHAT_SOURCE" status --porcelain=v1 | shasum -a 256 | awk '{print $1}')
@@ -38,6 +38,8 @@ fi
 TASK_TMP=$(mktemp -d /private/tmp/anza-T10.1-contract.XXXXXX)
 LEASE_HELD=0
 LEASE_SHA=
+# ShellCheck does not recognize cleanup's indirect EXIT/HUP/INT/TERM trap use.
+# shellcheck disable=SC2329
 cleanup() {
 	if [ "$LEASE_HELD" -eq 1 ]; then
 		CLAIM_REMOTE=/Users/Shared/mini-build-lease.git /Users/dndungu/.agents/skills/claim/scripts/claim.sh release R-build-lease "$LEASE_SHA"
