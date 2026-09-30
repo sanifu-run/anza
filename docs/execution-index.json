@@ -1794,7 +1794,17 @@
         ".github/workflows/release.yml",
         "scripts/release.sh",
         "scripts/release.ps1",
-        "docs/release.md"
+        "docs/release.md",
+        "cmd/anza/main.go",
+        "internal/cli/app.go",
+        "internal/lifecycle/update.go",
+        "internal/lifecycle/ed25519.go",
+        "internal/lifecycle/ed25519_test.go",
+        "internal/lifecycle/update_test.go",
+        "scripts/schema-lock.py",
+        "scripts/tests/schema-lock-negative.py",
+        "schemas/SHA256SUMS",
+        "docs/evidence/T9.4.md"
       ],
       "use_cases": [
         "UC-001",
@@ -1806,12 +1816,16 @@
         "Run targeted tests, whole-module integration and go vet/lint on required native runners; missing native runner means unqualified, not pass.",
         "Prepare manual gated release workflow with minimal permissions and no publish on ordinary PRs; include rollback/revocation/compromised-release procedure.",
         "Release only the Anza CLI and content artifacts from this repository. Shared backend image/config is built and deployed through chat existing infrastructure; coordinate advertised catalog compatibility and deploy the additive backend first.",
-        "Payload manifest covers binaries/content only. Generate bootstrap scripts afterward with its digest; do not recursively include those scripts in that same manifest. Record script hashes separately."
+        "Payload manifest covers binaries/content only. Generate bootstrap scripts afterward with its digest; do not recursively include those scripts in that same manifest. Record script hashes separately.",
+        "Wire the CLI updater to a concrete Ed25519 verifier and bounded no-redirect HTTPS source; require a matching build-time public key and fail closed when absent or malformed.",
+        "Lock every JSON schema with a checked SHA-256 manifest and prove CI rejects an edited schema."
       ],
       "acceptance": [
         "CI rejects missing tests, failed native jobs, changed generated schemas and integrity failures.",
         "Every artifact has exact platform/name/version/digest. Both bootstraps pin manifest hashes; the Go updater verifies Ed25519 signatures using an embedded public key. Document initial HTTPS trust and signing-key rotation/revocation.",
-        "No production release is created by this preparation task."
+        "No production release is created by this preparation task.",
+        "The CLI verifies the exact signed metadata payload with its build-time public key; missing/malformed keys fail closed, while real key custody remains separately authorized.",
+        "CI detects schema drift against the committed SHA-256 lock; the negative-control fixture demonstrates rejection."
       ],
       "test_cases": [
         "Run workflow validation and local artifact dry-run; actual release is T11.3"
@@ -2161,7 +2175,8 @@
         "infra/lambda/index.ts",
         "infra/lambda/README.md",
         "infra/lambda/setup_config_check.py",
-        "docs/anza-rollout.md"
+        "docs/anza-rollout.md",
+        "docs/evidence/T11.5.md"
       ],
       "use_cases": [
         "UC-016",
@@ -2176,7 +2191,8 @@
       "acceptance": [
         "The reviewed infra change adds setup coordination/config to the existing stack without replacing its transcript table, Lambda identity or public API.",
         "Absent or failed setup coordination storage leaves setup disabled/unavailable while existing intake is operational.",
-        "Rollout packet includes exact shared resource/config changes, IAM scope and reversible setup disable before any live apply."
+        "Rollout packet includes exact shared resource/config changes, IAM scope and reversible setup disable before any live apply.",
+        "Setup remains default-off; enabling it requires a positive daily session-admission cap, a pinned matching catalog, and reviewed positive cost limits."
       ],
       "test_cases": [
         "Setup config fixture validation",
