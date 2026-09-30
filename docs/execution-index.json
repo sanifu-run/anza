@@ -669,7 +669,14 @@
         "setup_runtime.go",
         "setup_routes_test.go",
         "setup_fixture_test.go",
-        "docs/anza-setup-api.md"
+        "setup_admission.go",
+        "setup_admission_test.go",
+        "setup_handlers.go",
+        "setup_handlers_test.go",
+        "setup_interview.go",
+        "setup_quota_test.go",
+        "docs/anza-setup-api.md",
+        "docs/evidence/T3.6.md"
       ],
       "use_cases": [
         "UC-016",
@@ -680,12 +687,14 @@
         "Default ANZA_SETUP_ENABLED to false. A missing/invalid setup-only configuration disables setup capability and its routes with a clear status; existing health/intake/title/brief/booking still function.",
         "Reuse provider secrets, shared HTTP process, storage and graceful shutdown. Apply quota/mode guards before provider calls; use shared allow/active exactly once per call. Do not introduce a new executable or health service.",
         "Provide an opt-in loopback setup test fixture using the real shared router and fake storage/provider. Its startup writes a temporary ready file; no live credentials/model/calendar calls. This supports the Anza cross-repo CLI acceptance task.",
-        "Document additive API/config and gate rollout on existing website contact/intake/title/brief/booking regression results from the reconciled peer baseline."
+        "Document additive API/config and gate rollout on existing website contact/intake/title/brief/booking regression results from the reconciled peer baseline.",
+        "Enforce a no-cost durable daily UTC admission cap independently of paid model-call quota, with replay idempotency, conflicting-replay rejection, and HTTP 429 at capacity."
       ],
       "acceptance": [
         "Feature disabled preserves all existing route behavior and the current contact-intake prompt tests.",
         "Feature enabled runs both website intake and Anza setup through the same server/store/model client with purpose isolation.",
-        "Missing setup quota/catalog configuration does not cause shared server startup failure or an unrelated website outage."
+        "Missing setup quota/catalog configuration does not cause shared server startup failure or an unrelated website outage.",
+        "Session admission is durable, idempotent, bounded independently from paid-call quota, and returns HTTP 429 when ANZA_SETUP_DAILY_SESSION_CAP is reached."
       ],
       "test_cases": [
         "TestSetupFeatureDisabled",
