@@ -71,6 +71,7 @@ type App struct {
 	RepairActions   lifecycle.RepairActions
 	RemovalFS       lifecycle.FileSystem
 	UpdateChecker   lifecycle.Checker
+	UpdateSetupErr  error
 	DownloadClient  *http.Client
 	Chat            WizardChat
 	CredentialStore credentials.Store
@@ -732,6 +733,9 @@ func (a *App) uninstallWithArgs(ctx context.Context, args []string, out io.Write
 func (a *App) updateCommand(ctx context.Context, _ []string, _ io.Reader, out, _ io.Writer) error {
 	if err := ctx.Err(); err != nil {
 		return err
+	}
+	if a.UpdateSetupErr != nil {
+		return fmt.Errorf("configure release update verification: %w", a.UpdateSetupErr)
 	}
 	release, err := a.UpdateChecker.Check(ctx)
 	if err != nil {

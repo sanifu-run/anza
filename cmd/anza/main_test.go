@@ -69,6 +69,17 @@ func TestUnknownFlagExitCode(t *testing.T) {
 	}
 }
 
+func TestUpdateFailsClosedWithoutBuildTimeKey(t *testing.T) {
+	t.Setenv("ANZA_RELEASE_METADATA_URL", "https://updates.example/anza/1.2.3/release-metadata.json")
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"update"}, &stdout, &stderr); code == 0 {
+		t.Fatal("update succeeded without a build-time public key")
+	}
+	if !strings.Contains(stderr.String(), "release Ed25519 public key is not configured") {
+		t.Fatalf("missing-key error = %q", stderr.String())
+	}
+}
+
 func directoryEntries(t *testing.T, root string) []string {
 	t.Helper()
 	var entries []string

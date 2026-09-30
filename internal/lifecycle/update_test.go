@@ -25,6 +25,31 @@ func (v testVerifier) Verify(_, _ []byte) error { return v.err }
 
 func signedFixture(t *testing.T, m ReleaseMetadata) SignedRelease {
 	t.Helper()
+	if m.CatalogVersion == "" {
+		m.CatalogVersion = "1.0.0"
+	}
+	if m.CatalogDigest == "" {
+		m.CatalogDigest = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+	}
+	if m.PayloadManifests == nil {
+		m.PayloadManifests = map[string]string{
+			"manifest.json":         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			"windows/manifest.json": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		}
+	}
+	manifestSet, err := json.Marshal(m.PayloadManifests)
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifestDigest := sha256.Sum256(manifestSet)
+	m.ArtifactDigest = "sha256:" + hex.EncodeToString(manifestDigest[:])
+	m.SignatureAlgorithm = "Ed25519"
+	m.SignatureFile = "release-metadata.sig"
+	return rawSignedFixture(t, m)
+}
+
+func rawSignedFixture(t *testing.T, m ReleaseMetadata) SignedRelease {
+	t.Helper()
 	payload, err := json.Marshal(m)
 	if err != nil {
 		t.Fatal(err)
@@ -64,6 +89,45 @@ func TestUpdateIntegrityFailure(t *testing.T) {
 	checker = Checker{Source: &testSource{release: release}, Verifier: testVerifier{err: errors.New("bad signature")}}
 	if _, err := checker.Check(context.Background()); !errors.Is(err, ErrIntegrity) {
 		t.Fatalf("Check() signature error = %v, want ErrIntegrity", err)
+	}
+}
+
+func TestUpdateCheckRequiresValidCatalogIdentity(t *testing.T) {
+	manifestDigests := map[string]string{
+		"manifest.json":         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		"windows/manifest.json": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+	}
+	manifestSet, err := json.Marshal(manifestDigests)
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifestDigest := sha256.Sum256(manifestSet)
+	base := ReleaseMetadata{
+		Version: "1.1.0", CatalogVersion: "1.0.0",
+		CatalogDigest:  "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+		ArtifactDigest: "sha256:" + hex.EncodeToString(manifestDigest[:]),
+		ProtocolMin:    1, ProtocolMax: 1, PayloadManifests: manifestDigests,
+		SignatureAlgorithm: "Ed25519", SignatureFile: "release-metadata.sig",
+	}
+	if _, err := (Checker{Source: &testSource{release: rawSignedFixture(t, base)}, Verifier: testVerifier{}}).Check(context.Background()); err != nil {
+		t.Fatalf("Check(valid catalog identity) error = %v", err)
+	}
+	for name, mutate := range map[string]func(*ReleaseMetadata){
+		"empty version":     func(m *ReleaseMetadata) { m.CatalogVersion = "" },
+		"malformed version": func(m *ReleaseMetadata) { m.CatalogVersion = "catalog-1.0" },
+		"empty digest":      func(m *ReleaseMetadata) { m.CatalogDigest = "" },
+		"malformed digest": func(m *ReleaseMetadata) {
+			m.CatalogDigest = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			metadata := base
+			mutate(&metadata)
+			release := rawSignedFixture(t, metadata)
+			if _, err := (Checker{Source: &testSource{release: release}, Verifier: testVerifier{}}).Check(context.Background()); !errors.Is(err, ErrIntegrity) {
+				t.Fatalf("Check() error = %v, want ErrIntegrity", err)
+			}
+		})
 	}
 }
 
