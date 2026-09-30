@@ -126,14 +126,24 @@ licenses=['Anza dependency license inventory','', 'License expressions are repor
 licenses.extend(f"{m['path']} {m['version']}: NOASSERTION" for m in requirements)
 pathlib.Path(licenses_path).write_text('\n'.join(licenses)+'\n')
 PYMOD
-python3 - "$outdir/$version" "$version" <<'PY'
-import hashlib,json,pathlib,sys
-root=pathlib.Path(sys.argv[1]); version=sys.argv[2]
+python3 - "$outdir/$version" "$version" "$root" <<'PY'
+import hashlib,json,pathlib,re,subprocess,sys
+root=pathlib.Path(sys.argv[1]); version=sys.argv[2]; repo=pathlib.Path(sys.argv[3])
 manifests={}
 for path in (root/'manifest.json',root/'windows/manifest.json'):
     manifests[str(path.relative_to(root))]=hashlib.sha256(path.read_bytes()).hexdigest()
 manifest_set=json.dumps(manifests,sort_keys=True,separators=(',',':')).encode()
-metadata={'version':version,'catalog_version':'','catalog_digest':'','artifact_digest':'sha256:'+hashlib.sha256(manifest_set).hexdigest(),'protocol_min':1,'protocol_max':1,'payload_manifests':manifests,'signature_algorithm':'Ed25519','signature_file':'release-metadata.sig'}
+catalog_script=repo/'scripts/catalog-manifest.py'
+subprocess.run([sys.executable,str(catalog_script),'--check'],cwd=repo,check=True,stdout=subprocess.DEVNULL)
+setup_catalog=json.loads(subprocess.check_output([sys.executable,str(catalog_script),'--setup-catalog'],cwd=repo))
+source_manifest=json.loads((repo/'catalog/manifest.json').read_text(encoding='utf-8'))
+catalog_version=setup_catalog.get('catalog_version')
+catalog_digest=setup_catalog.get('catalog_digest')
+if not isinstance(catalog_version,str) or not re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)',catalog_version) or catalog_version!=source_manifest.get('version'):
+    raise SystemExit('setup catalog version is empty, invalid, or differs from the checked source manifest')
+if not isinstance(catalog_digest,str) or not re.fullmatch(r'[0-9a-f]{64}',catalog_digest):
+    raise SystemExit('setup catalog digest is empty or invalid')
+metadata={'version':version,'catalog_version':catalog_version,'catalog_digest':catalog_digest,'artifact_digest':'sha256:'+hashlib.sha256(manifest_set).hexdigest(),'protocol_min':1,'protocol_max':1,'payload_manifests':manifests,'signature_algorithm':'Ed25519','signature_file':'release-metadata.sig'}
 (root/'release-metadata.json').write_text(json.dumps(metadata,sort_keys=True,indent=2)+'\n')
 PY
     openssl pkeyutl -sign -rawin -inkey "$ANZA_ED25519_PRIVATE_KEY_FILE" -in "$outdir/$version/release-metadata.json" -out "$outdir/$version/release-metadata.sig"

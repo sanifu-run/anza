@@ -104,8 +104,8 @@ func (c Checker) Check(ctx context.Context) (VerifiedRelease, error) {
 	if metadata.ArtifactDigest != "sha256:"+hex.EncodeToString(manifestDigest[:]) {
 		return VerifiedRelease{}, fmt.Errorf("%w: artifact digest does not match payload manifest set", ErrIntegrity)
 	}
-	if metadata.CatalogDigest != "" && !validSHA256(strings.TrimPrefix(metadata.CatalogDigest, "sha256:")) {
-		return VerifiedRelease{}, fmt.Errorf("%w: invalid catalog digest", ErrIntegrity)
+	if !validVersion(metadata.CatalogVersion) || !validSHA256(metadata.CatalogDigest) {
+		return VerifiedRelease{}, fmt.Errorf("%w: invalid catalog version or digest", ErrIntegrity)
 	}
 	for path, fileDigest := range metadata.ManagedFiles {
 		if path == "" || strings.HasPrefix(path, "/") || strings.Contains(path, "..") || !validSHA256(strings.TrimPrefix(fileDigest, "sha256:")) {
