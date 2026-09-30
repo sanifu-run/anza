@@ -16,6 +16,12 @@ The tests currently cover poisoned credential fields in imported briefs, parent 
 - `GOCACHE=/private/tmp/anza-t103-tests GOTOOLCHAIN=local GOPROXY=off go vet ./internal/acceptance` passed.
 - Full `GOCACHE=/private/tmp/anza-t103-tests GOTOOLCHAIN=local GOPROXY=off go test ./internal/acceptance -count=1 -v` passed: six pre-existing shared-Chat tests skipped because `ANZA_CHAT_SOURCE` is unset; the five local security test functions ran (quota replay explicitly skipped), with all runnable assertions green.
 - `git diff --check` passed.
+- Coordinator checked `uptime` (one-minute load 2.79) before attempting to
+  claim the shared build lease for the contract's multi-package race test.
+  `claim.sh claim R-build-lease` returned `BLOCKED: could not materialize
+  empty tree` after a Git temporary-file permission error. No lease was
+  acquired, so `go test -race ./internal/executor ./internal/state -count=1`
+  was not run.
 
 ## Limits and unresolved evidence
 
