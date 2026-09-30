@@ -31,6 +31,11 @@ record does not infer them from prior budgets.
   intake and email behavior must remain available. Chat documentation says
   owner email copies are excluded from setup; verify this in the proposed
   image/config before enabling.
+- A read-only `pulumi stack ls --json` attempt from Chat's Lambda stack
+  directory could not open `/Users/dndungu/.pulumi/credentials.json`
+  (`operation not permitted`). No stack names, account/region, active config,
+  or cloud state were retrieved. The Pulumi CLI is installed (v3.226.0), but
+  this runtime cannot access its configured credentials.
 
 ## Authorization ledger
 
@@ -69,5 +74,7 @@ The implementation and offline config checks are ready for review, but T11.2
 is **not accepted**: there is no authenticated preview, verified deployment
 identity/origin, selected cap or positive spend ceiling, live-smoke scope,
 license decision, publication authorization, or production key custody in the
-available evidence. Do not run `pulumi up`, provision credentials, make paid
-provider calls, enable setup, or publish until the missing scope is recorded.
+available evidence, and the configured Pulumi credentials are inaccessible to
+this runtime. Do not run `pulumi up`, provision credentials, make paid provider
+calls, enable setup, or publish until the missing scope is recorded and an
+authorized preview can be run.
