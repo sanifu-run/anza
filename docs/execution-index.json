@@ -634,7 +634,7 @@
         "UC-017"
       ],
       "steps": [
-        "Implement capability/session/context/recommendation handlers per contract v1 revision 2 on setupService, reusing transcriptHeaders, conversationID, writeJSON and transcriptStore. Do not register new routes or edit the main router until T3.6.",
+        "Implement capability/session/context/recommendation handlers per contract v1 revision 3 on setupService, reusing transcriptHeaders, conversationID, writeJSON and transcriptStore. Do not register new routes or edit the main router until T3.6.",
         "Use the same X-Conversation-Token and stable requestId semantics as chat. Start accepts reviewed setup facts; new tokens are participant-generated. No invitation or independent bearer-session protocol.",
         "Test real HTTP requests through a local handler mux for every documented method/status/body, origin policy, feature flag, session-purpose isolation and strict new payload size/field limits.",
         "Require completed current setup turn and exact version for recommendation. Ordinary conversation GET/DELETE remain the sole resume/deletion endpoints."
@@ -653,7 +653,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna worker commit 27384e89d6243f28e99dcfdc4e6b79ceccfb93be; Chat merge d53159b. Worker focused HTTP tests, extended matrix, go vet, formatting and diff checks passed. Coordinator post-merge test rerun could not download uncached modules because network access was unavailable; see docs/evidence/T3.5.md. Follow-up dependencies: T3.6 legacy-route purpose guards and a no-cost durable session-admission API or contract amendment.",
       "wave": 15,
       "repository": "chat"
     },
@@ -1232,7 +1232,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "Certified: GPT-6-Luna 2026-09-28 d396f3f02e3aa8756e35e240440fb5315d5fff4f; catalog digest aa6a9c6b\u2026a948c; rights remain a release gate",
+      "certification": "Certified: GPT-6-Luna 2026-09-28 d396f3f02e3aa8756e35e240440fb5315d5fff4f; catalog digest aa6a9c6b…a948c; rights remain a release gate",
       "wave": 7,
       "repository": "anza"
     },
@@ -1732,7 +1732,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna worker commit e890e4b with redirect-hardening follow-up f1b1ceb; Anza merge 26cd360. Shell syntax, 17 POSIX fixture checks, ShellCheck and diff checks passed. Release digest remains intentionally unstamped for T9.4.",
       "wave": 15,
       "repository": "anza"
     },
@@ -1768,7 +1768,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "not_run",
+      "certification": "Certified: GPT-6-Luna worker commits 8ed5d1f and 567568f; Anza merge dd6d370. Static checks and diff checks passed; PowerShell fixture was not run because no PowerShell runtime is installed. T9.4 release metadata remains unstamped.",
       "wave": 15,
       "repository": "anza"
     },

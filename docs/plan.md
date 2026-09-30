@@ -45,7 +45,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E2](plans/E2.md).
 
-### E3 -- Shared chat setup interview -> docs/plans/E3.md (6/8)
+### E3 -- Shared chat setup interview -> docs/plans/E3.md (7/8)
 
 [Open E3](plans/E3.md).
 
@@ -69,7 +69,7 @@ Each epic links to exact owned outputs, dependencies, estimates, acc predicates 
 
 [Open E8](plans/E8.md).
 
-### E9 -- CLI integration bootstrap and artifacts -> docs/plans/E9.md (1/4)
+### E9 -- CLI integration bootstrap and artifacts -> docs/plans/E9.md (3/4)
 
 [Open E9](plans/E9.md).
 
@@ -205,9 +205,9 @@ The table below is a conservative executable schedule: complete review/integrati
 
 ### Wave 15: Dispatch (3 workers)
 
-- [ ] T3.5 Implement additive setup handlers alongside existing chat routes
-- [ ] T9.2 Implement POSIX one-line bootstrap
-- [ ] T9.3 Implement native PowerShell bootstrap
+- [x] T3.5 Implement additive setup handlers alongside existing chat routes
+- [x] T9.2 Implement POSIX one-line bootstrap
+- [x] T9.3 Implement native PowerShell bootstrap
 
 ### Wave 16: Dispatch (3 workers)
 
