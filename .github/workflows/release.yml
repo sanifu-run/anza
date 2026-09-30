@@ -1,0 +1,121 @@
+name: prepare-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (x.y.z)'
+        required: true
+        type: string
+      release_origin:
+        description: 'Reviewed HTTPS origin that serves immutable Anza release paths'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  qualify-native:
+    name: qualify (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: true
+      - name: Validate plan and generated catalog
+        shell: bash
+        run: |
+          python3 scripts/check-plan.py
+          python3 -c 'import json; from pathlib import Path; [json.loads(p.read_text()) for p in Path("schemas").glob("*.json")]'
+          python3 scripts/catalog-manifest.py --check
+      - name: Go tests
+        run: go test ./... -count=1
+      - name: Go vet
+        run: go vet ./...
+      - name: POSIX bootstrap fixtures
+        if: runner.os != 'Windows'
+        shell: bash
+        run: sh scripts/tests/bootstrap-posix.sh
+      - name: Windows bootstrap fixtures
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/tests/bootstrap-windows.ps1
+
+  build:
+    needs: qualify-native
+    name: build (${{ matrix.goos }}/${{ matrix.goarch }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: darwin, goarch: amd64 }
+          - { goos: darwin, goarch: arm64 }
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 }
+          - { goos: windows, goarch: amd64 }
+          - { goos: windows, goarch: arm64 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: true
+      - name: Build target artifact
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: sh scripts/release.sh build "$RELEASE_VERSION" '${{ matrix.goos }}' '${{ matrix.goarch }}' artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 7
+
+  assemble:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # Configure this environment with required reviewers and protected secrets.
+    environment: release-approval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: binary-*
+          path: artifacts
+          merge-multiple: true
+      - name: Prepare manifests, bootstraps, SBOM, checksums and signature
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_ORIGIN: ${{ inputs.release_origin }}
+          SIGNING_KEY_PEM: ${{ secrets.ANZA_ED25519_PRIVATE_KEY_PEM }}
+          SIGNING_PUBLIC_KEY_PEM: ${{ secrets.ANZA_ED25519_PUBLIC_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          printf '%s' "$SIGNING_KEY_PEM" > "$RUNNER_TEMP/anza-release-key.pem"
+          printf '%s' "$SIGNING_PUBLIC_KEY_PEM" > "$RUNNER_TEMP/anza-release-pub.pem"
+          trap 'rm -f "$RUNNER_TEMP/anza-release-key.pem" "$RUNNER_TEMP/anza-release-pub.pem"' EXIT
+          ANZA_ED25519_PRIVATE_KEY_FILE="$RUNNER_TEMP/anza-release-key.pem" \
+          ANZA_ED25519_PUBLIC_KEY_FILE="$RUNNER_TEMP/anza-release-pub.pem" \
+            sh scripts/release.sh assemble "$RELEASE_VERSION" "$RELEASE_ORIGIN" artifacts prepared
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prepared-anza-${{ inputs.version }}
+          path: prepared/${{ inputs.version }}/
+          if-no-files-found: error
+          retention-days: 7

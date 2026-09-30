@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    name: native (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: true
+      - name: Validate plan and generated catalog
+        shell: bash
+        run: |
+          python3 scripts/check-plan.py
+          python3 -c 'import json; from pathlib import Path; [json.loads(p.read_text()) for p in Path("schemas").glob("*.json")]'
+          python3 scripts/catalog-manifest.py --check
+      - name: Go tests
+        run: go test ./... -count=1
+      - name: Go vet
+        run: go vet ./...
+      - name: POSIX bootstrap fixtures
+        if: runner.os != 'Windows'
+        shell: bash
+        run: sh scripts/tests/bootstrap-posix.sh
+      - name: Windows bootstrap fixtures
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/tests/bootstrap-windows.ps1
