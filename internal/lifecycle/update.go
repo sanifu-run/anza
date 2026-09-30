@@ -41,6 +41,9 @@ type ReleaseMetadata struct {
 	ArtifactDigest       string            `json:"artifact_digest"`
 	ProtocolMin          int               `json:"protocol_min"`
 	ProtocolMax          int               `json:"protocol_max"`
+	PayloadManifests     map[string]string `json:"payload_manifests"`
+	SignatureAlgorithm   string            `json:"signature_algorithm"`
+	SignatureFile        string            `json:"signature_file"`
 	CompatibilityChanges []string          `json:"compatibility_changes,omitempty"`
 	Migrations           []Migration       `json:"migrations,omitempty"`
 	ManagedFiles         map[string]string `json:"managed_files,omitempty"`
@@ -84,8 +87,22 @@ func (c Checker) Check(ctx context.Context) (VerifiedRelease, error) {
 		return VerifiedRelease{}, fmt.Errorf("%w: malformed metadata: %v", ErrIntegrity, err)
 	}
 	if !validVersion(metadata.Version) || metadata.ProtocolMin < 0 || metadata.ProtocolMax < metadata.ProtocolMin ||
-		!validArtifactDigest(metadata.ArtifactDigest) {
+		!validArtifactDigest(metadata.ArtifactDigest) || metadata.SignatureAlgorithm != "Ed25519" || metadata.SignatureFile != "release-metadata.sig" ||
+		len(metadata.PayloadManifests) != 2 || metadata.PayloadManifests["manifest.json"] == "" || metadata.PayloadManifests["windows/manifest.json"] == "" {
 		return VerifiedRelease{}, fmt.Errorf("%w: invalid release metadata fields", ErrIntegrity)
+	}
+	for path, digest := range metadata.PayloadManifests {
+		if path == "" || strings.HasPrefix(path, "/") || strings.Contains(path, "..") || !validSHA256(digest) {
+			return VerifiedRelease{}, fmt.Errorf("%w: invalid payload manifest entry", ErrIntegrity)
+		}
+	}
+	manifestSet, err := json.Marshal(metadata.PayloadManifests)
+	if err != nil {
+		return VerifiedRelease{}, fmt.Errorf("%w: encode payload manifest digests", ErrIntegrity)
+	}
+	manifestDigest := sha256.Sum256(manifestSet)
+	if metadata.ArtifactDigest != "sha256:"+hex.EncodeToString(manifestDigest[:]) {
+		return VerifiedRelease{}, fmt.Errorf("%w: artifact digest does not match payload manifest set", ErrIntegrity)
 	}
 	if metadata.CatalogDigest != "" && !validSHA256(strings.TrimPrefix(metadata.CatalogDigest, "sha256:")) {
 		return VerifiedRelease{}, fmt.Errorf("%w: invalid catalog digest", ErrIntegrity)

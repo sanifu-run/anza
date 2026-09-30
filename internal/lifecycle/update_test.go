@@ -25,6 +25,20 @@ func (v testVerifier) Verify(_, _ []byte) error { return v.err }
 
 func signedFixture(t *testing.T, m ReleaseMetadata) SignedRelease {
 	t.Helper()
+	if m.PayloadManifests == nil {
+		m.PayloadManifests = map[string]string{
+			"manifest.json":         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			"windows/manifest.json": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		}
+	}
+	manifestSet, err := json.Marshal(m.PayloadManifests)
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifestDigest := sha256.Sum256(manifestSet)
+	m.ArtifactDigest = "sha256:" + hex.EncodeToString(manifestDigest[:])
+	m.SignatureAlgorithm = "Ed25519"
+	m.SignatureFile = "release-metadata.sig"
 	payload, err := json.Marshal(m)
 	if err != nil {
 		t.Fatal(err)

@@ -33,6 +33,8 @@ jobs:
         run: |
           python3 scripts/check-plan.py
           python3 -c 'import json; from pathlib import Path; [json.loads(p.read_text()) for p in Path("schemas").glob("*.json")]'
+          python3 scripts/schema-lock.py --check
+          python3 scripts/tests/schema-lock-negative.py
           python3 scripts/catalog-manifest.py --check
       - name: Go tests
         run: go test ./... -count=1

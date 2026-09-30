@@ -4,7 +4,7 @@ set -eu
 
 usage() { echo "usage: $0 build VERSION GOOS GOARCH OUTDIR | assemble VERSION HTTPS_ORIGIN ARTIFACT_DIR OUTDIR" >&2; exit 2; }
 fail() { echo "release: $*" >&2; exit 1; }
-valid_version() { printf '%s' "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([+-][A-Za-z0-9.-]+)?$'; }
+valid_version() { printf '%s' "$1" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'; }
 sha256() { shasum -a 256 "$1" | awk '{print tolower($1)}'; }
 
 mode=${1:-}; shift || usage
@@ -13,13 +13,23 @@ case $mode in
     [ "$#" -eq 4 ] || usage
     version=$1 goos=$2 goarch=$3 outdir=$4
     valid_version "$version" || fail 'invalid semantic version'
+    command -v python3 >/dev/null 2>&1 || fail 'Python 3 is required'
+    [ -n "${ANZA_RELEASE_PUBLIC_KEY_BASE64:-}" ] || fail 'ANZA_RELEASE_PUBLIC_KEY_BASE64 must contain the pinned Ed25519 public key'
+    python3 - "$ANZA_RELEASE_PUBLIC_KEY_BASE64" <<'PYKEY' || fail 'ANZA_RELEASE_PUBLIC_KEY_BASE64 must be canonical base64 for a 32-byte Ed25519 public key'
+import base64, sys
+try:
+    key=base64.b64decode(sys.argv[1],validate=True)
+except Exception:
+    raise SystemExit(1)
+if len(key)!=32 or base64.b64encode(key).decode()!=sys.argv[1]: raise SystemExit(1)
+PYKEY
     case "$goos/$goarch" in darwin/amd64|darwin/arm64|linux/amd64|linux/arm64|windows/amd64|windows/arm64) ;; *) fail 'unsupported GOOS/GOARCH pair' ;; esac
     command -v go >/dev/null 2>&1 || fail 'Go toolchain is required'
     mkdir -p "$outdir"
     outdir=$(CDPATH='' cd -- "$outdir" && pwd)
     name="anza-$goos-$goarch"; [ "$goos" != windows ] || name="$name.exe"
     root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
-    (cd "$root" && CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -buildvcs=false -ldflags='-buildid=' -o "$outdir/$name" ./cmd/anza)
+    (cd "$root" && CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -buildvcs=false -ldflags="-buildid= -X main.releasePublicKeyBase64=$ANZA_RELEASE_PUBLIC_KEY_BASE64" -o "$outdir/$name" ./cmd/anza)
     echo "$outdir/$name"
     ;;
   assemble)
@@ -116,13 +126,14 @@ licenses=['Anza dependency license inventory','', 'License expressions are repor
 licenses.extend(f"{m['path']} {m['version']}: NOASSERTION" for m in requirements)
 pathlib.Path(licenses_path).write_text('\n'.join(licenses)+'\n')
 PYMOD
-    python3 - "$outdir/$version" "$version" <<'PY'
+python3 - "$outdir/$version" "$version" <<'PY'
 import hashlib,json,pathlib,sys
 root=pathlib.Path(sys.argv[1]); version=sys.argv[2]
 manifests={}
 for path in (root/'manifest.json',root/'windows/manifest.json'):
     manifests[str(path.relative_to(root))]=hashlib.sha256(path.read_bytes()).hexdigest()
-metadata={'version':version,'payload_manifests':manifests,'signature_algorithm':'Ed25519','signature_file':'release-metadata.sig'}
+manifest_set=json.dumps(manifests,sort_keys=True,separators=(',',':')).encode()
+metadata={'version':version,'catalog_version':'','catalog_digest':'','artifact_digest':'sha256:'+hashlib.sha256(manifest_set).hexdigest(),'protocol_min':1,'protocol_max':1,'payload_manifests':manifests,'signature_algorithm':'Ed25519','signature_file':'release-metadata.sig'}
 (root/'release-metadata.json').write_text(json.dumps(metadata,sort_keys=True,indent=2)+'\n')
 PY
     openssl pkeyutl -sign -rawin -inkey "$ANZA_ED25519_PRIVATE_KEY_FILE" -in "$outdir/$version/release-metadata.json" -out "$outdir/$version/release-metadata.sig"
