@@ -28,10 +28,21 @@ case $mode in
     valid_version "$version" || fail 'invalid semantic version'
     command -v python3 >/dev/null 2>&1 || fail 'Python 3 is required'
     python3 - "$origin" <<'PYURL' || fail 'release origin must be a plain HTTPS origin without credentials, port, path, query, or fragment'
-import sys
+import re, sys
 from urllib.parse import urlsplit
-u=urlsplit(sys.argv[1])
-if u.scheme!='https' or not u.hostname or u.username or u.password or u.port is not None or u.path not in ('','/') or u.query or u.fragment:
+try:
+    u=urlsplit(sys.argv[1])
+    host=u.hostname or ''
+    port=u.port
+    host.encode('ascii')
+except (UnicodeError, ValueError):
+    raise SystemExit(1)
+labels=host.split('.')
+label_pattern=re.compile(r'^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$')
+valid_host=(len(host)<=253 and len(labels)>=2 and all(label_pattern.fullmatch(label) for label in labels)
+            and not labels[-1].isdigit())
+if (u.scheme!='https' or not valid_host or u.username or u.password or port is not None
+        or u.path or u.query or u.fragment):
     raise SystemExit(1)
 PYURL
     [ -d "$artifacts" ] || fail 'artifact directory is missing'
