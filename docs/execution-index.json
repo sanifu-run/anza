@@ -1795,6 +1795,8 @@
         "T9.3"
       ],
       "owned_paths": [
+        "internal/cli/app_test.go",
+        "go.sum",
         ".github/workflows/ci.yml",
         ".github/workflows/release.yml",
         "scripts/release.sh",
@@ -2076,6 +2078,7 @@
         "T11.5"
       ],
       "owned_paths": [
+        "docs/evidence/T11.2-cost-reservations.md",
         "docs/launch-authorization.md"
       ],
       "use_cases": [

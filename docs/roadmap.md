@@ -6,7 +6,7 @@ No Anza/setup extension implementation shipped; the existing chat foundation is 
 
 ## In progress
 
-Core implementation through Wave 15 is integrated locally. Waves 16–18 have source and evidence integrated, with qualification gates still open. Coordinator (2026-09-30) is correcting the shared API origin and reconciling launch evidence. GPT-6-Luna workers are extending T10.1 with a socket-free real-Chat protocol fixture and T10.3 with local adversarial coverage plus an approval-expiry race correction.
+Core implementation and corrective evidence are merged locally on Anza main (`d516914`). Shared Chat replay/deletion corrections are on Chat main (`1d4adcb`), with peer edits preserved. Apache License 2.0, pilot limits, and bounded provider checks are approved. Qualification continues with GPT-6-Luna workers for full CLI journeys, release preparation, and isolated provider readiness; no setup deployment or CLI publication is claimed.
 
 ## Planned
 
@@ -24,4 +24,4 @@ Core implementation through Wave 15 is integrated locally. Waves 16–18 have so
 
 ## Blocked release gates
 
-Native runtime qualification, platform/account evidence, incremental shared-backend scope/caps, publication scope and license/shared-retention notice decisions. These do not block ordinary local implementation after foundation setup.
+Native platform/account evidence, verified hosted-model price reservations, reviewed additive infrastructure preview, publication/signing configuration, and participant pilot evidence remain open. The previous filesystem restriction and owner license/pilot-limit decisions are resolved. These gates do not block ordinary local implementation or authorized synthetic checks.
