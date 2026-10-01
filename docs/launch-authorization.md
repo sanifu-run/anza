@@ -127,8 +127,13 @@ reasoning double-reserved as a safety allowance. This would permit only two
 such full-envelope requests within the approved 1,000,000 microUSD daily cap.
 The approved 10-session and 12-call settings are ceilings; a verified
 fail-closed daily budget may admit fewer requests than those maxima. The
-current T3.6 repair path reserves its optional second request under the same
-call ceiling, so total requests cannot exceed 120/day.
+10-session limit is new-session admission per day, while each conversation's
+12-call limit applies across its lifetime. A same-day cohort of 10 new sessions
+using all 12 call reservations would be 120 requests; that is an illustrative
+workload, not a global daily request ceiling. The T3.6 repair path reserves its
+optional request under the same per-conversation call ceiling. Active sessions
+from earlier days may also use quota, so the verified daily cost guard is the
+global bound.
 
 These are evidence-based candidate reservation values, not deployment-ready
 settings: the deployed gateway route, account price tier, and enforcement of
@@ -136,6 +141,5 @@ Chat's `max_tokens=2048` request field have not been verified. The conditional
 application-cap calculation and its limitations are in the evidence record.
 No reservation values are applied to configuration, and setup remains disabled.
 Do not enable or deploy until an owner-reviewed reservation policy and its
-gateway/runtime enforcement are verified. Full 10-session × 12-call throughput
-does not need to fit inside the daily cap because those values are maximums;
-the runtime must instead reject additional requests before crossing the cap.
+gateway/runtime enforcement are verified. The runtime may admit fewer calls
+than these ceilings and must reject requests before crossing the daily cap.
