@@ -125,12 +125,17 @@ The conservative public-limit envelope is 210,000 microUSD input plus 96,000
 microUSD output and 96,000 microUSD reasoning per provider request, with
 reasoning double-reserved as a safety allowance. This would permit only two
 such full-envelope requests within the approved 1,000,000 microUSD daily cap.
-It does not fit the approved 10-session × 12-call maximum.
+The approved 10-session and 12-call settings are ceilings; a verified
+fail-closed daily budget may admit fewer requests than those maxima. The
+current T3.6 repair path reserves its optional second request under the same
+call ceiling, so total requests cannot exceed 120/day.
 
 These are evidence-based candidate reservation values, not deployment-ready
 settings: the deployed gateway route, account price tier, and enforcement of
 Chat's `max_tokens=2048` request field have not been verified. The conditional
 application-cap calculation and its limitations are in the evidence record.
 No reservation values are applied to configuration, and setup remains disabled.
-Do not enable or deploy until an owner-reviewed reservation policy fits all
-approved call/session limits and the gateway/runtime enforce the claimed bounds.
+Do not enable or deploy until an owner-reviewed reservation policy and its
+gateway/runtime enforcement are verified. Full 10-session × 12-call throughput
+does not need to fit inside the daily cap because those values are maximums;
+the runtime must instead reject additional requests before crossing the cap.
