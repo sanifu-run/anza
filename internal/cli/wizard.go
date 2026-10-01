@@ -41,11 +41,12 @@ type wizardStateStore interface {
 }
 
 type Wizard struct {
-	in      *lineInput
-	chat    WizardChat
-	store   wizardStateStore
-	facts   *domain.MachineFacts
-	privacy string
+	in             *lineInput
+	chat           WizardChat
+	store          wizardStateStore
+	facts          *domain.MachineFacts
+	privacy        string
+	recommendation *interviewclient.RecommendationResponse
 }
 
 type wizardDraft struct {
@@ -225,7 +226,10 @@ func (w *Wizard) completeDraft(ctx context.Context, draft *wizardDraft) error {
 		}
 	}
 	if draft.Brief == nil && draft.BriefText == nil {
-		draft.Brief = &domain.ProjectBrief{SchemaVersion: 1, ProjectSummary: draft.ProjectSummary, DesiredSlice: draft.DesiredSlice, Experience: draft.Experience}
+		draft.Brief = &domain.ProjectBrief{
+			SchemaVersion: 1, ProjectSummary: draft.ProjectSummary, DesiredSlice: draft.DesiredSlice, Experience: draft.Experience,
+			Constraints: []string{}, KnownStack: []string{},
+		}
 	}
 	return nil
 }
@@ -258,6 +262,12 @@ func (w *Wizard) selectBrief(ctx context.Context, draft *wizardDraft) error {
 				return err
 			}
 			if context.Brief != nil {
+				if context.Brief.Constraints == nil {
+					context.Brief.Constraints = []string{}
+				}
+				if context.Brief.KnownStack == nil {
+					context.Brief.KnownStack = []string{}
+				}
 				draft.Brief = context.Brief
 			}
 			if context.ApprovedBriefText != "" {
@@ -341,6 +351,7 @@ func (w *Wizard) interview(ctx context.Context, session WizardSession) error {
 			if err != nil {
 				return fmt.Errorf("get typed setup recommendation: %w", err)
 			}
+			w.recommendation = &recommendation
 			fmt.Fprintf(w.in.writer, "Typed recommendation:\n%s\n", terminalText(recommendation.Recommendation.Summary))
 			return nil
 		}

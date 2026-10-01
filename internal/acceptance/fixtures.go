@@ -34,7 +34,8 @@ import (
 )
 
 const (
-	maxFixtureWait = 20 * time.Second
+	maxFixtureWait           = 20 * time.Second
+	defaultChatFixtureCommit = "869a89d8e121f97c03647b0b61ee712d8019949d"
 )
 
 var errDropFixtureResponse = errors.New("synthetic Chat response dropped after commit")
@@ -57,6 +58,7 @@ type chatFixture struct {
 func startChatFixture(t *testing.T, source string) *chatFixture {
 	t.Helper()
 	root := t.TempDir()
+	chatTree := chatSourceTree(t, source)
 	source = chatFixtureOverlay(t, source, filepath.Join(root, "chat-source"))
 	readyPath := filepath.Join(root, "chat-ready.json")
 	stopPath := filepath.Join(root, "chat-stop")
@@ -90,6 +92,7 @@ func startChatFixture(t *testing.T, source string) *chatFixture {
 			if fx.ready.BaseURL == "" || len(fx.ready.CatalogDigest) != 64 || len(fx.ready.CatalogVersion) == 0 {
 				t.Fatalf("synthetic Chat fixture returned incomplete ready data: %+v", fx.ready)
 			}
+			t.Logf("synthetic Chat fixture: commit=%s tree=%s catalog_version=%s catalog_digest=%s", chatFixtureCommit(), chatTree, fx.ready.CatalogVersion, fx.ready.CatalogDigest)
 			return fx
 		}
 		select {
@@ -102,13 +105,33 @@ func startChatFixture(t *testing.T, source string) *chatFixture {
 	return nil
 }
 
+func chatSourceTree(t *testing.T, source string) string {
+	t.Helper()
+	result, err := exec.Command("git", "-C", source, "rev-parse", chatFixtureCommit()+"^{tree}").Output()
+	if err != nil {
+		t.Fatalf("read reviewed Chat source tree: %v", err)
+	}
+	return strings.TrimSpace(string(result))
+}
+
+func chatFixtureCommit() string {
+	if commit := strings.TrimSpace(os.Getenv("ANZA_CHAT_FIXTURE_COMMIT")); commit != "" {
+		return commit
+	}
+	return defaultChatFixtureCommit
+}
+
 // chatFixtureOverlay extracts the reviewed Chat commit into the task temp root
 // and changes only its synthetic provider reply. Production Chat sources stay
 // read-only; the overlay's provider returns plain prose for turns and a valid
 // empty typed recommendation for recommendation prompts.
 func chatFixtureOverlay(t *testing.T, source, destination string) string {
 	t.Helper()
-	cmd := exec.Command("git", "archive", "--format=tar", "HEAD")
+	commit := chatFixtureCommit()
+	if err := exec.Command("git", "-C", source, "cat-file", "-e", commit+"^{commit}").Run(); err != nil {
+		t.Fatalf("reviewed Chat main commit %s is unavailable: %v", commit, err)
+	}
+	cmd := exec.Command("git", "archive", "--format=tar", commit)
 	cmd.Dir = source
 	archive, err := cmd.Output()
 	if err != nil {
@@ -170,7 +193,7 @@ func chatFixtureOverlay(t *testing.T, source, destination string) string {
 		content := "Tell me what you want to build first."
 		for _, message := range request.Messages {
 			if strings.Contains(message.Content, "Return only JSON") || strings.Contains(message.Content, "typed setup recommendation") {
-				content = fmt.Sprintf("{\"schema_version\":1,\"catalog_version\":%q,\"summary\":\"A synthetic review is ready.\",\"selected_recipe_ids\":[],\"selected_pack_ids\":[],\"selected_exercise_id\":\"\",\"reasons\":{},\"unresolved_questions\":[],\"manual_steps\":[],\"readiness_constraints\":[]}", catalog.CatalogVersion)
+				content = fmt.Sprintf("{\"schema_version\":1,\"catalog_version\":%q,\"summary\":\"A synthetic review is ready.\",\"selected_recipe_ids\":[],\"selected_pack_ids\":[],\"selected_exercise_id\":\"mobile-desktop-exercise\",\"reasons\":{},\"unresolved_questions\":[],\"manual_steps\":[],\"readiness_constraints\":[]}", catalog.CatalogVersion)
 				break
 			}
 		}
@@ -462,6 +485,9 @@ func (f *chatFixture) close(t *testing.T) {
 func fixtureEnvironment(base []string, overrides map[string]string) []string {
 	blocked := func(key string) bool {
 		upper := strings.ToUpper(key)
+		if strings.Contains(upper, "LIVE") || strings.Contains(upper, "EVAL") {
+			return true
+		}
 		for _, prefix := range []string{"AWS_", "OPENAI_", "OPENROUTER_", "ANTHROPIC_", "GITHUB_TOKEN", "CHATGPT_", "CLAUDE_", "ANZA_RELEASE_"} {
 			if strings.HasPrefix(upper, prefix) {
 				return true
@@ -493,14 +519,32 @@ func fixtureEnvironment(base []string, overrides map[string]string) []string {
 	return result
 }
 
+func privateUserStateOverrides(root string) map[string]string {
+	return map[string]string{
+		"ANZA_STATE_DIR":  filepath.Join(root, "state"),
+		"XDG_CONFIG_HOME": filepath.Join(root, "config"),
+	}
+}
+
+func privateUserStateEnvironment(base []string, root string, additional map[string]string) []string {
+	overrides := privateUserStateOverrides(root)
+	for key, value := range additional {
+		overrides[key] = value
+	}
+	return fixtureEnvironment(base, overrides)
+}
+
 type localProxy struct {
-	addr     string
-	caFile   string
-	server   *http.Server
-	listener net.Listener
-	mu       sync.Mutex
-	routes   []string
-	requests []requestRecord
+	addr          string
+	caFile        string
+	server        *http.Server
+	listener      net.Listener
+	mu            sync.Mutex
+	connects      []string
+	connectEvents []string
+	proxyEvents   []string
+	routes        []string
+	requests      []requestRecord
 }
 
 type requestRecord struct {
@@ -549,12 +593,39 @@ func startChatProxyWith(t *testing.T, target string, root string, rewrite func(*
 		fx.mu.Unlock()
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
+		fx.mu.Lock()
+		event := fmt.Sprintf("upstream-status=%d path=%s", resp.StatusCode, resp.Request.URL.Path)
+		if resp.Request.URL.Path == "/api/setup/capabilities" {
+			body, err := io.ReadAll(resp.Body)
+			if err == nil {
+				resp.Body = io.NopCloser(bytes.NewReader(body))
+				event += fmt.Sprintf(" content_type=%s content_length=%d body=%s", resp.Header.Get("Content-Type"), resp.ContentLength, string(body))
+				var capabilities struct {
+					Enabled         bool   `json:"enabled"`
+					ProtocolVersion int    `json:"protocolVersion"`
+					CatalogVersion  string `json:"catalogVersion"`
+					CatalogDigest   string `json:"catalogDigest"`
+				}
+				if json.Unmarshal(body, &capabilities) == nil {
+					event += fmt.Sprintf(" enabled=%t protocol=%d catalog_version=%s catalog_digest=%s", capabilities.Enabled, capabilities.ProtocolVersion, capabilities.CatalogVersion, capabilities.CatalogDigest)
+				} else {
+					event += " malformed-capabilities"
+				}
+			} else {
+				event += " unreadable-capabilities"
+			}
+		}
+		fx.proxyEvents = append(fx.proxyEvents, event)
+		fx.mu.Unlock()
 		if rewrite != nil {
 			return rewrite(resp, resp.Request)
 		}
 		return nil
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		fx.mu.Lock()
+		fx.proxyEvents = append(fx.proxyEvents, "upstream-error="+err.Error())
+		fx.mu.Unlock()
 		if errors.Is(err, errDropFixtureResponse) {
 			if hijacker, ok := w.(http.Hijacker); ok {
 				conn, _, hijackErr := hijacker.Hijack()
@@ -592,6 +663,24 @@ func (p *localProxy) routeSnapshot() []string {
 	return append([]string(nil), p.routes...)
 }
 
+func (p *localProxy) connectSnapshot() []string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return append([]string(nil), p.connects...)
+}
+
+func (p *localProxy) connectEventSnapshot() []string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return append([]string(nil), p.connectEvents...)
+}
+
+func (p *localProxy) proxyEventSnapshot() []string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return append([]string(nil), p.proxyEvents...)
+}
+
 func (p *localProxy) requestSnapshot() []requestRecord {
 	p.mu.Lock()
 	defer p.mu.Unlock()
@@ -607,6 +696,13 @@ func (p *localProxy) handleConnect(conn net.Conn, cert tlsCertificate) {
 	_ = conn.SetDeadline(time.Now().Add(10 * time.Second))
 	reader := bufio.NewReader(conn)
 	req, err := http.ReadRequest(reader)
+	p.mu.Lock()
+	if err != nil {
+		p.connects = append(p.connects, "read-error: "+err.Error())
+	} else {
+		p.connects = append(p.connects, req.Method+" host="+req.Host+" url_host="+req.URL.Host)
+	}
+	p.mu.Unlock()
 	if err != nil || req.Method != http.MethodConnect || !strings.EqualFold(req.Host, strings.TrimPrefix(interviewclient.DefaultBaseURL, "https://")+":443") {
 		_, _ = io.WriteString(conn, "HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n")
 		return
@@ -614,10 +710,16 @@ func (p *localProxy) handleConnect(conn net.Conn, cert tlsCertificate) {
 	_, _ = io.WriteString(conn, "HTTP/1.1 200 Connection Established\r\n\r\n")
 	secure := tls.Server(&bufferedConn{Conn: conn, reader: reader}, cert.config)
 	if err := secure.Handshake(); err != nil {
+		p.mu.Lock()
+		p.connectEvents = append(p.connectEvents, "tls-handshake-error: "+err.Error())
+		p.mu.Unlock()
 		return
 	}
+	p.mu.Lock()
+	p.connectEvents = append(p.connectEvents, "tls-handshake-ok")
+	p.mu.Unlock()
 	_ = secure.SetDeadline(time.Time{})
-	_ = p.server.Serve(&oneConnListener{conn: secure})
+	_ = p.server.Serve(&oneConnListener{conn: secure, closed: make(chan struct{})})
 }
 
 type tlsCertificate struct{ config *tls.Config }
@@ -666,26 +768,50 @@ type bufferedConn struct {
 func (c *bufferedConn) Read(p []byte) (int, error) { return c.reader.Read(p) }
 
 type oneConnListener struct {
-	conn net.Conn
-	once sync.Once
+	conn      net.Conn
+	once      sync.Once
+	closeOnce sync.Once
+	closed    chan struct{}
 }
 
 func (l *oneConnListener) Accept() (net.Conn, error) {
 	var conn net.Conn
-	l.once.Do(func() { conn = l.conn })
+	l.once.Do(func() { conn = &oneConnConn{Conn: l.conn, listener: l} })
 	if conn != nil {
 		return conn, nil
 	}
+	<-l.closed
 	return nil, errors.New("fixture tunnel closed")
 }
-func (l *oneConnListener) Close() error   { return l.conn.Close() }
+
+func (l *oneConnListener) Close() error {
+	l.signalClose()
+	return l.conn.Close()
+}
+
 func (l *oneConnListener) Addr() net.Addr { return l.conn.LocalAddr() }
+
+func (l *oneConnListener) signalClose() {
+	l.closeOnce.Do(func() { close(l.closed) })
+}
+
+type oneConnConn struct {
+	net.Conn
+	listener *oneConnListener
+}
+
+func (c *oneConnConn) Close() error {
+	err := c.Conn.Close()
+	c.listener.signalClose()
+	return err
+}
 
 type cliProcess struct {
 	cmd     *exec.Cmd
 	stdin   io.WriteCloser
 	mu      sync.Mutex
 	output  bytes.Buffer
+	stderr  bytes.Buffer
 	done    chan struct{}
 	waitErr error
 	seen    map[string]int
@@ -729,8 +855,7 @@ func startCLI(t *testing.T, binary, root, proxyURL, caFile string, args ...strin
 	if err != nil {
 		t.Fatalf("open Anza PTY diagnostics: %v", err)
 	}
-	cmd.Env = fixtureEnvironment(os.Environ(), map[string]string{
-		"HOME": root, "XDG_CONFIG_HOME": filepath.Join(root, "config"), "XDG_STATE_HOME": filepath.Join(root, "state"),
+	cmd.Env = privateUserStateEnvironment(os.Environ(), root, map[string]string{
 		"HTTPS_PROXY": proxyURL, "https_proxy": proxyURL, "HTTP_PROXY": "", "http_proxy": "", "ALL_PROXY": "", "all_proxy": "",
 		"SSL_CERT_FILE": caFile, "SSL_CERT_DIR": "",
 		"NO_PROXY": "", "no_proxy": "",
@@ -740,27 +865,36 @@ func startCLI(t *testing.T, binary, root, proxyURL, caFile string, args ...strin
 	}
 	p := &cliProcess{cmd: cmd, stdin: stdin, done: make(chan struct{}), seen: make(map[string]int), root: root}
 	var readers sync.WaitGroup
-	for _, r := range []io.Reader{stdout, stderr} {
+	for _, stream := range []struct {
+		reader io.Reader
+		stderr bool
+	}{{reader: stdout}, {reader: stderr, stderr: true}} {
 		readers.Add(1)
-		go func(r io.Reader) {
+		go func(stream struct {
+			reader io.Reader
+			stderr bool
+		}) {
 			defer readers.Done()
 			buf := make([]byte, 1024)
 			for {
-				n, err := r.Read(buf)
+				n, err := stream.reader.Read(buf)
 				if n != 0 {
 					p.mu.Lock()
 					_, _ = p.output.Write(buf[:n])
+					if stream.stderr {
+						_, _ = p.stderr.Write(buf[:n])
+					}
 					p.mu.Unlock()
 				}
 				if err != nil {
 					return
 				}
 			}
-		}(r)
+		}(stream)
 	}
 	go func() {
-		err := cmd.Wait()
 		readers.Wait()
+		err := cmd.Wait()
 		p.mu.Lock()
 		p.waitErr = err
 		p.mu.Unlock()
@@ -795,9 +929,11 @@ func (p *cliProcess) waitOccurrences(t *testing.T, text string, count int) {
 		select {
 		case <-p.done:
 			p.mu.Lock()
+			output = p.output.String()
 			err := p.waitErr
+			stderr := p.stderr.String()
 			p.mu.Unlock()
-			t.Fatalf("Anza CLI exited before %q (err=%v):\n%s", text, err, output)
+			t.Fatalf("Anza CLI exited before %q (err=%v):\n%s\nCLI stderr:\n%s\nprivate state summary: %s", text, err, output, stderr, privateStateSummary(p.root))
 		case <-time.After(20 * time.Millisecond):
 		}
 	}
@@ -805,6 +941,53 @@ func (p *cliProcess) waitOccurrences(t *testing.T, text string, count int) {
 	output := p.output.String()
 	p.mu.Unlock()
 	t.Fatalf("Anza CLI did not reach occurrence %d of %q:\n%s", count, text, output)
+}
+
+func privateStateSummary(root string) string {
+	entries, err := os.ReadDir(filepath.Join(root, "state"))
+	if err != nil {
+		return "unavailable"
+	}
+	var files, tokens, pendingIDs, pendingBodies int
+	var pendingKinds []string
+	for _, entry := range entries {
+		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
+			continue
+		}
+		files++
+		data, err := os.ReadFile(filepath.Join(root, "state", entry.Name()))
+		if err != nil {
+			continue
+		}
+		var envelope struct {
+			Payload json.RawMessage `json:"payload"`
+		}
+		if json.Unmarshal(data, &envelope) != nil {
+			continue
+		}
+		var payload struct {
+			Token            string          `json:"token"`
+			PendingRequestID string          `json:"pending_request_id"`
+			PendingKind      string          `json:"pending_kind"`
+			PendingBody      json.RawMessage `json:"pending_body"`
+		}
+		if json.Unmarshal(envelope.Payload, &payload) != nil {
+			continue
+		}
+		if payload.Token != "" {
+			tokens++
+		}
+		if payload.PendingRequestID != "" {
+			pendingIDs++
+		}
+		if len(payload.PendingBody) != 0 {
+			pendingBodies++
+		}
+		if payload.PendingKind != "" {
+			pendingKinds = append(pendingKinds, payload.PendingKind)
+		}
+	}
+	return fmt.Sprintf("files=%d session_tokens=%d pending_ids=%d pending_bodies=%d pending_kinds=%v", files, tokens, pendingIDs, pendingBodies, pendingKinds)
 }
 
 func (p *cliProcess) answer(t *testing.T, prompt, answer string) {
@@ -823,13 +1006,13 @@ func (p *cliProcess) answer(t *testing.T, prompt, answer string) {
 
 func (p *cliProcess) finish(t *testing.T) string {
 	t.Helper()
-	_ = p.stdin.Close()
 	select {
 	case <-p.done:
 		p.mu.Lock()
 		output := p.output.String()
 		err := p.waitErr
 		p.mu.Unlock()
+		output = strings.ReplaceAll(output, "\r\n", "\n")
 		if err != nil {
 			t.Fatalf("Anza CLI subprocess failed: %v\n%s", err, output)
 		}
@@ -843,13 +1026,13 @@ func (p *cliProcess) finish(t *testing.T) string {
 
 func (p *cliProcess) finishExpectFailure(t *testing.T) string {
 	t.Helper()
-	_ = p.stdin.Close()
 	select {
 	case <-p.done:
 		p.mu.Lock()
 		output := p.output.String()
 		err := p.waitErr
 		p.mu.Unlock()
+		output = strings.ReplaceAll(output, "\r\n", "\n")
 		if err == nil {
 			t.Fatalf("Anza CLI unexpectedly succeeded:\n%s", output)
 		}
@@ -902,6 +1085,9 @@ func proxyRoots(t *testing.T, caFile string) *x509.CertPool {
 
 func failIfLegacyProseBecomesPlan(t *testing.T, binary, root, proxyURL, caFile string) {
 	t.Helper()
+	if err := os.MkdirAll(root, 0700); err != nil {
+		t.Fatalf("create synthetic CLI state root: %v", err)
+	}
 	briefPath := filepath.Join(root, "brief.json")
 	badRecommendation := filepath.Join(root, "recommendation.json")
 	brief := `{"schema_version":1,"project_summary":"A local synthetic test","desired_slice":"A reviewable first slice","experience":"beginner","constraints":[],"known_stack":[],"project_kind":"general","existing_project":true}`
@@ -913,7 +1099,7 @@ func failIfLegacyProseBecomesPlan(t *testing.T, binary, root, proxyURL, caFile s
 	}
 	cmd := exec.Command(binary, "plan", "--brief", briefPath, "--recommendation", badRecommendation)
 	cmd.Dir = root
-	cmd.Env = fixtureEnvironment(os.Environ(), map[string]string{"HOME": root, "XDG_CONFIG_HOME": filepath.Join(root, "config"), "HTTPS_PROXY": proxyURL, "SSL_CERT_FILE": caFile})
+	cmd.Env = privateUserStateEnvironment(os.Environ(), root, map[string]string{"HTTPS_PROXY": proxyURL, "SSL_CERT_FILE": caFile})
 	output, err := cmd.CombinedOutput()
 	if err == nil || !bytes.Contains(output, []byte("recommendation")) {
 		t.Fatalf("legacy prose was accepted as an executable recommendation: err=%v output=%s", err, output)

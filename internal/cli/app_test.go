@@ -141,13 +141,17 @@ func TestCLIGuidedDefaultStopsPartiallyWhenReviewIsSkipped(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())
 	var out, diagnostic bytes.Buffer
 	app := NewApp(strings.NewReader("guided\nnew\nbeginner\nBuild a demo\nCreate a slice\n\nyes\n:recommend\n"), &out, &diagnostic, "test")
-	app.Interactive, app.Chat = true, fixtureChat{}
+	recommendationCalls := 0
+	app.Interactive, app.Chat = true, fixtureChat{recommendationCalls: &recommendationCalls}
 	app.GuidedApproval = func(context.Context, string) (string, error) { return "no", nil }
 	if got := app.Run(context.Background(), nil); got != ExitOK {
 		t.Fatalf("default guided flow exit=%d stderr=%s", got, diagnostic.String())
 	}
 	if !strings.Contains(out.String(), "Readiness: partial. Plan remains unapplied") {
 		t.Fatalf("skipped review did not report partial readiness: %s", out.String())
+	}
+	if recommendationCalls != 1 {
+		t.Fatalf("setup fetched typed recommendation %d times, want exactly one", recommendationCalls)
 	}
 	diagnostic.Reset()
 	if got := app.Run(context.Background(), []string{"apply", "--json"}); got != ExitFailure || !strings.Contains(diagnostic.String(), "saved approval") {
@@ -421,22 +425,25 @@ func TestCLIHelperProcess(t *testing.T) {
 	os.Exit(0)
 }
 
-type fixtureChat struct{}
+type fixtureChat struct{ recommendationCalls *int }
 
 func (fixtureChat) Capabilities(context.Context) (interviewclient.Capabilities, error) {
 	return interviewclient.Capabilities{ProtocolVersion: 1, Enabled: true}, nil
 }
-func (fixtureChat) NewSession(_ context.Context, name string, start interviewclient.SetupStart) (WizardSession, error) {
+func (c fixtureChat) NewSession(_ context.Context, name string, start interviewclient.SetupStart) (WizardSession, error) {
 	if start.ConsentVersion != SetupConsentVersion {
 		return nil, errors.New("explicit setup consent was not attached")
 	}
-	return fixtureSession{name: name}, nil
+	return fixtureSession{name: name, recommendationCalls: c.recommendationCalls}, nil
 }
-func (fixtureChat) ResumeSession(name string) (WizardSession, error) {
-	return fixtureSession{name: name}, nil
+func (c fixtureChat) ResumeSession(name string) (WizardSession, error) {
+	return fixtureSession{name: name, recommendationCalls: c.recommendationCalls}, nil
 }
 
-type fixtureSession struct{ name string }
+type fixtureSession struct {
+	name                string
+	recommendationCalls *int
+}
 
 func (fixtureSession) Ask(context.Context, string) (interviewclient.AskResponse, error) {
 	return interviewclient.AskResponse{Mode: "answer", Answer: "Synthetic local interview response"}, nil
@@ -444,7 +451,10 @@ func (fixtureSession) Ask(context.Context, string) (interviewclient.AskResponse,
 func (fixtureSession) UpdateContext(context.Context, *domain.ProjectBrief, *string, *domain.MachineFacts) (interviewclient.Conversation, error) {
 	return interviewclient.Conversation{}, nil
 }
-func (fixtureSession) Recommend(context.Context) (interviewclient.RecommendationResponse, error) {
+func (s fixtureSession) Recommend(context.Context) (interviewclient.RecommendationResponse, error) {
+	if s.recommendationCalls != nil {
+		*s.recommendationCalls++
+	}
 	cat, err := catalog.LoadBundled()
 	if err != nil {
 		return interviewclient.RecommendationResponse{}, err

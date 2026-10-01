@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"os"
@@ -89,10 +90,48 @@ func TestWizardBeginnerDeveloper(t *testing.T) {
 			if chat.starts != 1 || chat.start.ConsentVersion != SetupConsentVersion || chat.start.Brief == nil || chat.start.Brief.Experience != level {
 				t.Fatalf("setup did not receive reviewed typed project context: %#v", chat.start)
 			}
+			if chat.start.Brief.Constraints == nil || chat.start.Brief.KnownStack == nil {
+				t.Fatalf("setup omitted empty contract arrays from reviewed project context: %#v", chat.start.Brief)
+			}
+			encodedBrief, err := json.Marshal(chat.start.Brief)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := domain.DecodeProjectBrief(encodedBrief); err != nil {
+				t.Fatalf("setup brief did not satisfy the strict v1 project brief schema: %v", err)
+			}
 			if !session.recommended || !strings.Contains(output.String(), "A typed recommendation") {
 				t.Fatal("typed recommendation was not shown")
 			}
 		})
+	}
+}
+
+func TestWizardImportedBriefNormalizesOptionalArrays(t *testing.T) {
+	path := t.TempDir() + "/reviewed-brief.json"
+	data := []byte(`{"schema_version":1,"project_summary":"Reviewed app","desired_slice":"List records","experience":"developer","constraints":[],"known_stack":[],"project_kind":"web","existing_project":false}`)
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	chat := &scriptedChat{session: &scriptedSession{}}
+	input := strings.Join([]string{"imported", "new", "developer", "Draft summary", "Draft slice", path, "yes", "yes", ":recommend"}, "\n") + "\n"
+	var output strings.Builder
+	w, err := NewWizardWithChat(strings.NewReader(input), &output, chat, &memoryState{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := w.Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if chat.start.Brief == nil || chat.start.Brief.Constraints == nil || chat.start.Brief.KnownStack == nil {
+		t.Fatalf("uploaded reviewed brief omitted required empty arrays: %#v", chat.start.Brief)
+	}
+	encoded, err := json.Marshal(chat.start.Brief)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := domain.DecodeProjectBrief(encoded); err != nil {
+		t.Fatalf("uploaded reviewed brief did not satisfy strict v1 schema: %v", err)
 	}
 }
 

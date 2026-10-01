@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -34,6 +33,11 @@ func newHarness(t *testing.T, rewrite func(*http.Response, *http.Request) error)
 	chatSource := requireChatSource(t)
 	fixture := startChatFixture(t, chatSource)
 	proxy := startChatProxyWith(t, fixture.ready.BaseURL, fixture.root, rewrite)
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("synthetic loopback proxy CONNECTs=%v events=%v routes=%v proxy_events=%v", proxy.connectSnapshot(), proxy.connectEventSnapshot(), proxy.routeSnapshot(), proxy.proxyEventSnapshot())
+		}
+	})
 	binary := strings.TrimSpace(os.Getenv("ANZA_BINARY"))
 	if binary == "" {
 		t.Fatal("ANZA_BINARY must point to the CLI built by scripts/tests/chat-contract.sh under the shared build lease")
@@ -43,6 +47,25 @@ func newHarness(t *testing.T, rewrite func(*http.Response, *http.Request) error)
 		t.Fatalf("ANZA_BINARY must be an executable Anza CLI: %q", binary)
 	}
 	return &harness{fixture: fixture, proxy: proxy, binary: binary}
+}
+
+func TestCLIPrivateStateIsolationPreservesHome(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "private-cli")
+	homeBefore, homeWasSet := os.LookupEnv("HOME")
+	env := privateUserStateEnvironment(os.Environ(), root, nil)
+	got := make(map[string]string, len(env))
+	for _, entry := range env {
+		key, value, ok := strings.Cut(entry, "=")
+		if ok {
+			got[key] = value
+		}
+	}
+	if got["ANZA_STATE_DIR"] != filepath.Join(root, "state") {
+		t.Fatalf("private Anza state root = %q, want %q", got["ANZA_STATE_DIR"], filepath.Join(root, "state"))
+	}
+	if homeAfter, ok := got["HOME"]; ok != homeWasSet || (ok && homeAfter != homeBefore) {
+		t.Fatalf("fixture changed inherited HOME: before=%q present=%t after=%q present=%t", homeBefore, homeWasSet, homeAfter, ok)
+	}
 }
 
 func TestFreshJourney(t *testing.T) {
@@ -104,10 +127,7 @@ func TestInterruptedJourney(t *testing.T) {
 	if !strings.Contains(firstOutput, "outcome is unknown") {
 		t.Fatalf("lost ask response was not reported as ambiguous:\n%s", firstOutput)
 	}
-	conversationPath := filepath.Join(root, "Library", "Application Support", "Anza", "State", "interview-interrupted-network.json")
-	if runtime.GOOS != "darwin" {
-		conversationPath = filepath.Join(root, "state", "anza", "interview-interrupted-network.json")
-	}
+	conversationPath := filepath.Join(root, "state", "interview-interrupted-network.json")
 	stateBytes, err := os.ReadFile(conversationPath)
 	if err != nil {
 		t.Fatalf("read synthetic private recovery state: %v", err)
@@ -280,7 +300,7 @@ func TestSharedChatContract(t *testing.T) {
 	}
 
 	legacyToken := "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
-	resp, body = fixtureRequest(t, h, http.MethodPost, "/api/ask", legacyToken, map[string]any{"requestId": "legacy-ask-01", "message": "I am using the existing website intake."})
+	resp, body = fixtureRequest(t, h, http.MethodPost, "/api/ask", legacyToken, map[string]any{"requestId": "legacy-ask-contract-01", "message": "I am using the existing website intake."})
 	if resp.StatusCode != http.StatusOK || !bytes.Contains(body, []byte(`"mode":"llm"`)) {
 		t.Fatalf("legacy /api/ask changed under setup: status=%d body=%s", resp.StatusCode, body)
 	}
@@ -351,11 +371,13 @@ func (s *socketlessStateStore) Load(key string, dst any) error {
 
 func TestSharedChatProtocolContract(t *testing.T) {
 	source := requireChatSource(t)
+	t.Logf("reviewed Chat source: commit=%s tree=%s", chatFixtureCommit(), chatSourceTree(t, source))
 	fixture := startSocketlessChatFixture(t, source)
 	cat, err := catalog.LoadBundled()
 	if err != nil {
 		t.Fatalf("load pinned Anza catalog: %v", err)
 	}
+	t.Logf("Anza catalog: version=%s digest=%s", cat.Version(), cat.Digest())
 	catSnapshot := &interviewclient.CatalogSnapshot{Version: cat.Version(), Digest: cat.Digest(), RecipeIDs: map[string]bool{}, PackIDs: map[string]bool{}, ExerciseIDs: map[string]bool{"mobile-desktop-exercise": true}}
 	store := &socketlessStateStore{}
 	httpClient := &http.Client{Transport: fixture, Timeout: 10 * time.Second}

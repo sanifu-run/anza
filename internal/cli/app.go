@@ -173,13 +173,8 @@ func (a *App) setupCommand(ctx context.Context, args []string, in io.Reader, out
 		return errors.New("interview finished without a valid local session name")
 	}
 	a.lastSetupName = name
-	session, err := chat.ResumeSession(name)
-	if err != nil {
-		return fmt.Errorf("resume completed interview: %w", err)
-	}
-	recommended, err := session.Recommend(ctx)
-	if err != nil {
-		return fmt.Errorf("get final setup recommendation: %w", err)
+	if wizard.recommendation == nil {
+		return errors.New("interview finished without a typed recommendation")
 	}
 	var draft wizardDraft
 	if err := store.Load("wizard-"+name, &draft); err != nil {
@@ -195,7 +190,7 @@ func (a *App) setupCommand(ctx context.Context, args []string, in io.Reader, out
 	if brief.KnownStack == nil {
 		brief.KnownStack = []string{}
 	}
-	if err := store.Save("setup-"+name, savedSetup{Brief: *brief, Recommendation: recommended.Recommendation, Facts: facts}); err != nil {
+	if err := store.Save("setup-"+name, savedSetup{Brief: *brief, Recommendation: wizard.recommendation.Recommendation, Facts: facts}); err != nil {
 		return fmt.Errorf("save private setup recommendation: %w", err)
 	}
 	fmt.Fprintf(out, "Interview and recommendation saved privately. Next: `anza plan --session %s`\n", name)
