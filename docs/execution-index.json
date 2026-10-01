@@ -1857,6 +1857,8 @@
         "T3.6"
       ],
       "owned_paths": [
+        "internal/cli/app.go",
+        "internal/cli/app_test.go",
         "internal/cli/wizard.go",
         "internal/cli/wizard_test.go",
         "internal/acceptance/journeys_test.go",
