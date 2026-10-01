@@ -1903,8 +1903,11 @@
       ],
       "owned_paths": [
         "docs/evidence/platform-qualification.md",
+        "docs/evidence/T10.2-macos-arm64-local.md",
         "scripts/qualify-platform.sh",
-        "scripts/qualify-platform.ps1"
+        "scripts/qualify-platform.ps1",
+        "internal/state/store.go",
+        "internal/state/store_test.go"
       ],
       "use_cases": [
         "UC-001",

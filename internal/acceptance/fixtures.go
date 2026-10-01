@@ -222,7 +222,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sanifu-run/anza/internal/interviewclient"
 )
 
 type anzaFixtureRequest struct {

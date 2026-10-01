@@ -118,3 +118,9 @@ usage/cost and remaining cap, preservation verdict, credential removal verdict,
 and any failure category. Keep raw private output outside the repository;
 include only sanitized results here. All four positive cells, all negative
 cells, and both mixed-provider cells currently remain **NOT RUN**.
+
+## 2026-09-30 account clarification and network preflight
+
+Owner selected existing Codex/Claude subscriptions plus a separate capped OpenRouter test key. No additional macOS user account is required for isolated agent configuration directories. Do not copy existing credentials; separate logins and verified key caps remain prerequisites. `composio link openrouter` failed before connecting (`getaddrinfo ENOTFOUND backend.composio.dev`). Read-only `curl --head --max-time 10` checks for `auth.openai.com`, `claude.ai`, and `openrouter.ai` each exited 6 (DNS resolution denied/unavailable in this runtime). No credential was read or transmitted, no account was connected, and no inference ran. The approved 12-request/$1 total qualification scope remains unused; all four live cells remain NOT RUN.
+
+Official Codex authentication reference reviewed: https://learn.chatgpt.com/docs/auth and configuration locations: https://learn.chatgpt.com/docs/config-file/config-advanced. The authentication documentation provides device login where localhost callbacks are unavailable; network access is still required.

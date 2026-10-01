@@ -231,6 +231,60 @@ func TestWorkspaceIDCanonicalPath(t *testing.T) {
 	}
 }
 
+func TestUserStateRootOverride(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "private-state")
+	t.Setenv("ANZA_STATE_DIR", root)
+
+	got, err := UserStateRoot()
+	if err != nil {
+		t.Fatalf("UserStateRoot with absolute override: %v", err)
+	}
+	if got != filepath.Clean(root) {
+		t.Fatalf("UserStateRoot = %q, want override %q", got, filepath.Clean(root))
+	}
+
+	store, err := NewStore(got)
+	if err != nil {
+		t.Fatalf("NewStore at override: %v", err)
+	}
+	info, err := os.Stat(got)
+	if err != nil {
+		t.Fatalf("stat override root: %v", err)
+	}
+	if info.Mode().Perm()&0o077 != 0 {
+		t.Fatalf("override root permissions = %o, want private", info.Mode().Perm())
+	}
+	if err := store.Save("override-check", testDocument{Value: "local"}); err != nil {
+		t.Fatalf("save in override root: %v", err)
+	}
+}
+
+func TestUserStateRootRejectsUnsafeOverrides(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		value string
+		env   bool
+	}{
+		{name: "relative", value: "relative/path", env: true},
+		{name: "blank", value: "   ", env: true},
+		{name: "nul", value: "bad\x00path"},
+		{name: "filesystem root", value: string(filepath.Separator), env: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if !tc.env {
+				if got, err := validateStateRootOverride(tc.value); err == nil {
+					t.Fatalf("validateStateRootOverride(%q) = %q, want validation error", tc.value, got)
+				}
+				return
+			}
+			t.Setenv("ANZA_STATE_DIR", tc.value)
+			if got, err := UserStateRoot(); err == nil {
+				t.Fatalf("UserStateRoot(%q) = %q, want validation error", tc.value, got)
+			}
+		})
+	}
+}
+
 type testDocument struct {
 	Value string `json:"value"`
 }

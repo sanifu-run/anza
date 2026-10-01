@@ -140,3 +140,7 @@ hard-capped accounts and read-only synthetic files. Read-only local credential
 presence did not establish disposable account ownership, hard caps, or runtime
 budget enforcement; qualification remains NOT RUN, and no provider requests were
 made.
+
+2026-09-30 direct Chat integration authorization: owner explicitly requested changes in `../chat` and isolated Codex/Claude-directory testing on this Mac. Candidate `0a7d86b` patch passed `git apply --check` over current peer changes. Actual application was denied by filesystem policy (Chat is outside writable roots); repeated read-only apply check still passes and status retains the same peer changes. Combined-checkout verification and isolated macOS ARM64 checks are assigned to GPT-6-Luna workers. No live credentials copied or paid request initiated.
+
+2026-09-30 provider access scope clarified: owner authorizes existing Codex/Claude subscriptions and a separately capped OpenRouter test key. New Mac accounts are not required for directory-isolated checks. Fresh terminal DNS preflight fails for all three provider/authentication hosts; Composio OpenRouter connection also fails before authorization. No credential copy, login or paid request occurred. Corrected an erroneous Anza import inside the generated Chat fixture; paired root verification is being rerun.
