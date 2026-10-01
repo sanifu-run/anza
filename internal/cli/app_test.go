@@ -290,9 +290,10 @@ func TestAppMissingConsentStyleErrorsStayActionable(t *testing.T) {
 
 func TestCLIEndToEndFixture(t *testing.T) {
 	var providerRequests, downloadRequests atomic.Int32
+	metadata := fixtureReleaseMetadata(t)
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		providerRequests.Add(1)
-		_, _ = io.WriteString(w, `{"version":"1.2.3","artifact_digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","protocol_min":1,"protocol_max":1}`)
+		_, _ = w.Write(metadata)
 	}))
 	defer provider.Close()
 	download := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -449,6 +450,31 @@ func (fixtureSession) Recommend(context.Context) (interviewclient.Recommendation
 		return interviewclient.RecommendationResponse{}, err
 	}
 	return interviewclient.RecommendationResponse{Recommendation: domain.Recommendation{SchemaVersion: 1, CatalogVersion: cat.Version(), Summary: "Synthetic reviewed recommendation", SelectedRecipeIDs: []string{}, SelectedPackIDs: []string{}, SelectedExerciseID: "mobile-desktop-exercise", Reasons: map[string]string{}, UnresolvedQuestions: []string{}, ManualSteps: []string{}, ReadinessConstraints: []string{}}}, nil
+}
+
+func fixtureReleaseMetadata(t *testing.T) []byte {
+	t.Helper()
+	manifests := map[string]string{
+		"manifest.json":         strings.Repeat("a", 64),
+		"windows/manifest.json": strings.Repeat("b", 64),
+	}
+	manifestSet, err := json.Marshal(manifests)
+	if err != nil {
+		t.Fatalf("marshal fixture manifest digests: %v", err)
+	}
+	manifestDigest := sha256.Sum256(manifestSet)
+	metadata := lifecycle.ReleaseMetadata{
+		Version: "1.2.3", CatalogVersion: "1.0.0",
+		CatalogDigest:  strings.Repeat("c", 64),
+		ArtifactDigest: "sha256:" + hex.EncodeToString(manifestDigest[:]),
+		ProtocolMin:    1, ProtocolMax: 1, PayloadManifests: manifests,
+		SignatureAlgorithm: "Ed25519", SignatureFile: "release-metadata.sig",
+	}
+	payload, err := json.Marshal(metadata)
+	if err != nil {
+		t.Fatalf("marshal fixture release metadata: %v", err)
+	}
+	return payload
 }
 
 type fixtureReleaseSource struct{ url string }

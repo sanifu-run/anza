@@ -71,7 +71,13 @@ def go_toolchain_record(root: Path, outdir: Path) -> dict:
     lines = output.splitlines()
     if len(lines) != 2 or not lines[0] or not re.fullmatch(r"go[0-9][A-Za-z0-9.+-]*", lines[1]):
         fail("Go toolchain metadata is incomplete")
-    license_path = Path(lines[0]) / "LICENSE"
+    goroot = Path(lines[0])
+    license_path = goroot / "LICENSE"
+    # Homebrew relocates the Go distribution into <version>/libexec while
+    # keeping its top-level license beside libexec. Accept that known layout
+    # only when GOROOT itself has no license.
+    if not license_path.exists() and goroot.name == "libexec":
+        license_path = goroot.parent / "LICENSE"
     if license_path.is_symlink() or not license_path.is_file():
         fail("Go toolchain LICENSE is missing or unsafe")
     data = license_path.read_bytes()
