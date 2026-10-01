@@ -1,5 +1,11 @@
 # Anza roadmap
 
+Current frontier: [launch completion plan](launch-completion-plan.md). Local
+qualification is complete; agents own security, native/provider qualification,
+cost and release preparation. Human logins, signing custody, concrete rollout
+review and consented pilot work are tracked in Blink. Deployment and publication
+remain gated on the reviewed packet.
+
 ## Shipped
 
 No Anza/setup extension implementation shipped; the existing chat foundation is already deployed.

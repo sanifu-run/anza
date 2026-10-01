@@ -1,5 +1,9 @@
 # Anza implementation plan
 
+Current launch frontier: [launch completion plan](launch-completion-plan.md).
+Progress 2026-10-01: accepted local qualification fixes are merged and pushed;
+native/live qualification, reviewed rollout, release and pilot remain open.
+
 Date: 2026 09 28. Revision: 4, shared chat reuse, native-only credentials dependency, and CLI credential-input ownership. Status: in progress. Execution target: GPT-6-Luna.
 
 ## Context
