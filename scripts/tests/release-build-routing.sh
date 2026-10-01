@@ -16,6 +16,14 @@ import sys
 import tempfile
 
 release_script = Path(sys.argv[1]).resolve(strict=True)
+powershell_release = release_script.with_name("release.ps1").read_text(encoding="utf-8")
+for required in (
+    "'X64' { 'amd64' }",
+    "'Arm64' { 'arm64' }",
+    "default { throw \"Unsupported native macOS architecture",
+    "$hostArch -ne $GOARCH",
+):
+    assert required in powershell_release, f"PowerShell Darwin architecture guard is missing: {required}"
 public_key = base64.b64encode(bytes(32)).decode("ascii")
 expected_tags = "keyring_no1password,keyring_noprotonpass,keyring_nofile,keyring_nopass"
 
@@ -83,5 +91,5 @@ with tempfile.TemporaryDirectory(prefix="anza-release-build-routing-") as tempor
                 assert "-tags" in args and args[args.index("-tags") + 1] == expected_tags
             assert (root / f"{goos}-{goarch}" / (f"anza-{goos}-{goarch}" + (".exe" if goos == "windows" else ""))).is_file()
 
-print("release build routing passed: native Darwin cgo/host guard, Linux/Windows cgo-off tags, and version injection")
+print("release build routing passed: six POSIX targets, Darwin cgo/host guard, PowerShell X64/Arm64 normalization and unsupported-arch rejection, and version injection")
 PY

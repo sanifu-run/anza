@@ -15,7 +15,12 @@ try { $keyBytes = [Convert]::FromBase64String($releasePublicKey) } catch { throw
 if ($keyBytes.Length -ne 32 -or [Convert]::ToBase64String($keyBytes) -cne $releasePublicKey) { throw 'ANZA_RELEASE_PUBLIC_KEY_BASE64 must be canonical base64 for a 32-byte Ed25519 public key.' }
 if ($GOOS -eq 'darwin') {
     $isMacOS = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
-    $hostArch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
+    $hostArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    $hostArch = switch ($hostArchitecture) {
+        'X64' { 'amd64' }
+        'Arm64' { 'arm64' }
+        default { throw "Unsupported native macOS architecture '$hostArchitecture' for Darwin release builds." }
+    }
     if (-not $isMacOS -or $hostArch -ne $GOARCH) { throw 'Darwin release builds require a matching native macOS architecture.' }
     if (-not (Get-Command clang -ErrorAction SilentlyContinue)) { throw 'Darwin release builds require clang for cgo.' }
 }
