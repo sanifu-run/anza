@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-14, windows-2022]
+        os: [ubuntu-24.04, macos-15, windows-2022]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -45,7 +45,9 @@ jobs:
       - name: POSIX bootstrap fixtures
         if: runner.os != 'Windows'
         shell: bash
-        run: sh scripts/tests/bootstrap-posix.sh
+        run: |
+          sh scripts/tests/bootstrap-posix.sh
+          sh scripts/tests/release-build-routing.sh
       - name: Windows bootstrap fixtures
         if: runner.os == 'Windows'
         shell: pwsh
@@ -54,18 +56,18 @@ jobs:
   build:
     needs: qualify-native
     name: build (${{ matrix.goos }}/${{ matrix.goarch }})
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { goos: darwin, goarch: amd64 }
-          - { goos: darwin, goarch: arm64 }
-          - { goos: linux, goarch: amd64 }
-          - { goos: linux, goarch: arm64 }
-          - { goos: windows, goarch: amd64 }
-          - { goos: windows, goarch: arm64 }
+          - { goos: darwin, goarch: amd64, runner: macos-15-intel }
+          - { goos: darwin, goarch: arm64, runner: macos-15 }
+          - { goos: linux, goarch: amd64, runner: ubuntu-24.04 }
+          - { goos: linux, goarch: arm64, runner: ubuntu-24.04 }
+          - { goos: windows, goarch: amd64, runner: ubuntu-24.04 }
+          - { goos: windows, goarch: arm64, runner: ubuntu-24.04 }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -101,6 +103,8 @@ jobs:
           pattern: binary-*
           path: artifacts
           merge-multiple: true
+      - name: Populate pinned dependency license sources
+        run: go mod download
       - name: Prepare manifests, bootstraps, SBOM, checksums and signature
         env:
           RELEASE_VERSION: ${{ inputs.version }}

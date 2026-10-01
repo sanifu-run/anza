@@ -674,6 +674,8 @@
         "setup_handlers.go",
         "setup_handlers_test.go",
         "setup_interview.go",
+        "setup_quota.go",
+        "setup_quota_dynamo.go",
         "setup_quota_test.go",
         "docs/anza-setup-api.md",
         "docs/evidence/T3.6.md"
@@ -1241,7 +1243,7 @@
       "kind": "agent",
       "estimate_minutes": 90,
       "target_model": "GPT-6-Luna",
-      "certification": "Certified: GPT-6-Luna 2026-09-28 d396f3f02e3aa8756e35e240440fb5315d5fff4f; catalog digest aa6a9c6b…a948c; rights remain a release gate",
+      "certification": "Certified: GPT-6-Luna 2026-09-28 d396f3f02e3aa8756e35e240440fb5315d5fff4f; catalog digest aa6a9c6b\u2026a948c; rights remain a release gate",
       "wave": 7,
       "repository": "anza"
     },
@@ -1793,6 +1795,9 @@
         ".github/workflows/ci.yml",
         ".github/workflows/release.yml",
         "scripts/release.sh",
+        "scripts/license-bundle.py",
+        "scripts/tests/release-build-routing.sh",
+        "docs/evidence/T9.4-license.md",
         "scripts/release.ps1",
         "docs/release.md",
         "cmd/anza/main.go",
@@ -1936,7 +1941,12 @@
       ],
       "owned_paths": [
         "internal/acceptance/security_test.go",
-        "docs/evidence/security-review.md"
+        "docs/evidence/security-review.md",
+        "internal/executor/apply.go",
+        "internal/executor/recover.go",
+        "internal/process/cancel_unix.go",
+        "internal/process/cancel_windows.go",
+        "internal/process/run.go"
       ],
       "use_cases": [
         "UC-005",
@@ -2018,7 +2028,9 @@
         "docs/troubleshooting.md",
         "docs/privacy-draft.md",
         "docs/third-party-notices.md",
-        "docs/license-decision.md"
+        "docs/license-decision.md",
+        "LICENSE",
+        "NOTICE"
       ],
       "use_cases": [
         "UC-001",

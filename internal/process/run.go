@@ -141,7 +141,7 @@ func Run(ctx context.Context, spec Spec) (Result, error) {
 
 	runCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	cmd := exec.CommandContext(runCtx, spec.Program, spec.Args...)
+	cmd := exec.Command(spec.Program, spec.Args...)
 	cmd.Dir = spec.Dir
 	cmd.Env = childEnv
 	cmd.WaitDelay = time.Second
@@ -151,17 +151,43 @@ func Run(ctx context.Context, spec Spec) (Result, error) {
 	stderr := newCapture(outputLimit, secrets)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
-	runErr := cmd.Run()
+	if err := cmd.Start(); err != nil {
+		stdout.finish()
+		stderr.finish()
+		result.Stdout, result.StdoutTruncated, result.StdoutRedacted = stdout.result()
+		result.Stderr, result.StderrTruncated, result.StderrRedacted = stderr.result()
+		return result, ErrStart
+	}
+
+	waitDone := make(chan error, 1)
+	go func() { waitDone <- cmd.Wait() }()
+	var runErr error
+	var cancelErr error
+	select {
+	case runErr = <-waitDone:
+	case <-runCtx.Done():
+		select {
+		case runErr = <-waitDone:
+		default:
+			cancelErr = cancelCommand(cmd)
+			if cancelErr != nil && !errors.Is(cancelErr, os.ErrProcessDone) {
+				if killErr := cmd.Process.Kill(); killErr != nil && !errors.Is(killErr, os.ErrProcessDone) {
+					cancelErr = errors.Join(cancelErr, killErr)
+				}
+			}
+			runErr = <-waitDone
+		}
+	}
 	stdout.finish()
 	stderr.finish()
 	result.Stdout, result.StdoutTruncated, result.StdoutRedacted = stdout.result()
 	result.Stderr, result.StderrTruncated, result.StderrRedacted = stderr.result()
 
 	if ctx.Err() != nil {
-		return result, ctx.Err()
+		return result, errors.Join(ctx.Err(), cancellationError(cancelErr))
 	}
 	if errors.Is(runCtx.Err(), context.DeadlineExceeded) {
-		return result, ErrTimeout
+		return result, errors.Join(ErrTimeout, cancellationError(cancelErr))
 	}
 	if runErr == nil {
 		result.ExitCode = 0
@@ -173,6 +199,13 @@ func Run(ctx context.Context, spec Spec) (Result, error) {
 		return result, &ExitError{Code: result.ExitCode}
 	}
 	return result, ErrStart
+}
+
+func cancellationError(err error) error {
+	if err == nil || errors.Is(err, os.ErrProcessDone) {
+		return nil
+	}
+	return fmt.Errorf("cancel owned process tree: %w", err)
 }
 
 func validateSpec(spec Spec) error {

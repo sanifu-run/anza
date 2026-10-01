@@ -22,7 +22,9 @@ import (
 	"github.com/sanifu-run/anza/internal/domain"
 )
 
-const DefaultBaseURL = "https://sanifu.run"
+// DefaultBaseURL is the existing shared Chat API, not its static website.
+// Keep it fixed so private recovery tokens cannot be redirected to other hosts.
+const DefaultBaseURL = "https://vg78ulztb1.execute-api.us-west-2.amazonaws.com"
 const protocolVersion = 1
 const maxResponseBytes = 64 << 10
 

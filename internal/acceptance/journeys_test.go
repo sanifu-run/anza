@@ -2,8 +2,11 @@ package acceptance
 
 import (
 	"bytes"
+	"context"
+	"crypto/sha256"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,8 +14,13 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/sanifu-run/anza/internal/catalog"
+	"github.com/sanifu-run/anza/internal/domain"
+	"github.com/sanifu-run/anza/internal/interviewclient"
 )
 
 type harness struct {
@@ -312,6 +320,226 @@ func TestSharedChatContract(t *testing.T) {
 	failIfLegacyProseBecomesPlan(t, h.binary, cliRoot, proxy.addr, proxy.caFile)
 }
 
+type socketlessStateStore struct {
+	mu     sync.Mutex
+	values map[string][]byte
+}
+
+func (s *socketlessStateStore) Save(key string, value any) error {
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.values == nil {
+		s.values = map[string][]byte{}
+	}
+	s.values[key] = encoded
+	return nil
+}
+
+func (s *socketlessStateStore) Load(key string, dst any) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	encoded, ok := s.values[key]
+	if !ok {
+		return os.ErrNotExist
+	}
+	return json.Unmarshal(encoded, dst)
+}
+
+func TestSharedChatProtocolContract(t *testing.T) {
+	source := requireChatSource(t)
+	fixture := startSocketlessChatFixture(t, source)
+	cat, err := catalog.LoadBundled()
+	if err != nil {
+		t.Fatalf("load pinned Anza catalog: %v", err)
+	}
+	catSnapshot := &interviewclient.CatalogSnapshot{Version: cat.Version(), Digest: cat.Digest(), RecipeIDs: map[string]bool{}, PackIDs: map[string]bool{}, ExerciseIDs: map[string]bool{"mobile-desktop-exercise": true}}
+	store := &socketlessStateStore{}
+	httpClient := &http.Client{Transport: fixture, Timeout: 10 * time.Second}
+	client, err := interviewclient.NewClient(httpClient, store, catSnapshot)
+	if err != nil {
+		t.Fatalf("construct Anza interview client: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+	defer cancel()
+	capabilities, err := client.Capabilities(ctx)
+	if os.Getenv("ANZA_SOCKETLESS_NEGATIVE_CONTROL") == "capabilities-route" {
+		if !errors.Is(err, interviewclient.ErrFeatureDisabled) || capabilities.Enabled {
+			t.Fatalf("broken archived capabilities route was accepted: %+v", capabilities)
+		}
+		t.Logf("negative control passed: the real Anza client rejected a deliberately broken capabilities route (%v)", err)
+		return
+	}
+	if err != nil {
+		t.Fatalf("read real Chat setup capabilities: %v", err)
+	}
+	if !capabilities.Enabled || capabilities.ProtocolVersion != 1 || capabilities.CatalogVersion != catSnapshot.Version || capabilities.CatalogDigest != catSnapshot.Digest {
+		t.Fatalf("real Chat capabilities do not match the pinned Anza catalog: %+v", capabilities)
+	}
+	mismatchedCatalog := *catSnapshot
+	mismatchedCatalog.Version += "-stale"
+	mismatchClient, err := interviewclient.NewClient(httpClient, &socketlessStateStore{}, &mismatchedCatalog)
+	if err != nil {
+		t.Fatalf("construct Anza client with stale catalog pin: %v", err)
+	}
+	if _, err := mismatchClient.Capabilities(ctx); !errors.Is(err, interviewclient.ErrUnsupportedCatalog) {
+		t.Fatalf("real Chat catalog mismatch was not rejected: %v", err)
+	}
+
+	brief := &domain.ProjectBrief{SchemaVersion: 1, ProjectSummary: "A private inventory tracker", DesiredSlice: "Add and list one stock item", Experience: "beginner", Constraints: []string{}, KnownStack: []string{}, ProjectKind: "general", ExistingProject: false}
+	session, err := client.NewSession(ctx, "socketless-contract", interviewclient.SetupStart{ConsentVersion: "acceptance-consent-1", Brief: brief})
+	if err != nil {
+		t.Fatalf("start real setup conversation: %v", err)
+	}
+	started, err := session.Resume(ctx)
+	if err != nil || started.Purpose != "setup" || started.Setup == nil || started.Version == 0 {
+		t.Fatalf("setup session did not resume with the shared purpose token: version=%d purpose=%q setup=%+v err=%v", started.Version, started.Purpose, started.Setup, err)
+	}
+	answer, err := session.Ask(ctx, "I want a private list of garden inventory items.")
+	if err != nil || answer.Mode != "llm" || !strings.Contains(answer.Answer, "Tell me what you want to build first.") {
+		t.Fatalf("real Chat /api/ask route did not return the synthetic provider response: answer=%+v err=%v", answer, err)
+	}
+
+	var askRequest socketlessRequest
+	var askResponse socketlessResponse
+	for i := range fixture.requests {
+		if fixture.requests[i].Method == http.MethodPost && fixture.requests[i].Path == "/api/ask" {
+			askRequest, askResponse = fixture.requests[i], fixture.responses[i]
+			break
+		}
+	}
+	if askRequest.Method == "" || len(askRequest.Body) == 0 || len(askRequest.Header.Get("X-Conversation-Token")) != 64 {
+		t.Fatal("Anza did not send /api/ask with a stable private conversation token and body")
+	}
+	var askIdentity struct {
+		RequestID string `json:"requestId"`
+	}
+	if err := json.Unmarshal(askRequest.Body, &askIdentity); err != nil || askIdentity.RequestID == "" {
+		t.Fatalf("Anza ask request omitted its replay identity: id=%q err=%v", askIdentity.RequestID, err)
+	}
+	bodyDigest := sha256.Sum256(askRequest.Body)
+	tokenDigest := sha256.Sum256([]byte(askRequest.Header.Get("X-Conversation-Token")))
+	requestIDDigest := sha256.Sum256([]byte(askIdentity.RequestID))
+	afterAsk, err := session.Resume(ctx)
+	if err != nil {
+		t.Fatalf("read setup version after Anza completed /api/ask: %v", err)
+	}
+	for _, request := range fixture.requests {
+		if request.Header.Get("X-Conversation-Token") != "" && request.Header.Get("X-Conversation-Token") != askRequest.Header.Get("X-Conversation-Token") {
+			t.Fatal("setup token changed between capabilities, session, ask, and recovery requests")
+		}
+	}
+	replayReq, err := http.NewRequestWithContext(ctx, http.MethodPost, interviewclient.DefaultBaseURL+askRequest.Path, bytes.NewReader(askRequest.Body))
+	if err != nil {
+		t.Fatalf("create exact replay request: %v", err)
+	}
+	replayReq.Header = askRequest.Header.Clone()
+	replay, err := httpClient.Do(replayReq)
+	if err != nil {
+		t.Fatalf("replay exact /api/ask request through real router: %v", err)
+	}
+	replayBody, readErr := io.ReadAll(replay.Body)
+	_ = replay.Body.Close()
+	if readErr != nil || replay.StatusCode != askResponse.Status || !bytes.Equal(replayBody, askResponse.Body) {
+		var replayError struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		_ = json.Unmarshal(replayBody, &replayError)
+		t.Errorf("identical /api/ask replay did not return the cached response: status=%d code=%q message=%q request_id_sha256=%x body_sha256=%x token_sha256=%x err=%v", replay.StatusCode, replayError.Code, replayError.Message, requestIDDigest, bodyDigest, tokenDigest, readErr)
+	}
+	resumed, err := session.Resume(ctx)
+	if err != nil || resumed.Version != afterAsk.Version {
+		t.Errorf("replay changed the server conversation version: before=%d after=%d err=%v", afterAsk.Version, resumed.Version, err)
+	}
+
+	updated, err := session.UpdateContext(ctx, nil, nil, &domain.MachineFacts{OS: "darwin", Arch: "arm64", OSVersion: "synthetic", ShellKind: "zsh", Capabilities: map[string]domain.Capability{}})
+	if err != nil || updated.Version <= resumed.Version {
+		t.Fatalf("real setup context route failed: version=%d err=%v", updated.Version, err)
+	}
+	recommendation, err := session.Recommend(ctx)
+	if err != nil || recommendation.Recommendation.Summary != "A synthetic review is ready." || recommendation.CatalogDigest != catSnapshot.Digest {
+		t.Fatalf("real setup recommendation route failed typed catalog validation: response=%+v err=%v", recommendation, err)
+	}
+	if !strings.Contains(string(askResponse.Body), `"mode":"llm"`) {
+		t.Fatalf("shared /api/ask envelope changed: %s", askResponse.Body)
+	}
+
+	for _, route := range []string{"/api/brief", "/api/booking", "/api/conversation/title"} {
+		response, err := rawSocketlessRequest(ctx, httpClient, http.MethodPost, interviewclient.DefaultBaseURL+route, askRequest.Header.Get("X-Conversation-Token"), []byte(`{}`))
+		if err != nil {
+			t.Fatalf("check setup-purpose guard for %s: %v", route, err)
+		}
+		if response.Status != http.StatusConflict || !strings.Contains(string(response.Body), "setup conversations cannot use this route") {
+			t.Fatalf("setup-purpose guard for %s changed: status=%d body=%s", route, response.Status, response.Body)
+		}
+	}
+
+	legacyToken := strings.Repeat("d", 64)
+	legacyAsk, err := rawSocketlessRequest(ctx, httpClient, http.MethodPost, interviewclient.DefaultBaseURL+"/api/ask", legacyToken, []byte(`{"requestId":"legacy-socketless-001","message":"Keep the existing website intake available."}`))
+	if err != nil || legacyAsk.Status != http.StatusOK || !bytes.Contains(legacyAsk.Body, []byte(`"mode":"llm"`)) {
+		t.Fatalf("existing website /api/ask route failed under the real shared router: status=%d body=%s err=%v", legacyAsk.Status, legacyAsk.Body, err)
+	}
+	for _, route := range []string{"/api/brief", "/api/booking", "/api/conversation/title"} {
+		response, err := rawSocketlessRequest(ctx, httpClient, http.MethodPost, interviewclient.DefaultBaseURL+route, legacyToken, []byte(`{}`))
+		if err != nil {
+			t.Fatalf("check legacy route %s: %v", route, err)
+		}
+		if response.Status == http.StatusConflict || strings.Contains(string(response.Body), "setup conversations cannot use this route") {
+			t.Fatalf("existing website route %s was incorrectly treated as setup-only: status=%d body=%s", route, response.Status, response.Body)
+		}
+	}
+
+	if err := session.Delete(ctx); err != nil {
+		t.Fatalf("delete setup conversation through shared route: %v", err)
+	}
+	if _, err := session.Resume(ctx); !errors.Is(err, interviewclient.ErrExpiredOrMissing) {
+		t.Errorf("Anza accepted its deleted local setup session: %v", err)
+	}
+	deleted, err := rawSocketlessRequest(ctx, httpClient, http.MethodGet, interviewclient.DefaultBaseURL+"/api/conversation", askRequest.Header.Get("X-Conversation-Token"), nil)
+	if err != nil {
+		t.Fatalf("check deleted setup transcript: %v", err)
+	}
+	var deletedConversation struct {
+		Version uint64          `json:"version"`
+		Purpose string          `json:"purpose"`
+		Setup   json.RawMessage `json:"setup"`
+	}
+	if deleted.Status != http.StatusNotFound && (deleted.Status != http.StatusOK || json.Unmarshal(deleted.Body, &deletedConversation) != nil || deletedConversation.Version != 0 || deletedConversation.Purpose != "" || len(deletedConversation.Setup) != 0) {
+		t.Errorf("deleted setup transcript remained recoverable: status=%d body=%s", deleted.Status, deleted.Body)
+	}
+}
+
+func rawSocketlessRequest(ctx context.Context, client *http.Client, method, target, token string, body []byte) (*socketlessResponse, error) {
+	var input io.Reader
+	if body != nil {
+		input = bytes.NewReader(body)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, target, input)
+	if err != nil {
+		return nil, err
+	}
+	if token != "" {
+		req.Header.Set("X-Conversation-Token", token)
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	response, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &socketlessResponse{Status: response.StatusCode, Header: response.Header.Clone(), Body: data}, nil
+}
+
 func fillNewSetup(t *testing.T, cli *cliProcess, name, experience, project, slice, briefPath string, uploadBrief bool) {
 	t.Helper()
 	cli.answer(t, "Private session name (1-48 letters, numbers, dash or underscore): ", name)
@@ -337,7 +565,7 @@ func fixtureRequest(t *testing.T, h *harness, method, path, token string, payloa
 		}
 		body = bytes.NewReader(encoded)
 	}
-	req, err := http.NewRequest(method, "https://sanifu.run"+path, body)
+	req, err := http.NewRequest(method, interviewclient.DefaultBaseURL+path, body)
 	if err != nil {
 		t.Fatalf("create synthetic Chat request: %v", err)
 	}

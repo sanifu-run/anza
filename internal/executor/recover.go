@@ -53,10 +53,10 @@ func Recover(ctx context.Context, plan domain.Plan, approval domain.Approval, op
 	if err := validateOperations(plan, options.Payloads); err != nil {
 		return receipt, err
 	}
-	return reconcileReceipt(ctx, plan, receipt, options)
+	return reconcileReceipt(ctx, plan, receipt, approval, options)
 }
 
-func reconcileReceipt(ctx context.Context, plan domain.Plan, receipt domain.Receipt, options Options) (domain.Receipt, error) {
+func reconcileReceipt(ctx context.Context, plan domain.Plan, receipt domain.Receipt, approval domain.Approval, options Options) (domain.Receipt, error) {
 	name := receiptName(plan.Digest)
 	changed := false
 	for _, op := range plan.Operations {
@@ -99,17 +99,17 @@ func reconcileReceipt(ctx context.Context, plan domain.Plan, receipt domain.Rece
 			return receipt, ErrRecoveryManual
 		}
 	}
-	return runPending(ctx, plan, receipt, options)
+	return runPending(ctx, plan, receipt, approval, options)
 }
 
-func resume(ctx context.Context, plan domain.Plan, receipt domain.Receipt, options Options) (domain.Receipt, error) {
+func resume(ctx context.Context, plan domain.Plan, receipt domain.Receipt, approval domain.Approval, options Options) (domain.Receipt, error) {
 	if options.Now == nil {
 		options.Now = time.Now
 	}
-	return reconcileReceipt(ctx, plan, receipt, options)
+	return reconcileReceipt(ctx, plan, receipt, approval, options)
 }
 
-func runPending(ctx context.Context, plan domain.Plan, receipt domain.Receipt, options Options) (domain.Receipt, error) {
+func runPending(ctx context.Context, plan domain.Plan, receipt domain.Receipt, approval domain.Approval, options Options) (domain.Receipt, error) {
 	name := receiptName(plan.Digest)
 	for _, op := range plan.Operations {
 		idx := operationIndex(receipt, op.ID)
@@ -147,6 +147,15 @@ func runPending(ctx context.Context, plan domain.Plan, receipt domain.Receipt, o
 		}
 		setOperation(&receipt, op.ID, "running", options.Now().UTC().Format(time.RFC3339Nano))
 		if err := saveReceipt(options.Store, name, receipt); err != nil {
+			return receipt, err
+		}
+		if err := validateApproval(plan, approval, options.Now); err != nil {
+			setOperation(&receipt, op.ID, "planned", "")
+			receipt.Operations[idx].StartedAt = ""
+			receipt.Operations[idx].FinishedAt = ""
+			if saveErr := saveReceipt(options.Store, name, receipt); saveErr != nil {
+				return receipt, errors.Join(err, saveErr)
+			}
 			return receipt, err
 		}
 		if err := applyEffect(ctx, options.Effects, op, op.PreimageHash, options.Payloads[op.ID]); err != nil {
