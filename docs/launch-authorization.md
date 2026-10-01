@@ -116,3 +116,21 @@ confirms the recorded Lambda target and Experiential route above. This is source
 evidence, not a fresh cloud-state check. The client’s website-origin bug is being
 corrected to reuse that existing API origin; no new host is introduced. Both
 read-only health fetches failed at local DNS resolution, before an HTTP request.
+
+## T11.2 cost reservation evidence — 2026-10-01
+
+Public model hard limits and published standard prices are now recorded in
+[`docs/evidence/T11.2-cost-reservations.md`](evidence/T11.2-cost-reservations.md).
+The conservative public-limit envelope is 210,000 microUSD input plus 96,000
+microUSD output and 96,000 microUSD reasoning per provider request, with
+reasoning double-reserved as a safety allowance. This would permit only two
+such full-envelope requests within the approved 1,000,000 microUSD daily cap.
+It does not fit the approved 10-session × 12-call maximum.
+
+These are evidence-based candidate reservation values, not deployment-ready
+settings: the deployed gateway route, account price tier, and enforcement of
+Chat's `max_tokens=2048` request field have not been verified. The conditional
+application-cap calculation and its limitations are in the evidence record.
+No reservation values are applied to configuration, and setup remains disabled.
+Do not enable or deploy until an owner-reviewed reservation policy fits all
+approved call/session limits and the gateway/runtime enforce the claimed bounds.
