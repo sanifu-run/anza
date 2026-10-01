@@ -231,6 +231,30 @@ func (w *Wizard) completeDraft(ctx context.Context, draft *wizardDraft) error {
 			Constraints: []string{}, KnownStack: []string{},
 		}
 	}
+	if draft.Brief != nil {
+		if err := normalizeDraftBrief(draft.Brief); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func normalizeDraftBrief(brief *domain.ProjectBrief) error {
+	if brief.Constraints == nil {
+		brief.Constraints = []string{}
+	}
+	if brief.KnownStack == nil {
+		brief.KnownStack = []string{}
+	}
+	encoded, err := json.Marshal(brief)
+	if err != nil {
+		return fmt.Errorf("validate reviewed project details: %w", err)
+	}
+	validated, err := domain.DecodeProjectBrief(encoded)
+	if err != nil {
+		return fmt.Errorf("reviewed project details are not valid input: %w", err)
+	}
+	*brief = validated
 	return nil
 }
 
@@ -262,11 +286,8 @@ func (w *Wizard) selectBrief(ctx context.Context, draft *wizardDraft) error {
 				return err
 			}
 			if context.Brief != nil {
-				if context.Brief.Constraints == nil {
-					context.Brief.Constraints = []string{}
-				}
-				if context.Brief.KnownStack == nil {
-					context.Brief.KnownStack = []string{}
+				if err := normalizeDraftBrief(context.Brief); err != nil {
+					return err
 				}
 				draft.Brief = context.Brief
 			}

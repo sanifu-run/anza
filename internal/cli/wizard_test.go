@@ -135,6 +135,39 @@ func TestWizardImportedBriefNormalizesOptionalArrays(t *testing.T) {
 	}
 }
 
+func TestWizardResumedLegacyDraftNormalizesOptionalArrays(t *testing.T) {
+	store := &memoryState{values: map[string]any{
+		"wizard-legacy": wizardDraft{
+			SchemaVersion: 1, Name: "legacy", Experience: "developer",
+			ProjectSummary: "Legacy project", DesiredSlice: "List records", ProjectCaptured: true, BriefSelected: true,
+			Brief: &domain.ProjectBrief{
+				SchemaVersion: 1, ProjectSummary: "Legacy project", DesiredSlice: "List records",
+				Experience: "developer", ProjectKind: "web", ExistingProject: false,
+			},
+		},
+	}}
+	chat := &scriptedChat{session: &scriptedSession{}}
+	input := strings.Join([]string{"legacy", "new", "yes", "yes", ":recommend"}, "\n") + "\n"
+	var output strings.Builder
+	w, err := NewWizardWithChat(strings.NewReader(input), &output, chat, store, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := w.Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if chat.start.Brief == nil || chat.start.Brief.Constraints == nil || chat.start.Brief.KnownStack == nil {
+		t.Fatalf("resumed legacy draft omitted required empty arrays: %#v", chat.start.Brief)
+	}
+	encoded, err := json.Marshal(chat.start.Brief)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := domain.DecodeProjectBrief(encoded); err != nil {
+		t.Fatalf("resumed legacy brief did not satisfy strict v1 schema: %v", err)
+	}
+}
+
 func TestWizardEOFResume(t *testing.T) {
 	store := &memoryState{}
 	session := &scriptedSession{}
