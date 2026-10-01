@@ -308,8 +308,14 @@ func TestProductionOriginPinned(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if client.base.String() != DefaultBaseURL {
-		t.Fatalf("production origin = %q, want %q", client.base, DefaultBaseURL)
+	// The website is a static frontend; the shared Chat deployment record pins
+	// this existing API origin. Never send recovery tokens to the website.
+	const deployedChatOrigin = "https://vg78ulztb1.execute-api.us-west-2.amazonaws.com"
+	if client.base.String() != deployedChatOrigin {
+		t.Fatalf("production origin = %q, want deployed Chat %q", client.base, deployedChatOrigin)
+	}
+	if _, err := newClient("https://sanifu.run", nil, store, catalog, false); err == nil {
+		t.Fatal("website origin accepted as the production Chat API")
 	}
 	if _, err := newTestClient("https://example.invalid", nil, store, catalog); err == nil {
 		t.Fatal("non-loopback fixture origin accepted")

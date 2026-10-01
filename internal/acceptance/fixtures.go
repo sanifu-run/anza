@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 	"net"
@@ -28,6 +29,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/sanifu-run/anza/internal/interviewclient"
 )
 
 const (
@@ -182,7 +185,255 @@ func chatFixtureOverlay(t *testing.T, source, destination string) string {
 	if err := os.WriteFile(fixturePath, updated, 0600); err != nil {
 		t.Fatalf("write temporary Chat provider fixture: %v", err)
 	}
+	if os.Getenv("ANZA_SOCKETLESS_NEGATIVE_CONTROL") == "capabilities-route" {
+		mainPath := filepath.Join(destination, "main.go")
+		mainSource, err := os.ReadFile(mainPath)
+		if err != nil {
+			t.Fatalf("read disposable Chat router for negative control: %v", err)
+		}
+		const route = `mux.HandleFunc("/api/setup/capabilities", s.setupCapabilities)`
+		const broken = `mux.HandleFunc("/api/setup/capabilities-disabled", s.setupCapabilities)`
+		if !bytes.Contains(mainSource, []byte(route)) {
+			t.Fatalf("negative control could not find capabilities route in archived Chat source")
+		}
+		mainSource = bytes.Replace(mainSource, []byte(route), []byte(broken), 1)
+		if err := os.WriteFile(mainPath, mainSource, 0600); err != nil {
+			t.Fatalf("apply disposable Chat route negative control: %v", err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(destination, "setup_socketless_fixture_test.go"), []byte(socketlessChatTestSource), 0600); err != nil {
+		t.Fatalf("add disposable socketless Chat fixture test: %v", err)
+	}
 	return destination
+}
+
+const socketlessChatTestSource = `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+)
+
+type anzaFixtureRequest struct {
+	ID string        ` + "`json:\"id\"`" + `
+	Method string      ` + "`json:\"method\"`" + `
+	Path string        ` + "`json:\"path\"`" + `
+	Header http.Header ` + "`json:\"header\"`" + `
+	Body []byte        ` + "`json:\"body\"`" + `
+}
+
+type anzaFixtureResponse struct {
+	ID string        ` + "`json:\"id\"`" + `
+	Status int         ` + "`json:\"status\"`" + `
+	Header http.Header ` + "`json:\"header\"`" + `
+	Body []byte        ` + "`json:\"body\"`" + `
+}
+
+type anzaSyntheticProvider struct{ catalogVersion string }
+
+func (p anzaSyntheticProvider) RoundTrip(r *http.Request) (*http.Response, error) {
+	var request struct {
+		Messages []struct { Content string ` + "`json:\"content\"`" + ` } ` + "`json:\"messages\"`" + `
+	}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	content := "Tell me what you want to build first."
+	for _, message := range request.Messages {
+		if strings.Contains(message.Content, "Return only JSON") || strings.Contains(message.Content, "typed setup recommendation") {
+			content = fmt.Sprintf(` + "`" + `{"schema_version":1,"catalog_version":%q,"summary":"A synthetic review is ready.","selected_recipe_ids":[],"selected_pack_ids":[],"selected_exercise_id":"mobile-desktop-exercise","reasons":{},"unresolved_questions":[],"manual_steps":[],"readiness_constraints":[]}` + "`" + `, p.catalogVersion)
+			break
+		}
+	}
+	data, _ := json.Marshal(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": content}}}})
+	return &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": []string{"application/json"}}, Body: io.NopCloser(bytes.NewReader(data)), ContentLength: int64(len(data)), Request: r}, nil
+}
+
+// This test-only child process applies the reviewed router directly through
+// httptest.ResponseRecorder. It binds no listener; model traffic is synthetic.
+func TestAnzaSocketlessProtocolFixture(t *testing.T) {
+	svc, _, catalog := setupHandlerFixture(t)
+	s := svc.server
+	s.key, s.model, s.endpoint = "fixture-only", "fixture", "https://synthetic.invalid/chat/completions"
+	s.client = &http.Client{Transport: anzaSyntheticProvider{catalogVersion: catalog.CatalogVersion}}
+	s.active = make(chan struct{}, 4)
+	s.requests = map[string][]time.Time{}
+	s.setup = svc
+	s.setupCleanup = svc.quota.DeleteConversation
+	s.setupTombstoneLookup = svc.quota.store.ConversationDeleted
+	routes := s.routes()
+	root := os.Getenv("ANZA_SOCKETLESS_FIXTURE_DIR")
+	if root == "" { t.Fatal("ANZA_SOCKETLESS_FIXTURE_DIR is required") }
+	inputPath, outputPath, stopPath := filepath.Join(root, "request.json"), filepath.Join(root, "response.json"), filepath.Join(root, "stop")
+	ticker := time.NewTicker(10 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			if _, err := os.Stat(stopPath); err == nil { return }
+			encoded, err := os.ReadFile(inputPath)
+			if err != nil {
+				if os.IsNotExist(err) { continue }
+				t.Fatalf("read Anza protocol bridge request: %v", err)
+			}
+			if err := os.Remove(inputPath); err != nil { t.Fatalf("claim Anza protocol bridge request: %v", err) }
+			var input anzaFixtureRequest
+			if err := json.Unmarshal(encoded, &input); err != nil { t.Fatalf("decode Anza protocol bridge request: %v", err) }
+			req := httptest.NewRequest(input.Method, "https://fixture.invalid"+input.Path, bytes.NewReader(input.Body))
+			for name, values := range input.Header {
+				for _, value := range values { req.Header.Add(name, value) }
+			}
+			recorder := httptest.NewRecorder()
+			routes.ServeHTTP(recorder, req)
+			response := anzaFixtureResponse{ID: input.ID, Status: recorder.Code, Header: recorder.Header(), Body: recorder.Body.Bytes()}
+			encoded, err = json.Marshal(response)
+			if err != nil { t.Fatalf("encode Anza protocol bridge response: %v", err) }
+			temporary := outputPath + ".partial"
+			if err := os.WriteFile(temporary, encoded, 0600); err != nil { t.Fatalf("write Anza protocol bridge response: %v", err) }
+			if err := os.Rename(temporary, outputPath); err != nil { t.Fatalf("publish Anza protocol bridge response: %v", err) }
+		}
+	}
+}
+
+`
+
+type socketlessChatFixture struct {
+	command   *exec.Cmd
+	root      string
+	stderr    bytes.Buffer
+	mu        sync.Mutex
+	done      bool
+	sequence  int
+	requests  []socketlessRequest
+	responses []socketlessResponse
+}
+
+type socketlessRequest struct {
+	ID     string      `json:"id"`
+	Method string      `json:"method"`
+	Path   string      `json:"path"`
+	Header http.Header `json:"header"`
+	Body   []byte      `json:"body"`
+}
+
+type socketlessResponse struct {
+	ID     string      `json:"id"`
+	Status int         `json:"status"`
+	Header http.Header `json:"header"`
+	Body   []byte      `json:"body"`
+}
+
+func startSocketlessChatFixture(t *testing.T, source string) *socketlessChatFixture {
+	t.Helper()
+	root := t.TempDir()
+	fixtureSource := chatFixtureOverlay(t, source, filepath.Join(root, "chat-source"))
+	cmd := exec.Command("go", "test", "-run", "^TestAnzaSocketlessProtocolFixture$", "-count=1")
+	cmd.Dir = fixtureSource
+	cmd.Env = fixtureEnvironment(os.Environ(), map[string]string{"ANZA_CONTRACT_FIXTURE": "", "HTTP_PROXY": "", "HTTPS_PROXY": "", "ALL_PROXY": "", "http_proxy": "", "https_proxy": "", "all_proxy": ""})
+	if err := os.MkdirAll(root, 0700); err != nil {
+		t.Fatalf("create socketless Chat bridge directory: %v", err)
+	}
+	f := &socketlessChatFixture{command: cmd, root: root}
+	cmd.Env = append(cmd.Env, "ANZA_SOCKETLESS_FIXTURE_DIR="+root)
+	cmd.Stdout = io.Discard
+	cmd.Stderr = &f.stderr
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("start archived Chat protocol fixture: %v", err)
+	}
+	t.Cleanup(func() { f.close(t) })
+	return f
+}
+
+func (f *socketlessChatFixture) roundTrip(req *http.Request) (*http.Response, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.done {
+		return nil, errors.New("socketless Chat fixture is closed")
+	}
+	var body []byte
+	if req.Body != nil {
+		var err error
+		body, err = io.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
+	}
+	f.sequence++
+	id := fmt.Sprintf("request-%08d", f.sequence)
+	input := socketlessRequest{ID: id, Method: req.Method, Path: req.URL.RequestURI(), Header: req.Header.Clone(), Body: body}
+	f.requests = append(f.requests, input)
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+	inputPath := filepath.Join(f.root, "request.json")
+	if err := os.WriteFile(inputPath+".partial", encoded, 0600); err != nil {
+		return nil, fmt.Errorf("write request to real Chat router: %w", err)
+	}
+	if err := os.Rename(inputPath+".partial", inputPath); err != nil {
+		return nil, fmt.Errorf("publish request to real Chat router: %w", err)
+	}
+	deadline := time.Now().Add(10 * time.Second)
+	outputPath := filepath.Join(f.root, "response.json")
+	var responseData []byte
+	for time.Now().Before(deadline) {
+		responseData, err = os.ReadFile(outputPath)
+		if err == nil {
+			break
+		}
+		if !os.IsNotExist(err) {
+			return nil, fmt.Errorf("read response from real Chat router: %w", err)
+		}
+		select {
+		case <-req.Context().Done():
+			return nil, req.Context().Err()
+		case <-time.After(10 * time.Millisecond):
+		}
+	}
+	if responseData == nil {
+		return nil, fmt.Errorf("timed out waiting for real Chat router: %s", f.stderr.String())
+	}
+	if err := os.Remove(outputPath); err != nil {
+		return nil, fmt.Errorf("claim response from real Chat router: %w", err)
+	}
+	var output socketlessResponse
+	if err := json.Unmarshal(responseData, &output); err != nil {
+		return nil, fmt.Errorf("decode response from real Chat router: %w", err)
+	}
+	if output.ID != id {
+		return nil, fmt.Errorf("real Chat router response id %q did not match request %q", output.ID, id)
+	}
+	f.responses = append(f.responses, output)
+	return &http.Response{StatusCode: output.Status, Header: output.Header, Body: io.NopCloser(bytes.NewReader(output.Body)), ContentLength: int64(len(output.Body)), Request: req}, nil
+}
+
+func (f *socketlessChatFixture) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f.roundTrip(req)
+}
+
+func (f *socketlessChatFixture) close(t *testing.T) {
+	t.Helper()
+	f.mu.Lock()
+	if f.done {
+		f.mu.Unlock()
+		return
+	}
+	f.done = true
+	f.mu.Unlock()
+	_ = os.WriteFile(filepath.Join(f.root, "stop"), []byte("stop\n"), 0600)
+	if err := f.command.Wait(); err != nil {
+		t.Errorf("archived Chat protocol fixture failed: %v; stderr: %s", err, f.stderr.String())
+	}
 }
 
 func (f *chatFixture) close(t *testing.T) {
@@ -356,7 +607,7 @@ func (p *localProxy) handleConnect(conn net.Conn, cert tlsCertificate) {
 	_ = conn.SetDeadline(time.Now().Add(10 * time.Second))
 	reader := bufio.NewReader(conn)
 	req, err := http.ReadRequest(reader)
-	if err != nil || req.Method != http.MethodConnect || !strings.EqualFold(req.Host, "sanifu.run:443") {
+	if err != nil || req.Method != http.MethodConnect || !strings.EqualFold(req.Host, strings.TrimPrefix(interviewclient.DefaultBaseURL, "https://")+":443") {
 		_, _ = io.WriteString(conn, "HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n")
 		return
 	}
@@ -389,7 +640,7 @@ func proxyCertificate() ([]byte, tlsCertificate, error) {
 	if err != nil {
 		return nil, tlsCertificate{}, err
 	}
-	leafTemplate := &x509.Certificate{SerialNumber: big.NewInt(2), Subject: pkix.Name{CommonName: "sanifu.run"}, DNSNames: []string{"sanifu.run"}, NotBefore: time.Now().Add(-time.Hour), NotAfter: time.Now().Add(24 * time.Hour), KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}}
+	leafTemplate := &x509.Certificate{SerialNumber: big.NewInt(2), Subject: pkix.Name{CommonName: strings.TrimPrefix(interviewclient.DefaultBaseURL, "https://")}, DNSNames: []string{strings.TrimPrefix(interviewclient.DefaultBaseURL, "https://")}, NotBefore: time.Now().Add(-time.Hour), NotAfter: time.Now().Add(24 * time.Hour), KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}}
 	leafDER, err := x509.CreateCertificate(rand.Reader, leafTemplate, root, &leafKey.PublicKey, rootKey)
 	if err != nil {
 		return nil, tlsCertificate{}, err

@@ -69,7 +69,7 @@ func Apply(ctx context.Context, plan domain.Plan, approval domain.Approval, opti
 		if err := validateOperations(plan, options.Payloads); err != nil {
 			return receipt, err
 		}
-		return resume(ctx, plan, receipt, options)
+		return resume(ctx, plan, receipt, approval, options)
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return domain.Receipt{}, fmt.Errorf("load executor receipt: %w", err)
 	}
@@ -114,6 +114,20 @@ func Apply(ctx context.Context, plan domain.Plan, approval domain.Approval, opti
 		}
 		setOperation(&receipt, op.ID, "running", options.Now().UTC().Format(time.RFC3339Nano))
 		if err := saveReceipt(options.Store, rname, receipt); err != nil {
+			return receipt, err
+		}
+		// Approval is checked again under the effect lock after preflight. A
+		// plan can expire while slow reads or state writes are in progress.
+		if err := validateApproval(plan, approval, options.Now); err != nil {
+			setOperation(&receipt, op.ID, "planned", "")
+			idx := operationIndex(receipt, op.ID)
+			if idx >= 0 {
+				receipt.Operations[idx].StartedAt = ""
+				receipt.Operations[idx].FinishedAt = ""
+			}
+			if saveErr := saveReceipt(options.Store, rname, receipt); saveErr != nil {
+				return receipt, errors.Join(err, saveErr)
+			}
 			return receipt, err
 		}
 		if err := applyEffect(ctx, options.Effects, op, op.PreimageHash, options.Payloads[op.ID]); err != nil {

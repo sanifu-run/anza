@@ -1,9 +1,10 @@
 # Shared chat launch authorization
 
-Status: **draft for founder review; no live rollout authorization recorded**.
-This packet distinguishes local code approval from cloud, provider-spend,
-publication, and participant-data approval. Unknown values remain unset; this
-record does not infer them from prior budgets.
+Status: **owner-approved pilot limits recorded; deployment and enablement remain unauthorized pending a reviewed preview and verified cost reservations**.
+
+This packet distinguishes approved pilot settings from cloud deployment,
+provider qualification, publication, and participant-data approval. Unknown
+values remain unset; this record does not infer them from prior budgets.
 
 ## Verified candidate and local changes
 
@@ -42,13 +43,41 @@ record does not infer them from prior budgets.
 | Scope | Verified authorization | Remaining decision/evidence |
 |---|---|---|
 | Local implementation | The user authorized execution of the Anza plan, including the recommended no-cost durable admission design and signed-updater/schema-lock code. | None for these local source changes. This does not authorize deployment or recurring spend. |
-| Existing backend target | Reuse the existing Chat service is the plan/ADR direction. | Name the actual stack, account, region, deployed origin, operator, and confirm that the target is the service covered by existing grants. Source notes conflict on whether the candidate Lambda stack has ever been applied; no authenticated account state was inspected. |
-| Existing provider route | Candidate uses the existing Chat/OpenRouter route and existing secret reference. | Confirm the deployed model and current hard provider credit cap / total provider budget. Do not expose secret material. |
-| Additional cloud resources | Local source prepares one setup-coordination table, TTL, narrowly scoped permissions, and additive Lambda configuration. | No Pulumi preview or founder authorization to apply these additions was supplied. No deletion/replacement safety or incremental monthly cost has been observed. |
-| Setup admission and paid-call ceilings | No production setup value was selected. | Approve daily sessions and all five paid-call reservation values, plus a maximum incremental monthly spend. The recorded authorized incremental spend is currently **$0**; this is a stop boundary, not a proposed service budget. |
-| Live smoke | No live endpoint/provider call is authorized by the source-only task results. | Define exact synthetic-only routes, request count, maximum provider spend, and who may run them after a reviewed preview/deployment. |
+| Existing backend target | Reuse the existing Chat service is the plan/ADR direction. | Chat’s dated deployment record names project `sanifu-chat-lambda`, stack `prod`, region `us-west-2`, and origin `https://vg78ulztb1.execute-api.us-west-2.amazonaws.com`. The unused ECS scaffold is not the target. Reconfirm the active account/state before applying; this runtime has not inspected authenticated state. |
+| Existing provider route | The selected hosted Chat route is Experiential `gpt-6-luna`, using its existing secret reference. OpenRouter remains a participant-owned development-agent access path, not the selected hosted-interview provider. | The dated Chat deployment record records a founder-managed $100 Experiential budget and $50/month AWS authorization. Confirm current provider hard-cap enforcement and remaining budget without exposing secrets; setup must fit within these totals unless a separate increase is approved. |
+| Additional cloud resources | Local source prepares one setup-coordination table, TTL, narrowly scoped permissions, and additive Lambda configuration. | Existing Chat hosting has a recorded $50/month AWS authorization; that does not qualify or price these setup additions. No setup-specific Pulumi preview/apply evidence was supplied. No deletion/replacement safety or incremental monthly cost has been observed. |
+| Setup pilot limits | Owner approved a pilot of at most 10 sessions per day, 12 calls per conversation, and $1/day in hosted model spend, all within the existing $100 Experiential and $50/month AWS authorizations. | Candidate Pulumi settings are listed below. Input, output, and reasoning reservation values remain unset until verified pricing is recorded. These limits do not increase either existing budget. |
+| Preview and deployment | Prepare only a reviewed Pulumi preview before any deployment. | A preview has not been produced because this runtime cannot access the configured Pulumi credentials. Deployment and setup enablement remain unauthorized. Review exact resource changes and verified costs before requesting any later deployment authorization. |
+| Provider qualification | Owner approved up to 12 model requests and $1 total for T10.4 qualification, only with operator-owned disposable test accounts and independently verified hard-capped credentials; use read-only synthetic files. | Account ownership, hard caps, and runtime budget enforcement are not established in this environment. Qualification is **NOT RUN**; do not make requests until all conditions are verified. |
 | Retention, email, and participant data | Candidate inherits existing Chat settings and intends to exclude setup from owner email. | Verify actual retention and backup/PITR settings, physical-expiry limits, email exclusion, participant notice/deletion path, and data policy against the selected stack. |
-| Anza license and CLI publication | No approved public Anza license or CLI publication scope was found in the local decision record. | Select/record the license, release channel, package/artifact scope, signing-key custodian, and publication authorization. T9.4 provides code plumbing only; no production signing key or secret is configured. |
+
+| Anza license and CLI publication | Owner approved Apache License on 2026-09-30; Apache License 2.0 now covers original Anza code/documentation. Third-party licenses remain intact. No CLI publication scope was recorded. | Select/record the license, release channel, package/artifact scope, signing-key custodian, and publication authorization. T9.4 provides code plumbing only; no production signing key or secret is configured. |
+
+
+## Approved pilot settings — 2026-09-30
+
+The owner approved these candidate Pulumi values for the pilot, with setup
+remaining disabled:
+
+```text
+anzaSetupEnabled=false
+anzaSetupDailySessionCap=10
+anzaSetupPerConversationCallCap=12
+anzaSetupDailyCapMicroUsd=1000000
+```
+
+Input, output, and reasoning cost reservations remain unset pending verified
+current pricing. Do not invent or estimate them. The approved $1 daily hosted
+pilot ceiling is within the already authorized $100 Experiential budget and
+$50/month AWS budget; it does not authorize either budget to increase. Prepare
+only a reviewed preview before any deployment. This approval does not authorize
+`pulumi up`, setup enablement, or a live provider call.
+
+The separate T10.4 provider qualification approval is capped at 12 model
+requests and $1 total across qualification work, restricted to operator-owned
+disposable accounts with verified hard caps and read-only synthetic files. No
+provider request is authorized until those conditions and runtime budget
+enforcement are evidenced.
 
 ## Proposed rollout sequence
 
@@ -56,25 +85,34 @@ record does not infer them from prior budgets.
    Pulumi preview. Review every resource; require no deletion or replacement
    of existing transcript, Lambda, HTTP API, secret, and mail resources, no
    secret output, and only the expected additive table/policy/config changes.
-2. Record an explicit maximum incremental monthly cloud spend, setup session
-   cap, each paid-call reservation, total provider hard cap, smoke-call limit,
-   and the operator. Keep setup disabled until all are approved and match the
-   pinned catalog and immutable candidate image.
-3. Only after preview review and authorization, deploy the backend with setup
-   disabled. Run the approved synthetic legacy-route checks first; then enable
-   setup within the reviewed caps and verify admission, expiry, deletion, and
-   mail exclusion on the actual origin.
-4. Publish the signed Anza CLI last, after license, artifact channel,
-   production key custody, compatibility, and live-route checks are recorded.
-   For rollback, disable setup first and preserve the existing website intake.
+2. Resolve verified current input, output, and reasoning prices and set reviewed
+   positive reservation values that fit the approved $1/day cap. Keep setup
+   disabled and confirm the pinned catalog and immutable candidate image.
+3. Prepare and review the Pulumi preview, including resource replacement/deletion
+   safety and actual incremental cost. Stop before deployment; obtain any required
+   later deployment authorization after review.
+4. Qualify provider access only after disposable-account ownership, hard caps,
+   and runtime budget enforcement are evidenced. Any later deployment, enablement,
+   live calls, or publication needs its own recorded authorization and gates.
 
 ## Gate
 
-The implementation and offline config checks are ready for review, but T11.2
-is **not accepted**: there is no authenticated preview, verified deployment
-identity/origin, selected cap or positive spend ceiling, live-smoke scope,
-license decision, publication authorization, or production key custody in the
-available evidence, and the configured Pulumi credentials are inaccessible to
-this runtime. Do not run `pulumi up`, provision credentials, make paid provider
-calls, enable setup, or publish until the missing scope is recorded and an
-authorized preview can be run.
+The owner-approved pilot settings are recorded, but T11.2 is **not accepted**.
+No authenticated preview or current deployment identity/state is available;
+reservation values await verified pricing, and the configured Pulumi credentials
+are inaccessible to this runtime. Do not run `pulumi up`, enable setup, or make
+hosted pilot calls. T10.4 provider qualification is also **NOT RUN** because
+disposable account ownership, hard caps, and runtime budget enforcement could
+not be established. Do not make qualification requests until that evidence is
+recorded. A reviewed preview is the next authorized preparation step; it does
+not itself authorize deployment.
+
+## Source reconciliation — 2026-09-30
+
+The earlier packet incorrectly described the selected hosted route as OpenRouter
+and treated the deployment target as unknown. Read-only review of Chat’s
+`docs/aws-launch-2026-09-28.md`, `infra/lambda/Pulumi.prod.yaml`, and model routing
+confirms the recorded Lambda target and Experiential route above. This is source
+evidence, not a fresh cloud-state check. The client’s website-origin bug is being
+corrected to reuse that existing API origin; no new host is introduced. Both
+read-only health fetches failed at local DNS resolution, before an HTTP request.

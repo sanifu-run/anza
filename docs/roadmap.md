@@ -6,7 +6,7 @@ No Anza/setup extension implementation shipped; the existing chat foundation is 
 
 ## In progress
 
-Waves 1-4 are locally accepted: T1.1, T1.2, T1.3, T1.4, T1.5, T2.1, T2.2, T2.6 and T5.1. Wave 5 is next: T5.2, T5.4 and T5.5. Chat source-fixture parity remains a T3.6 integration check.
+Core implementation through Wave 15 is integrated locally. Waves 16–18 have source and evidence integrated, with qualification gates still open. Coordinator (2026-09-30) is correcting the shared API origin and reconciling launch evidence. GPT-6-Luna workers are extending T10.1 with a socket-free real-Chat protocol fixture and T10.3 with local adversarial coverage plus an approval-expiry race correction.
 
 ## Planned
 

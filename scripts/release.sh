@@ -25,11 +25,21 @@ if len(key)!=32 or base64.b64encode(key).decode()!=sys.argv[1]: raise SystemExit
 PYKEY
     case "$goos/$goarch" in darwin/amd64|darwin/arm64|linux/amd64|linux/arm64|windows/amd64|windows/arm64) ;; *) fail 'unsupported GOOS/GOARCH pair' ;; esac
     command -v go >/dev/null 2>&1 || fail 'Go toolchain is required'
+    root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
+    if [ "$goos" = darwin ]; then
+      host_os=$(cd "$root" && GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOWORK=off go env GOHOSTOS) || fail 'Go host platform could not be determined'
+      host_arch=$(cd "$root" && GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOWORK=off go env GOHOSTARCH) || fail 'Go host platform could not be determined'
+      [ "$host_os/$host_arch" = "$goos/$goarch" ] || fail 'Darwin releases must be built natively on the matching macOS architecture'
+      command -v clang >/dev/null 2>&1 || fail 'Xcode clang is required for the native macOS credential backend'
+    fi
     mkdir -p "$outdir"
     outdir=$(CDPATH='' cd -- "$outdir" && pwd)
     name="anza-$goos-$goarch"; [ "$goos" != windows ] || name="$name.exe"
-    root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
-    (cd "$root" && CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -buildvcs=false -ldflags="-buildid= -X main.releasePublicKeyBase64=$ANZA_RELEASE_PUBLIC_KEY_BASE64" -o "$outdir/$name" ./cmd/anza)
+    if [ "$goos" = darwin ]; then
+      (cd "$root" && CGO_ENABLED=1 GOOS="$goos" GOARCH="$goarch" go build -tags 'keyring_no1password,keyring_noprotonpass,keyring_nofile,keyring_nopass' -trimpath -buildvcs=false -ldflags="-buildid= -X main.version=$version -X main.releasePublicKeyBase64=$ANZA_RELEASE_PUBLIC_KEY_BASE64" -o "$outdir/$name" ./cmd/anza)
+    else
+      (cd "$root" && CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -tags 'keyring_no1password,keyring_noprotonpass,keyring_nofile,keyring_nopass' -trimpath -buildvcs=false -ldflags="-buildid= -X main.version=$version -X main.releasePublicKeyBase64=$ANZA_RELEASE_PUBLIC_KEY_BASE64" -o "$outdir/$name" ./cmd/anza)
+    fi
     echo "$outdir/$name"
     ;;
   assemble)
@@ -96,36 +106,10 @@ for source, name in ((root/'install.sh','install.sh'),(root/'install.ps1','insta
     print(f'{name} sha256 {sha(dest.read_bytes())}')
 PY
     root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
-    python3 - "$root/go.mod" "$root/go.sum" "$outdir/$version/go-modules.json" "$outdir/$version/sbom.spdx.json" "$outdir/$version/dependency-licenses.txt" "$version" <<'PYMOD'
-import hashlib,json,pathlib,re,sys
-mod_path,sum_path,modules_path,sbom_path,licenses_path,release_version=sys.argv[1:]
-requirements=[]; in_block=False
-for line in pathlib.Path(mod_path).read_text().splitlines():
-    stripped=line.strip()
-    if stripped.startswith('require ('): in_block=True; continue
-    if in_block and stripped==')': in_block=False; continue
-    if stripped.startswith('require '): stripped=stripped[len('require '):]
-    if stripped.startswith('//') or not stripped or stripped=='toolchain go1.27.1' or stripped.startswith('go '): continue
-    parts=stripped.split()
-    if len(parts)>=2 and parts[1].startswith('v'):
-        requirements.append({'path':parts[0],'version':parts[1],'indirect':'// indirect' in stripped})
-sums={}
-for line in pathlib.Path(sum_path).read_text().splitlines():
-    parts=line.split()
-    if len(parts)==3 and not parts[1].endswith('/go.mod'):
-        sums[(parts[0],parts[1])]=parts[2]
-for row in requirements: row['go_sum']=sums.get((row['path'],row['version']),'NOASSERTION')
-requirements.sort(key=lambda r:(r['path'],r['version']))
-pathlib.Path(modules_path).write_text(json.dumps(requirements,sort_keys=True,indent=2)+'\n')
-packages=[]
-for i,m in enumerate(requirements,1):
-    packages.append({'SPDXID':f'SPDXRef-Package-{i}','name':m['path'],'versionInfo':m['version'],'downloadLocation':'NOASSERTION','filesAnalyzed':False,'licenseConcluded':'NOASSERTION','licenseDeclared':'NOASSERTION','copyrightText':'NOASSERTION','externalRefs':[{'referenceCategory':'PACKAGE-MANAGER','referenceType':'purl','referenceLocator':f"pkg:golang/{m['path']}@{m['version']}"}]})
-doc={'spdxVersion':'SPDX-2.3','dataLicense':'CC0-1.0','SPDXID':'SPDXRef-DOCUMENT','name':f'anza-{release_version}','documentNamespace':f'https://spdx.org/spdxdocs/anza-{release_version}','creationInfo':{'creators':['Tool: anza-release.sh'],'created':'2000-01-01T00:00:00Z'},'packages':packages}
-pathlib.Path(sbom_path).write_text(json.dumps(doc,sort_keys=True,indent=2)+'\n')
-licenses=['Anza dependency license inventory','', 'License expressions are reported as NOASSERTION until separately reviewed. This inventory is not a license grant or a substitute for required license texts.']
-licenses.extend(f"{m['path']} {m['version']}: NOASSERTION" for m in requirements)
-pathlib.Path(licenses_path).write_text('\n'.join(licenses)+'\n')
-PYMOD
+    command -v go >/dev/null 2>&1 || fail 'Go toolchain is required to enumerate offline module licenses'
+    module_cache=$(cd "$root" && GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOWORK=off go env GOMODCACHE 2>/dev/null) || fail 'Go module cache could not be located'
+    [ -n "$module_cache" ] || fail 'Go module cache could not be located'
+    python3 "$root/scripts/license-bundle.py" --root "$root" --module-cache "$module_cache" --outdir "$outdir/$version"
 python3 - "$outdir/$version" "$version" "$root" <<'PY'
 import hashlib,json,pathlib,re,subprocess,sys
 root=pathlib.Path(sys.argv[1]); version=sys.argv[2]; repo=pathlib.Path(sys.argv[3])

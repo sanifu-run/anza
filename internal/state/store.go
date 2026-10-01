@@ -85,10 +85,14 @@ func OpenUserStore() (*Store, error) {
 	return NewStore(root)
 }
 
-// UserStateRoot returns Anza's platform-specific state directory. Linux honors
-// an absolute XDG_STATE_HOME; macOS uses Application Support; Windows uses
-// LocalAppData. Tests should use NewStore with t.TempDir instead.
+// UserStateRoot returns ANZA_STATE_DIR when it is set to a valid absolute
+// path; otherwise it returns Anza's platform-specific state directory. Linux
+// honors an absolute XDG_STATE_HOME; macOS uses Application Support; Windows
+// uses LocalAppData. Tests should use NewStore with t.TempDir instead.
 func UserStateRoot() (string, error) {
+	if root, ok := os.LookupEnv("ANZA_STATE_DIR"); ok {
+		return validateStateRootOverride(root)
+	}
 	if runtime.GOOS == "windows" {
 		root := os.Getenv("LOCALAPPDATA")
 		if root == "" {
@@ -117,6 +121,17 @@ func UserStateRoot() (string, error) {
 		return filepath.Join(xdg, "anza"), nil
 	}
 	return filepath.Join(home, ".local", "state", "anza"), nil
+}
+
+func validateStateRootOverride(root string) (string, error) {
+	if strings.TrimSpace(root) == "" || strings.ContainsRune(root, '\x00') || !filepath.IsAbs(root) {
+		return "", errors.New("ANZA_STATE_DIR must be a non-empty absolute path without NUL bytes")
+	}
+	root = filepath.Clean(root)
+	if root == filepath.VolumeName(root)+string(filepath.Separator) {
+		return "", errors.New("ANZA_STATE_DIR must not be a filesystem root")
+	}
+	return root, nil
 }
 
 // Root reports the canonical absolute state root selected for this Store.

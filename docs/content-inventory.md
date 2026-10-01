@@ -8,7 +8,7 @@ No founder workflow text is cleared for redistribution. The inspected shared ski
 
 ECC's inspected `LICENSE` is MIT at revision `d3b8a3e908904e242ed2dbe66af62cca71131419`. This is direct repository-level license evidence for the selected tracked files, with the MIT notice and attribution conditions preserved. It does not establish rights for untracked dependencies, bundled third-party material, external services, or every asset in ECC. Selected MIT material is therefore a source for limited adaptation of ideas; do not copy skill prose or code. `scripts/lib/install/hook-consent.js` explicitly credits a contributor for capability-disclosure and held-materialization semantics; preserve that attribution if any substantial contribution is adapted. This inventory itself contains no copied skill passages or code.
 
-The Anza repository has no approved product license yet. That question remains for its release/license task and is separate from whether these upstream sources may be used. Public candidate exports must contain no personal paths, private infrastructure, customer data, credentials, or unreleased content.
+The owner approved Apache License 2.0 for original Anza material on 2026-09-30. Upstream materials retain their own licenses; this decision does not grant redistribution rights to excluded sources. Public candidate exports must contain no personal paths, private infrastructure, customer data, credentials, or unreleased content.
 
 ## Recommended original portable skills
 
