@@ -666,6 +666,7 @@
       ],
       "owned_paths": [
         "main.go",
+        "transcripts.go",
         "setup_runtime.go",
         "setup_routes_test.go",
         "setup_fixture_test.go",
@@ -678,6 +679,7 @@
         "setup_quota_dynamo.go",
         "setup_quota_test.go",
         "docs/anza-setup-api.md",
+        "docs/anza-rollout.md",
         "docs/evidence/T3.6.md"
       ],
       "use_cases": [

@@ -1,7 +1,26 @@
 # T10.4 provider qualification
 
-Status: procedure prepared; **no provider cell is qualified**. No model request
-or tool-call request was made during this preparation.
+Status: procedure prepared; **qualification NOT RUN; no provider cell is qualified**. No model request or tool-call request was made during this preparation.
+
+## Owner authorization and readiness — 2026-09-30
+
+The owner approved a bounded qualification ceiling of at most 12 model requests
+and $1 total across this work, using only operator-owned disposable test accounts
+with verified hard-capped credentials and read-only synthetic files. This is a
+qualification-only ceiling, separate from the hosted interview pilot budget. It
+does not authorize use of everyday accounts or credentials, or requests before
+all prerequisites are evidenced.
+
+A read-only local readiness check found credential/config sources present, but
+did not inspect or print secret values or profile names. It did not establish
+that any account is disposable, operator-owned for this test, or hard capped.
+Runtime budget enforcement was not verified. Experiential is a separately
+hosted interview provider; local credential presence does not establish its
+budget or enforcement. No provider request was made. Therefore all positive,
+negative, and mixed-provider cells remain **NOT RUN**. Do not use the available
+local credentials for qualification; proceed only after the disposable account,
+per-request and aggregate hard caps, and runtime enforcement are independently
+verified and recorded.
 
 ## Local observations — 2026-09-30
 

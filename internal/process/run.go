@@ -31,6 +31,7 @@ var (
 	ErrTimeout     = errors.New("process deadline exceeded")
 	ErrStart       = errors.New("process could not be started")
 	ErrExitCode    = errors.New("process exited unsuccessfully")
+	ErrWaitDelay   = errors.New("process descendants kept output pipes open past the wait delay")
 )
 
 var envNamePattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
@@ -151,6 +152,11 @@ func Run(ctx context.Context, spec Spec) (Result, error) {
 	stderr := newCapture(outputLimit, secrets)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
+	// Context can expire while the command and its environment are prepared.
+	// Do not launch a process after cancellation has already won that race.
+	if err := runCtx.Err(); err != nil {
+		return result, runContextError(ctx, err)
+	}
 	if err := cmd.Start(); err != nil {
 		stdout.finish()
 		stderr.finish()
@@ -178,16 +184,22 @@ func Run(ctx context.Context, spec Spec) (Result, error) {
 			runErr = <-waitDone
 		}
 	}
+	var waitDelayCleanupErr error
+	if errors.Is(runErr, exec.ErrWaitDelay) {
+		// Wait may reap the leader while a same-group descendant still owns a
+		// capture pipe. Clean up that owned group before returning the result.
+		waitDelayCleanupErr = cleanupAfterWaitDelay(cmd)
+	}
 	stdout.finish()
 	stderr.finish()
 	result.Stdout, result.StdoutTruncated, result.StdoutRedacted = stdout.result()
 	result.Stderr, result.StderrTruncated, result.StderrRedacted = stderr.result()
 
 	if ctx.Err() != nil {
-		return result, errors.Join(ctx.Err(), cancellationError(cancelErr))
+		return result, errors.Join(ctx.Err(), cancellationError(cancelErr), waitDelayCleanupError(waitDelayCleanupErr))
 	}
 	if errors.Is(runCtx.Err(), context.DeadlineExceeded) {
-		return result, errors.Join(ErrTimeout, cancellationError(cancelErr))
+		return result, errors.Join(ErrTimeout, cancellationError(cancelErr), waitDelayCleanupError(waitDelayCleanupErr))
 	}
 	if runErr == nil {
 		result.ExitCode = 0
@@ -198,7 +210,28 @@ func Run(ctx context.Context, spec Spec) (Result, error) {
 		result.ExitCode = exitErr.ExitCode()
 		return result, &ExitError{Code: result.ExitCode}
 	}
+	if errors.Is(runErr, exec.ErrWaitDelay) {
+		result.ExitCode = 0
+		return result, errors.Join(ErrWaitDelay, runErr, waitDelayCleanupError(waitDelayCleanupErr))
+	}
 	return result, ErrStart
+}
+
+func waitDelayCleanupError(err error) error {
+	if err == nil || errors.Is(err, os.ErrProcessDone) {
+		return nil
+	}
+	return fmt.Errorf("clean up process descendants after wait delay: %w", err)
+}
+
+func runContextError(parent context.Context, runErr error) error {
+	if err := parent.Err(); err != nil {
+		return err
+	}
+	if errors.Is(runErr, context.DeadlineExceeded) {
+		return ErrTimeout
+	}
+	return runErr
 }
 
 func cancellationError(err error) error {

@@ -13,8 +13,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"testing"
 
 	"testing/fstest"
@@ -342,6 +344,149 @@ func TestCredentialLifetimeAndLeakage(t *testing.T) {
 		t.Fatalf("closed session store returned a credential: %v", err)
 	}
 	got.Clear()
+}
+
+func TestSecurityLeaderExitDescendantCancellation(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Unix process-group cancellation semantics")
+	}
+	if role := os.Getenv("ANZA_SECURITY_PIPE_ROLE"); role != "" {
+		securityPipeFixture(t, role)
+		return
+	}
+	childBinary, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	marker := filepath.Join(dir, "descendant-counter")
+	leaderPID := filepath.Join(dir, "leader-pid")
+	descendantPID := filepath.Join(dir, "descendant-pid")
+	t.Cleanup(func() { killSecurityProcess(descendantPID) })
+	env, err := process.NewSensitiveEnv(map[string]string{
+		"ANZA_SECURITY_PIPE_ROLE":           "leader",
+		"ANZA_SECURITY_PIPE_MARKER":         marker,
+		"ANZA_SECURITY_PIPE_LEADER_PID":     leaderPID,
+		"ANZA_SECURITY_PIPE_DESCENDANT_PID": descendantPID,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	result := make(chan error, 1)
+	go func() {
+		_, runErr := process.Run(ctx, process.Spec{Program: childBinary, Args: []string{"-test.run=^TestSecurityLeaderExitDescendantCancellation$"}, Dir: dir, Timeout: 10 * time.Second, SensitiveEnv: env})
+		result <- runErr
+	}()
+	waitSecurityCounter(t, marker, -1)
+	waitForSecurityLeaderReaped(t, leaderPID)
+	cancel()
+	select {
+	case runErr := <-result:
+		if !errors.Is(runErr, context.Canceled) {
+			t.Fatalf("Run error=%v, want context.Canceled", runErr)
+		}
+	case <-time.After(4 * time.Second):
+		t.Fatal("Run did not join after process-group cancellation")
+	}
+	before := readSecurityCounter(t, marker)
+	time.Sleep(50 * time.Millisecond)
+	if after := readSecurityCounter(t, marker); after != before {
+		t.Fatalf("same-group descendant continued after Run returned: %d -> %d", before, after)
+	}
+}
+
+func TestSecurityWaitDelayClassifiedAndCleansDescendant(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Unix process-group cleanup semantics")
+	}
+	if role := os.Getenv("ANZA_SECURITY_PIPE_ROLE"); role != "" {
+		securityPipeFixture(t, role)
+		return
+	}
+	childBinary, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	marker := filepath.Join(dir, "descendant-counter")
+	leaderPID := filepath.Join(dir, "leader-pid")
+	descendantPID := filepath.Join(dir, "descendant-pid")
+	t.Cleanup(func() { killSecurityProcess(descendantPID) })
+	env, err := process.NewSensitiveEnv(map[string]string{
+		"ANZA_SECURITY_PIPE_ROLE":           "leader",
+		"ANZA_SECURITY_PIPE_MARKER":         marker,
+		"ANZA_SECURITY_PIPE_LEADER_PID":     leaderPID,
+		"ANZA_SECURITY_PIPE_DESCENDANT_PID": descendantPID,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, runErr := process.Run(context.Background(), process.Spec{Program: childBinary, Args: []string{"-test.run=^TestSecurityWaitDelayClassifiedAndCleansDescendant$"}, Dir: dir, Timeout: 10 * time.Second, SensitiveEnv: env})
+	if !errors.Is(runErr, process.ErrWaitDelay) {
+		t.Fatalf("Run error=%v, want process.ErrWaitDelay", runErr)
+	}
+	before := readSecurityCounter(t, marker)
+	time.Sleep(50 * time.Millisecond)
+	if after := readSecurityCounter(t, marker); after != before {
+		t.Fatalf("same-group descendant continued after WaitDelay: %d -> %d", before, after)
+	}
+}
+
+func securityPipeFixture(t *testing.T, role string) {
+	t.Helper()
+	marker := os.Getenv("ANZA_SECURITY_PIPE_MARKER")
+	if role == "descendant" {
+		ticker := time.NewTicker(10 * time.Millisecond)
+		defer ticker.Stop()
+		for i := 1; ; i++ {
+			if err := writeSecurityCounter(marker, i); err != nil {
+				t.Fatal(err)
+			}
+			<-ticker.C
+		}
+	}
+	if role != "leader" {
+		t.Fatalf("unexpected fixture role %q", role)
+	}
+	child := exec.Command(os.Args[0], "-test.run=^TestSecurityLeaderExitDescendantCancellation$")
+	descendantPID := os.Getenv("ANZA_SECURITY_PIPE_DESCENDANT_PID")
+	child.Env = []string{"ANZA_SECURITY_PIPE_ROLE=descendant", "ANZA_SECURITY_PIPE_MARKER=" + marker, "ANZA_SECURITY_PIPE_DESCENDANT_PID=" + descendantPID}
+	child.Stdout = os.Stdout
+	child.Stderr = os.Stderr
+	if err := child.Start(); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(descendantPID, []byte(strconv.Itoa(child.Process.Pid)), 0600); err != nil {
+		t.Fatal(err)
+	}
+	waitSecurityCounter(t, marker, -1)
+	if err := os.WriteFile(os.Getenv("ANZA_SECURITY_PIPE_LEADER_PID"), []byte(strconv.Itoa(os.Getpid())), 0600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func waitForSecurityLeaderReaped(t *testing.T, pidPath string) {
+	t.Helper()
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		pidBytes, err := os.ReadFile(pidPath)
+		if err == nil {
+			pid, parseErr := strconv.Atoi(string(pidBytes))
+			if parseErr == nil {
+				leader, findErr := os.FindProcess(pid)
+				if findErr == nil {
+					signalErr := leader.Signal(syscall.Signal(0))
+					if errors.Is(signalErr, os.ErrProcessDone) || errors.Is(signalErr, syscall.ESRCH) {
+						return
+					}
+				}
+			}
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	t.Fatal("process.Run leader remained alive")
 }
 
 func TestSecurityProcessCancellationOwnership(t *testing.T) {

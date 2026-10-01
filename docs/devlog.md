@@ -125,3 +125,18 @@ The first T9.1 build found an accepted executor compile regression: production p
 2026-09-30 corrective integration: applied Apache License 2.0 after the explicit owner decision, preserving third-party provenance. Integrated Luna security commit `239e5d1` (effect-time approval expiry checks and race-free ProcessState handling), documentation commit `5d222c7`, and release preparation commits `7448a7c`, `7d7a5d1`, `ee6f53c`. Coordinator build-routing fixtures and plan/content validation passed; native/provider/release gates remain open. The real shared Chat handler fixture exposed completed-request replay rejection and deleted-session legacy fallback/provider execution; an isolated corrective T3.6 lane is active. Root Git staging now succeeds; shared build lease still cannot materialize its empty tree, and low disk space prevents broad compilation. No cloud deployment, publication, native keychain access or paid model request occurred.
 
 2026-09-30 checkpoint follow-up: a coordinator rerun of the full `interviewclient` package panicked in `TestClientChatContract` because sandbox policy denied the `httptest` loopback bind; the focused production-origin test had passed earlier, and no source failure was established by this rerun. Read-only T10.3 review found two Unix cancellation cases still under correction: an exited group leader with a descendant holding output open, and cancellation between process-run entry and `Start`. T10.3 remains gated pending the worker fix and review.
+
+2026-09-30 final local corrective checks: integrated process descendant follow-up and coordinator three-regression rerun passed (4.201s). Chat isolated candidate code `073d503` and evidence `0a7d86b` correct exact replay, deleted-token fallback and deletion/tombstone handling while setup is disabled; focused local tests and socket-free real-router normal/negative-control checks passed. Anza fixture/evidence follow-ups `24d5df4`, `4f2e047` are integrated. Actual Chat main remains peer-owned and unmodified; candidate integration is outstanding. Rollback must retain the setup quota table and tombstone retention. Owner approved pilot limits and bounded provider qualification; no deployment or paid call has occurred.
+
+2026-09-30 owner approvals recorded: hosted pilot candidate settings are
+`anzaSetupEnabled=false`, `anzaSetupDailySessionCap=10`,
+`anzaSetupPerConversationCallCap=12`, and
+`anzaSetupDailyCapMicroUsd=1000000`, within the existing $100 Experiential and
+$50/month AWS authorizations. Input/output/reasoning reservations remain unset
+pending verified pricing. Prepare only a reviewed preview; no deployment,
+enablement, or hosted pilot call is authorized. The separate T10.4 qualification
+ceiling is 12 model requests/$1 total, limited to operator-owned disposable
+hard-capped accounts and read-only synthetic files. Read-only local credential
+presence did not establish disposable account ownership, hard caps, or runtime
+budget enforcement; qualification remains NOT RUN, and no provider requests were
+made.

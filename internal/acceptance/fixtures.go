@@ -270,6 +270,8 @@ func TestAnzaSocketlessProtocolFixture(t *testing.T) {
 	s.active = make(chan struct{}, 4)
 	s.requests = map[string][]time.Time{}
 	s.setup = svc
+	s.setupCleanup = svc.quota.DeleteConversation
+	s.setupTombstoneLookup = svc.quota.store.ConversationDeleted
 	routes := s.routes()
 	root := os.Getenv("ANZA_SOCKETLESS_FIXTURE_DIR")
 	if root == "" { t.Fatal("ANZA_SOCKETLESS_FIXTURE_DIR is required") }

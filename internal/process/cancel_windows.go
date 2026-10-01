@@ -36,3 +36,9 @@ func cancelCommand(cmd *exec.Cmd) error {
 	}
 	return nil
 }
+
+// cleanupAfterWaitDelay cannot safely identify a process tree after the leader
+// exits without a Job Object. Do not use taskkill against a potentially reused PID.
+func cleanupAfterWaitDelay(cmd *exec.Cmd) error {
+	return errors.New("Windows descendant cleanup after WaitDelay is unavailable without Job Objects")
+}
