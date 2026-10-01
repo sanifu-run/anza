@@ -1857,11 +1857,11 @@
         "T3.6"
       ],
       "owned_paths": [
+        "internal/cli/wizard.go",
+        "internal/cli/wizard_test.go",
         "internal/acceptance/journeys_test.go",
         "internal/acceptance/fixtures.go",
-        "scripts/tests/chat-contract.sh",
-        "internal/cli/wizard.go",
-        "internal/cli/wizard_test.go"
+        "scripts/tests/chat-contract.sh"
       ],
       "use_cases": [
         "UC-001",
