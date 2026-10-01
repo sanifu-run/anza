@@ -1863,7 +1863,8 @@
         "internal/cli/wizard_test.go",
         "internal/acceptance/journeys_test.go",
         "internal/acceptance/fixtures.go",
-        "scripts/tests/chat-contract.sh"
+        "scripts/tests/chat-contract.sh",
+        "docs/evidence/T10.1.md"
       ],
       "use_cases": [
         "UC-001",

@@ -6,7 +6,7 @@ No Anza/setup extension implementation shipped; the existing chat foundation is 
 
 ## In progress
 
-Core implementation and corrective evidence are merged locally on Anza main (`d516914`). Shared Chat replay/deletion corrections are on Chat main (`1d4adcb`), with peer edits preserved. Apache License 2.0, pilot limits, and bounded provider checks are approved. Qualification continues with GPT-6-Luna workers for full CLI journeys, release preparation, and isolated provider readiness; no setup deployment or CLI publication is claimed.
+Core implementation and corrective code are merged locally, including Anza journey integration `e3ad2d1`, resumed-draft follow-up `c619cb1`, release mapping `3a9b770`, and Chat repair-quota/replay fix `869a89d`. Apache License 2.0, pilot ceilings, and bounded provider checks are approved. Full local Go tests/vet, Chat race checks, exact-source synthetic CLI journeys, release routing and pinned-license inventory pass. No setup deployment or CLI publication is claimed; live provider/native-platform and launch gates remain open.
 
 ## Planned
 
